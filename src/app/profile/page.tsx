@@ -31,20 +31,24 @@ export default function ProfilePage() {
     );
   }
 
-  const getInitials = (name?: string | null, email?: string | null) => {
+  const getInitials = (name?: string | null, email?: string | null): string | JSX.Element => {
     if (name && name.trim()) {
-      const parts = name.trim().split(' ');
-      if (parts.length > 1 && parts[0] && parts[parts.length -1]) {
-        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+      const nameParts = name.trim().split(' ').filter(part => part.length > 0);
+      if (nameParts.length > 1) {
+        // More than one part, take first char of first and last part
+        return (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase();
       }
-      if (parts[0]) {
-        return parts[0].substring(0, 2).toUpperCase();
+      if (nameParts.length === 1 && nameParts[0].length > 0) {
+        // Single part name, take first 1 or 2 chars
+        return nameParts[0].substring(0, Math.min(2, nameParts[0].length)).toUpperCase();
       }
     }
-    if (email) {
+    // No valid name, try email
+    if (email && email.trim()) {
       return email[0].toUpperCase();
     }
-    return <User className="h-3/5 w-3/5" />;
+    // No name or email, return default icon
+    return <User className="h-3/5 w-3/5 text-muted-foreground" />;
   };
   
   const memberSince = user.metadata.creationTime 
@@ -116,4 +120,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-
