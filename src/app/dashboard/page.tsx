@@ -2,13 +2,12 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-// import GoalList from '@/components/goal-list'; // Removed GoalList import
 import { useGoals } from '@/context/goal-context';
 import LoadingSpinner from '@/components/loading-spinner';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth-context';
 import Link from 'next/link';
-import { PlusCircle, BarChartBig, Lightbulb, Brain, LayoutGrid } from 'lucide-react'; // Added LayoutGrid
+import { PlusCircle, BarChartBig, Lightbulb, Brain, LayoutGrid, ArrowRight } from 'lucide-react';
 import { redirect } from 'next/navigation';
 import GoalProgressChart from '@/components/goal-progress-chart';
 import {
@@ -20,7 +19,7 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { getSmartSuggestions, type GenerateSmartSuggestionsResult } from '@/app/actions';
@@ -122,8 +121,6 @@ export default function DashboardPage() {
     );
   }
 
-  // Use goalsLoading (from useGoals context) for the primary loading state of goals
-  // This is primarily for the GoalProgressChart now
   if (goalsLoading && typeof window !== 'undefined' && !localStorage.getItem('achievoGoals')) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
@@ -136,153 +133,11 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-6 bg-card rounded-xl shadow-lg">
-        <div>
-          <h1 className="text-3xl font-bold text-primary">My Goals Dashboard</h1>
-          <p className="text-muted-foreground">Your journey to achievement starts here. Track your progress and stay motivated!</p>
-        </div>
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mt-4 sm:mt-0 self-center sm:self-auto w-full sm:w-auto">
-          <Button asChild variant="outline" size="lg" className="rounded-lg shadow-md transform hover:scale-105 transition-transform w-full sm:w-auto">
-            <Link href="/my-goals">
-              <LayoutGrid className="mr-2 h-5 w-5" />
-              My Goals
-            </Link>
-          </Button>
-          
-          <Dialog open={isOverviewModalOpen} onOpenChange={setIsOverviewModalOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="lg" className="rounded-lg shadow-md transform hover:scale-105 transition-transform w-full sm:w-auto">
-                <BarChartBig className="mr-2 h-5 w-5" />
-                Progress Overview
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-3xl w-[90vw] max-h-[90vh] overflow-y-auto rounded-lg">
-              <DialogHeader>
-                <DialogTitle className="text-2xl font-bold text-primary flex items-center">
-                   <BarChartBig className="mr-3 w-7 h-7" />
-                   Goal Progress Overview
-                </DialogTitle>
-                <DialogDescription>
-                  A visual summary of your current goal progress. Add more goals to see them reflected here!
-                </DialogDescription>
-              </DialogHeader>
-              <div className="py-4">
-                <GoalProgressChart goals={goals} />
-              </div>
-              <DialogFooter className="sm:justify-start pt-4">
-                 <Button type="button" variant="outline" onClick={() => setIsOverviewModalOpen(false)} className="w-full sm:w-auto">
-                    Close
-                  </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-
-          <Dialog open={isSuggestionsModalOpen} onOpenChange={(isOpen) => {
-            setIsSuggestionsModalOpen(isOpen);
-            if (!isOpen) { // Reset when closing
-              setSelectedGoalForSuggestions(null);
-              setSmartSuggestions(null);
-              setSuggestionsError(null);
-            }
-          }}>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="lg" className="rounded-lg shadow-md transform hover:scale-105 transition-transform w-full sm:w-auto border-accent text-accent hover:bg-accent/10">
-                <Brain className="mr-2 h-5 w-5" />
-                Get Smart Tips
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-lg w-[90vw] max-h-[90vh] overflow-y-auto rounded-lg">
-              <DialogHeader>
-                <DialogTitle className="text-2xl font-bold text-accent flex items-center">
-                   <Brain className="mr-3 w-7 h-7" />
-                   Smart Goal Suggestions
-                </DialogTitle>
-                <DialogDescription>
-                  Select one of your goals to get AI-powered tips and ideas to boost your progress.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="py-4 space-y-4">
-                <Select
-                  onValueChange={(goalId) => {
-                    const goal = goals.find(g => g.id === goalId);
-                    handleFetchSuggestions(goal || null);
-                  }}
-                  value={selectedGoalForSuggestions?.id || ""}
-                  disabled={goals.length === 0 || isLoadingSuggestions}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder={goals.length > 0 ? "Select a goal..." : "No goals available"} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {goals.length > 0 ? (
-                      <SelectGroup>
-                        <SelectLabel>Your Goals</SelectLabel>
-                        {goals.map((goal) => (
-                          <SelectItem key={goal.id} value={goal.id}>
-                            {goal.title || goal.originalGoal}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    ) : (
-                      <SelectItem value="no-goals" disabled>No goals created yet.</SelectItem>
-                    )}
-                  </SelectContent>
-                </Select>
-
-                {isLoadingSuggestions && (
-                  <div className="flex items-center justify-center py-6">
-                    <LoadingSpinner size={32} />
-                    <p className="ml-3 text-muted-foreground">Generating suggestions...</p>
-                  </div>
-                )}
-                {suggestionsError && !isLoadingSuggestions && (
-                  <Alert variant="destructive">
-                    <AlertTitle>Error</AlertTitle>
-                    <AlertDescription>
-                      {suggestionsError}
-                    </AlertDescription>
-                  </Alert>
-                )}
-                {smartSuggestions && !isLoadingSuggestions && selectedGoalForSuggestions && (
-                  <Card className="mt-4 bg-muted/30">
-                    <CardHeader>
-                        <CardTitle className="text-lg text-primary">Suggestions for: {selectedGoalForSuggestions.title || selectedGoalForSuggestions.originalGoal}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3 text-sm">
-                        {renderSuggestionsList("Topics to Cover", smartSuggestions.topicsToCover)}
-                        {smartSuggestions.dailyOrWeeklyTimeSuggestion && (
-                            <div>
-                            <h4 className="font-semibold text-foreground">Time Commitment:</h4>
-                            <p className="text-muted-foreground text-xs">{smartSuggestions.dailyOrWeeklyTimeSuggestion}</p>
-                            </div>
-                        )}
-                        {renderSuggestionsList("Sample Projects/Activities", smartSuggestions.sampleProjectsOrActivities)}
-                        {renderSuggestionsList("Diet & Nutrition Tips", smartSuggestions.dietAndNutritionTips)}
-                        {renderSuggestionsList("Workout Routine Ideas", smartSuggestions.workoutRoutineIdeas)}
-                        {renderSuggestionsList("General Tips", smartSuggestions.generalTips)}
-                    </CardContent>
-                  </Card>
-                )}
-                 {!selectedGoalForSuggestions && !isLoadingSuggestions && !suggestionsError && goals.length > 0 && (
-                    <p className="text-sm text-center text-muted-foreground pt-4">Please select a goal from the dropdown to see suggestions.</p>
-                )}
-              </div>
-              <DialogFooter className="sm:justify-start pt-4">
-                 <Button type="button" variant="outline" onClick={() => setIsSuggestionsModalOpen(false)} className="w-full sm:w-auto">
-                    Close
-                  </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-
-
-          <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg shadow-md transform hover:scale-105 transition-transform w-full sm:w-auto">
-            <Link href="/new-goal">
-              <PlusCircle className="mr-2 h-5 w-5" />
-              Add New Goal
-            </Link>
-          </Button>
-        </div>
+      <div className="p-4 sm:p-6">
+        <h1 className="text-3xl md:text-4xl font-bold text-primary">My Goals Dashboard</h1>
+        <p className="text-lg text-muted-foreground mt-1">
+          Your central hub for goal management, progress tracking, and smart insights.
+        </p>
       </div>
 
       {currentQuote && (
@@ -306,7 +161,202 @@ export default function DashboardPage() {
         </Card>
       )}
       
-      {/* <GoalList goals={goals} /> Removed GoalList direct display */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 p-4 sm:p-0">
+        {/* Card for My Goals */}
+        <Card className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl">
+          <CardHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <LayoutGrid className="w-8 h-8 text-primary" />
+              <CardTitle className="text-2xl">My Goals</CardTitle>
+            </div>
+            <CardDescription>View, manage, and track all your active and completed goals.</CardDescription>
+          </CardHeader>
+          <CardContent className="flex-grow">
+            {/* You can add a small summary here if needed, e.g., number of active goals */}
+             <p className="text-sm text-muted-foreground">You have {goals.length} goal(s) currently.</p>
+          </CardContent>
+          <CardFooter>
+            <Button asChild size="lg" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg">
+              <Link href="/my-goals">
+                Go to My Goals <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
+          </CardFooter>
+        </Card>
+
+        {/* Card for Progress Overview */}
+        <Dialog open={isOverviewModalOpen} onOpenChange={setIsOverviewModalOpen}>
+          <Card className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl">
+            <CardHeader>
+              <div className="flex items-center gap-3 mb-2">
+                <BarChartBig className="w-8 h-8 text-primary" />
+                <CardTitle className="text-2xl">Progress Overview</CardTitle>
+              </div>
+              <CardDescription>A visual summary of your current goal progress.</CardDescription>
+            </CardHeader>
+            <CardContent className="flex-grow">
+              <p className="text-sm text-muted-foreground">See charts and summaries of how you're doing.</p>
+            </CardContent>
+            <CardFooter>
+              <DialogTrigger asChild>
+                <Button size="lg" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg">
+                  View Overview <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </DialogTrigger>
+            </CardFooter>
+          </Card>
+          <DialogContent className="sm:max-w-3xl w-[90vw] max-h-[90vh] overflow-y-auto rounded-lg">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-bold text-primary flex items-center">
+                  <BarChartBig className="mr-3 w-7 h-7" />
+                  Goal Progress Overview
+              </DialogTitle>
+              <DialogDescription>
+                A visual summary of your current goal progress. Add more goals to see them reflected here!
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4">
+              <GoalProgressChart goals={goals} />
+            </div>
+            <DialogFooter className="sm:justify-start pt-4">
+                <Button type="button" variant="outline" onClick={() => setIsOverviewModalOpen(false)} className="w-full sm:w-auto">
+                  Close
+                </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Card for Get Smart Tips */}
+        <Dialog open={isSuggestionsModalOpen} onOpenChange={(isOpen) => {
+            setIsSuggestionsModalOpen(isOpen);
+            if (!isOpen) { 
+              setSelectedGoalForSuggestions(null);
+              setSmartSuggestions(null);
+              setSuggestionsError(null);
+            }
+          }}>
+          <Card className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl">
+            <CardHeader>
+              <div className="flex items-center gap-3 mb-2">
+                <Brain className="w-8 h-8 text-accent" />
+                <CardTitle className="text-2xl text-accent">Smart Goal Suggestions</CardTitle>
+              </div>
+              <CardDescription>Get AI-powered tips and ideas to boost your progress.</CardDescription>
+            </CardHeader>
+            <CardContent className="flex-grow">
+              <p className="text-sm text-muted-foreground">Select a goal to receive tailored advice.</p>
+            </CardContent>
+            <CardFooter>
+              <DialogTrigger asChild>
+                <Button size="lg" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg">
+                  Get Tips <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </DialogTrigger>
+            </CardFooter>
+          </Card>
+          <DialogContent className="sm:max-w-lg w-[90vw] max-h-[90vh] overflow-y-auto rounded-lg">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-bold text-accent flex items-center">
+                  <Brain className="mr-3 w-7 h-7" />
+                  Smart Goal Suggestions
+              </DialogTitle>
+              <DialogDescription>
+                Select one of your goals to get AI-powered tips and ideas to boost your progress.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4 space-y-4">
+              <Select
+                onValueChange={(goalId) => {
+                  const goal = goals.find(g => g.id === goalId);
+                  handleFetchSuggestions(goal || null);
+                }}
+                value={selectedGoalForSuggestions?.id || ""}
+                disabled={goals.length === 0 || isLoadingSuggestions}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={goals.length > 0 ? "Select a goal..." : "No goals available to get tips for."} />
+                </SelectTrigger>
+                <SelectContent>
+                  {goals.length > 0 ? (
+                    <SelectGroup>
+                      <SelectLabel>Your Goals</SelectLabel>
+                      {goals.map((goal) => (
+                        <SelectItem key={goal.id} value={goal.id}>
+                          {goal.title || goal.originalGoal}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  ) : (
+                    <SelectItem value="no-goals" disabled>No goals created yet.</SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
+
+              {isLoadingSuggestions && (
+                <div className="flex items-center justify-center py-6">
+                  <LoadingSpinner size={32} />
+                  <p className="ml-3 text-muted-foreground">Generating suggestions...</p>
+                </div>
+              )}
+              {suggestionsError && !isLoadingSuggestions && (
+                <Alert variant="destructive">
+                  <AlertTitle>Error</AlertTitle>
+                  <AlertDescription>{suggestionsError}</AlertDescription>
+                </Alert>
+              )}
+              {smartSuggestions && !isLoadingSuggestions && selectedGoalForSuggestions && (
+                <Card className="mt-4 bg-muted/30">
+                  <CardHeader>
+                      <CardTitle className="text-lg text-primary">Suggestions for: {selectedGoalForSuggestions.title || selectedGoalForSuggestions.originalGoal}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3 text-sm">
+                      {renderSuggestionsList("Topics to Cover", smartSuggestions.topicsToCover)}
+                      {smartSuggestions.dailyOrWeeklyTimeSuggestion && (
+                          <div>
+                          <h4 className="font-semibold text-foreground">Time Commitment:</h4>
+                          <p className="text-muted-foreground text-xs">{smartSuggestions.dailyOrWeeklyTimeSuggestion}</p>
+                          </div>
+                      )}
+                      {renderSuggestionsList("Sample Projects/Activities", smartSuggestions.sampleProjectsOrActivities)}
+                      {renderSuggestionsList("Diet & Nutrition Tips", smartSuggestions.dietAndNutritionTips)}
+                      {renderSuggestionsList("Workout Routine Ideas", smartSuggestions.workoutRoutineIdeas)}
+                      {renderSuggestionsList("General Tips", smartSuggestions.generalTips)}
+                  </CardContent>
+                </Card>
+              )}
+                {!selectedGoalForSuggestions && !isLoadingSuggestions && !suggestionsError && goals.length > 0 && (
+                  <p className="text-sm text-center text-muted-foreground pt-4">Please select a goal from the dropdown to see suggestions.</p>
+              )}
+            </div>
+            <DialogFooter className="sm:justify-start pt-4">
+                <Button type="button" variant="outline" onClick={() => setIsSuggestionsModalOpen(false)} className="w-full sm:w-auto">
+                  Close
+                </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Card for Add New Goal */}
+        <Card className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl">
+          <CardHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <PlusCircle className="w-8 h-8 text-primary" />
+              <CardTitle className="text-2xl">Add New Goal</CardTitle>
+            </div>
+            <CardDescription>Define a new ambition and let Achievo help you get started.</CardDescription>
+          </CardHeader>
+          <CardContent className="flex-grow">
+            <p className="text-sm text-muted-foreground">Describe what you want to achieve, and we'll break it down.</p>
+          </CardContent>
+          <CardFooter>
+            <Button asChild size="lg" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg">
+              <Link href="/new-goal">
+                Create Goal <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
       
       {goals.length === 0 && !goalsLoading && (
         <Card className="mt-8 text-center py-12 bg-card shadow-md rounded-xl">
@@ -314,23 +364,10 @@ export default function DashboardPage() {
             <CardTitle className="text-2xl font-semibold text-primary">Ready to Start Achieving?</CardTitle>
           </CardHeader>
           <CardContent>
+            <LayoutGrid className="w-16 h-16 mx-auto mb-6 text-primary opacity-30" />
             <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-              You haven't set any goals yet. Click "Add New Goal" to begin your journey or explore "My Goals" to manage existing ones.
+              You haven't set any goals yet. Click the "Create Goal" button above to begin your journey.
             </p>
-            <div className="flex justify-center gap-4">
-                <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
-                    <Link href="/new-goal">
-                    <PlusCircle className="mr-2 h-5 w-5" />
-                    Add First Goal
-                    </Link>
-                </Button>
-                <Button asChild variant="outline" size="lg">
-                    <Link href="/my-goals">
-                    <LayoutGrid className="mr-2 h-5 w-5" />
-                    Go to My Goals
-                    </Link>
-                </Button>
-            </div>
           </CardContent>
         </Card>
       )}
@@ -338,3 +375,4 @@ export default function DashboardPage() {
     </div>
   );
 }
+
