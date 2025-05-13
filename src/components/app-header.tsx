@@ -9,12 +9,18 @@ import { Target } from 'lucide-react';
 import { useAuth } from '@/context/auth-context'; 
 import { useTheme } from '@/context/theme-context'; 
 import LoadingSpinner from './loading-spinner';
+import { useEffect, useState } from 'react';
 
 export default function AppHeader() {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout, loading: authLoading } = useAuth(); 
   const { theme, toggleTheme } = useTheme(); 
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleLogout = async () => {
     await logout();
@@ -79,10 +85,11 @@ export default function AppHeader() {
             </>
           )}
           <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme" className="h-9 w-9 sm:h-10 sm:w-10">
-            {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+            {mounted ? (theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />) : <Sun className="h-5 w-5" /> }
           </Button>
         </nav>
       </div>
     </header>
   );
 }
+
