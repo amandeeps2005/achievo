@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -9,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Mail, Lock, UserPlus, Chrome, GithubIcon } from "lucide-react"; // Using Chrome as a generic browser icon for Google
+import { Mail, Lock, UserPlus, Chrome, GithubIcon } from "lucide-react"; 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 
@@ -37,7 +38,7 @@ const RegisterPage: React.FC = () => {
     setLoading(true);
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      router.push('/');
+      router.push('/dashboard'); // Updated redirect
     } catch (err: any) {
       if (err.code === 'auth/email-already-in-use') {
         setError('The email address is already in use by another account.');
@@ -58,7 +59,7 @@ const RegisterPage: React.FC = () => {
     const provider = providerType === 'google' ? new GoogleAuthProvider() : new GithubAuthProvider();
     try {
       await signInWithPopup(auth, provider);
-      router.push('/');
+      router.push('/dashboard'); // Updated redirect
     } catch (err: any) {
       if (err.code === 'auth/account-exists-with-different-credential') {
         setError('An account already exists with the same email address but different sign-in credentials. Try signing in with the original method.');

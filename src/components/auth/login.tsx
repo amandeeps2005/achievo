@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -14,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Mail, Lock, LogIn, Chrome, GithubIcon } from "lucide-react"; // Using Chrome as a generic browser icon for Google
+import { Mail, Lock, LogIn, Chrome, GithubIcon } from "lucide-react"; 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const LoginPage: React.FC = () => {
@@ -30,7 +31,7 @@ const LoginPage: React.FC = () => {
     setLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      router.push('/');
+      router.push('/dashboard'); // Updated redirect
     } catch (err: any) {
       if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') {
         setError('Invalid email or password. Please try again.');
@@ -48,9 +49,8 @@ const LoginPage: React.FC = () => {
     const provider = providerType === 'google' ? new GoogleAuthProvider() : new GithubAuthProvider();
     try {
       await signInWithPopup(auth, provider);
-      router.push('/');
+      router.push('/dashboard'); // Updated redirect
     } catch (err: any) {
-      // More user-friendly messages for common social sign-in errors
       if (err.code === 'auth/account-exists-with-different-credential') {
         setError('An account already exists with the same email address but different sign-in credentials. Try signing in with the original method.');
       } else if (err.code === 'auth/popup-closed-by-user') {
