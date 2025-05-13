@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import GoalList from '@/components/goal-list';
 import { useGoals } from '@/context/goal-context';
 import LoadingSpinner from '@/components/loading-spinner';
@@ -10,8 +10,29 @@ import Link from 'next/link';
 import { PlusCircle } from 'lucide-react';
 import { redirect } from 'next/navigation';
 
+const motivationalQuotes = [
+  "The secret of getting ahead is getting started. - Mark Twain",
+  "Don't watch the clock; do what it does. Keep going. - Sam Levenson",
+  "The will to win, the desire to succeed, the urge to reach your full potential... these are the keys that will unlock the door to personal excellence. - Confucius",
+  "Believe you can and you're halfway there. - Theodore Roosevelt",
+  "It does not matter how slowly you go as long as you do not stop. - Confucius",
+  "Our greatest glory is not in never failing, but in rising up every time we fail. - Ralph Waldo Emerson",
+  "The journey of a thousand miles begins with a single step. - Lao Tzu",
+  "Success is not final, failure is not fatal: It is the courage to continue that counts. - Winston Churchill",
+  "What you get by achieving your goals is not as important as what you become by achieving your goals. - Zig Ziglar",
+  "Act as if what you do makes a difference. It does. - William James"
+];
+
 export default function DashboardPage() {
   const { goals, isLoading } = useGoals();
+  const [currentQuote, setCurrentQuote] = useState("");
+
+  useEffect(() => {
+    // Select a random quote on component mount (client-side)
+    const randomIndex = Math.floor(Math.random() * motivationalQuotes.length);
+    setCurrentQuote(motivationalQuotes[randomIndex]);
+  }, []);
+
 
   if (isLoading && typeof window !== 'undefined' && !localStorage.getItem('achievoGoals')) {
     // Show loading only on initial load if goals are not yet in local storage
@@ -31,7 +52,13 @@ export default function DashboardPage() {
     }
   }, [user, authLoading]);
 
-  if (authLoading || (!user && !authLoading)) return null; // Render nothing while auth is loading or if redirecting
+  if (authLoading || (!user && !authLoading)) return (
+    <div className="fixed inset-0 flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm z-[100]">
+      <LoadingSpinner size={64} />
+      <p className="mt-4 text-lg text-foreground font-semibold">Authenticating...</p>
+    </div>
+  );
+
 
   return (
     <div className="space-y-8">
@@ -50,11 +77,11 @@ export default function DashboardPage() {
       
       <GoalList goals={goals} />
 
-      {goals.length > 0 && (
+      {goals.length > 0 && currentQuote && (
         <div className="mt-12 p-6 bg-card rounded-lg shadow">
           <h3 className="text-xl font-semibold text-primary mb-3">Motivational Corner</h3>
           <p className="text-muted-foreground italic">
-            "The secret of getting ahead is getting started." - Mark Twain
+            "{currentQuote}"
           </p>
         </div>
       )}
