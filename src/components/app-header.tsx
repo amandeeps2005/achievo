@@ -3,15 +3,18 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { LayoutDashboard } from 'lucide-react'; // Added LayoutDashboard for home/dashboard link
+import { LayoutDashboard, Moon, Sun } from 'lucide-react'; 
 import { usePathname, useRouter } from 'next/navigation';
 import { Target } from 'lucide-react'; // App icon
-import { useAuth } from '@/context/auth-context'; // Import useAuth
+import { useAuth } from '@/context/auth-context'; 
+import { useTheme } from '@/context/theme-context'; 
 
 export default function AppHeader() {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, logout } = useAuth(); // Get user and logout function
+  const { user, logout } = useAuth(); 
+  const { theme, toggleTheme } = useTheme(); 
+
   return (
     <header className="bg-card border-b border-border shadow-sm sticky top-0 z-50">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
@@ -28,12 +31,14 @@ export default function AppHeader() {
               </Link>
             </Button>
           )}
-          {/* The "New Goal" button was previously here and has been removed due to redundancy */}
-          {user && ( // Display logout button only when user is logged in
+          <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme">
+            {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+          </Button>
+          {user && ( 
             <Button
               variant="outline"
               size="sm"
-              onClick={async () => { await logout(); router.push('/login'); }} // Call logout function and redirect
+              onClick={async () => { await logout(); router.push('/login'); }} 
             >
               Logout
             </Button>
