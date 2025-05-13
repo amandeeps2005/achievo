@@ -1,3 +1,4 @@
+// @/app/actions.ts
 'use server';
 import { goalDecomposition, type GoalDecompositionInput, type GoalDecompositionOutput } from '@/ai/flows/goal-decomposition';
 
@@ -6,9 +7,10 @@ export interface GenerateGoalPlanResult {
   error?: string;
 }
 
-export async function generateGoalPlan(input: GoalDecompositionInput): Promise<GenerateGoalPlanResult> {
+export async function generateGoalPlan(input: Pick<GoalDecompositionInput, 'goal'>): Promise<GenerateGoalPlanResult> {
   try {
-    const result = await goalDecomposition(input);
+    const currentDate = new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD format
+    const result = await goalDecomposition({ ...input, currentDate });
     if (!result || !result.steps) { // Basic validation of AI output
         return { error: 'AI failed to generate a valid plan. Please try a different goal description.' };
     }

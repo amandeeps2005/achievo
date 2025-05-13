@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -15,9 +15,10 @@ import { generateGoalPlan, type GenerateGoalPlanResult } from '@/app/actions';
 import type { GoalDecompositionOutput } from '@/ai/flows/goal-decomposition';
 import { useGoals } from '@/context/goal-context';
 import type { Goal, StepUi } from '@/types';
-import { Info, ListChecks, CalendarDays, Wrench, CheckCircle, Lightbulb } from 'lucide-react';
+import { Info, ListChecks, CalendarDays, Wrench, CheckCircle, Lightbulb, Sparkles } from 'lucide-react';
 import LoadingSpinner from '@/components/loading-spinner';
 import { useAuth } from '@/context/auth-context';
+import { redirect } from 'next/navigation';
 
 const formSchema = z.object({
   goalDescription: z.string().min(10, "Goal description must be at least 10 characters.").max(500, "Goal description must be at most 500 characters."),
@@ -26,10 +27,11 @@ type FormData = z.infer<typeof formSchema>;
 
 export default function GoalSetupForm() {
   const router = useRouter();
-  const { user } = useAuth(); // Get the authenticated user from context
+  const { user, loading: authLoading } = useAuth();
   const [apiError, setApiError] = useState<string | null>(null);
   const [generatedPlan, setGeneratedPlan] = useState<GoalDecompositionOutput | null>(null);
-  const [isGlobalLoading, setGlobalLoading] = useState(false); 
+  const [isGeneratingPlan, setIsGeneratingPlan] = useState(false);
+  const [isSavingGoal, setIsSavingGoal] = useState(false);
   const { addGoal } = useGoals();
 
   const form = useForm<FormData>({
@@ -39,8 +41,15 @@ export default function GoalSetupForm() {
     },
   });
 
+  useEffect(() => {
+    if (!authLoading && !user) {
+      redirect('/login');
+    }
+  }, [user, authLoading]);
+
+
   const onSubmit: SubmitHandler<FormData> = async (data) => {
-    setGlobalLoading(true);
+    setIsGeneratingPlan(true);
     setApiError(null);
     setGeneratedPlan(null);
 
@@ -51,45 +60,61 @@ export default function GoalSetupForm() {
     } else {
       setGeneratedPlan(result.data);
     }
-    setGlobalLoading(false);
+    setIsGeneratingPlan(false);
   };
 
   const handleSaveGoal = () => {
     if (!generatedPlan || !form.getValues().goalDescription || !user) {
-      // Optionally show an error if user is not logged in, though the page should be protected
       console.error("Cannot save goal: plan not generated, description missing, or user not authenticated.");
+      setApiError("Could not save goal. Please ensure you are logged in and a plan is generated.");
       return;
     }
-    setGlobalLoading(true); // Add loading state for saving
+    setIsSavingGoal(true);
     
     const newGoal: Goal = {
       id: crypto.randomUUID(),
       originalGoal: form.getValues().goalDescription,
+      title: generatedPlan.category ? `${generatedPlan.category}: ${form.getValues().goalDescription.substring(0, 40)}...` : form.getValues().goalDescription.substring(0, 50) + (form.getValues().goalDescription.length > 50 ? '...' : ''),
       category: generatedPlan.category,
       timeline: generatedPlan.timeline,
       tools: generatedPlan.tools,
-      steps: generatedPlan.steps.map((step, index): StepUi => ({
+      steps: generatedPlan.steps.map((step): StepUi => ({
         ...step,
         id: crypto.randomUUID(),
         completed: false,
       })),
-      userId: user.uid, // Associate goal with the user
+      userId: user.uid, 
       createdAt: new Date().toISOString(),
-      progress: 0, // Will be calculated in context
+      progress: 0,
     };
-     newGoal.title = newGoal.originalGoal.substring(0, 50) + (newGoal.originalGoal.length > 50 ? '...' : ''); // Simple title based on original goal
+    
     addGoal(newGoal);
-    setGlobalLoading(false); // Reset loading state
+    setIsSavingGoal(false);
     router.push(`/goal/${newGoal.id}`);
   };
 
+  if (authLoading || (!user && !authLoading)) {
+    return (
+     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
+       <LoadingSpinner size={64} />
+       <p className="mt-4 text-lg text-foreground font-semibold">Authenticating...</p>
+     </div>
+   );
+ }
+
+
   return (
-    <Card className="w-full max-w-2xl mx-auto shadow-xl">
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold text-primary">Create New Goal</CardTitle>
-        <CardDescription>Let's break down your ambition into actionable steps. What do you want to achieve?</CardDescription>
+    <Card className="w-full max-w-2xl mx-auto shadow-xl border-primary/20">
+      <CardHeader className="bg-primary/5 p-6 rounded-t-lg">
+        <div className="flex items-center gap-3">
+          <Sparkles className="w-8 h-8 text-primary" />
+          <div>
+            <CardTitle className="text-2xl font-bold text-primary">Craft Your Next Big Achievement</CardTitle>
+            <CardDescription className="text-primary/80">Tell us your aspiration, and our AI will help you chart the course.</CardDescription>
+          </div>
+        </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
@@ -97,15 +122,15 @@ export default function GoalSetupForm() {
               name="goalDescription"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel htmlFor="goalDescription" className="text-lg">Your Goal</FormLabel>
+                  <FormLabel htmlFor="goalDescription" className="text-lg font-semibold text-foreground">What's Your Goal?</FormLabel>
                   <FormControl>
                     <Textarea
                       id="goalDescription"
-                      placeholder="e.g., 'Learn Python for data analysis in 3 months' or 'Run a 5K marathon'"
+                      placeholder="e.g., 'Launch a new SaaS product by end of year' or 'Complete a full-stack web development bootcamp'"
                       {...field}
-                      rows={4}
-                      className="text-base"
-                      disabled={isGlobalLoading || !!generatedPlan}
+                      rows={5}
+                      className="text-base border-muted-foreground/50 focus:border-primary focus:ring-primary/50 transition-all duration-300"
+                      disabled={isGeneratingPlan || !!generatedPlan || isSavingGoal}
                     />
                   </FormControl>
                   <FormMessage />
@@ -114,62 +139,75 @@ export default function GoalSetupForm() {
             />
 
             {apiError && (
-              <Alert variant="destructive">
-                <Info className="h-4 w-4" />
-                <AlertTitle>Error</AlertTitle>
+              <Alert variant="destructive" className="bg-destructive/10 border-destructive/30 text-destructive">
+                <Info className="h-5 w-5" />
+                <AlertTitle>Oops! Something went wrong.</AlertTitle>
                 <AlertDescription>{apiError}</AlertDescription>
               </Alert>
             )}
 
             {!generatedPlan && (
-              <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isGlobalLoading}>
-                {isGlobalLoading ? <LoadingSpinner className="mr-2" /> : <Lightbulb className="mr-2 h-4 w-4" />}
-                Generate Plan
+              <Button 
+                type="submit" 
+                className="w-full bg-gradient-to-r from-primary to-teal-600 hover:from-primary/90 hover:to-teal-600/90 text-primary-foreground py-3 text-base font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-[1.02] transition-all duration-300" 
+                disabled={isGeneratingPlan || isSavingGoal}
+              >
+                {isGeneratingPlan ? <LoadingSpinner className="mr-2" /> : <Lightbulb className="mr-2 h-5 w-5" />}
+                {isGeneratingPlan ? 'Generating Your Roadmap...' : 'Generate Smart Plan'}
               </Button>
             )}
           </form>
         </Form>
 
-        {isGlobalLoading && !generatedPlan && (
-          <div className="mt-6 text-center">
-            <LoadingSpinner size={32} />
-            <p className="mt-2 text-muted-foreground">Our AI is crafting your plan...</p>
+        {isGeneratingPlan && (
+          <div className="mt-6 text-center py-10">
+            <LoadingSpinner size={48} />
+            <p className="mt-4 text-lg text-muted-foreground animate-pulse">Our AI is crafting your personalized plan...</p>
+            <p className="text-sm text-muted-foreground/70">This might take a moment.</p>
           </div>
         )}
 
-        {generatedPlan && !isGlobalLoading && (
-          <div className="mt-8 space-y-6 animate-in fade-in duration-500">
-            <Alert variant="default" className="bg-teal-50 border-teal-200 dark:bg-teal-900 dark:border-teal-700">
-              <CheckCircle className="h-5 w-5 text-primary" />
-              <AlertTitle className="text-primary font-semibold">Your Plan is Ready!</AlertTitle>
+        {generatedPlan && !isGeneratingPlan && (
+          <div className="mt-8 space-y-6 animate-in fade-in duration-700">
+            <Alert variant="default" className="bg-teal-500/10 border-teal-500/30 text-teal-700 dark:bg-teal-600/20 dark:border-teal-500/50 dark:text-teal-300 rounded-lg">
+              <CheckCircle className="h-6 w-6" />
+              <AlertTitle className="font-semibold text-lg">Your AI-Generated Plan is Ready!</AlertTitle>
               <AlertDescription>
-                Review the generated plan below. If it looks good, save your goal to start tracking.
+                Review the detailed roadmap below. If it aligns with your vision, save it to begin your journey.
               </AlertDescription>
             </Alert>
 
-            <div className="space-y-4 p-4 border rounded-lg bg-background/50">
-              <h3 className="text-xl font-semibold text-foreground">Plan Overview</h3>
-              <p><strong className="text-primary">Category:</strong> {generatedPlan.category}</p>
-              <p><CalendarDays className="inline mr-2 h-4 w-4 text-primary" /> <strong className="text-primary">Timeline:</strong> {generatedPlan.timeline}</p>
-              <div>
-                <p><Wrench className="inline mr-2 h-4 w-4 text-primary" /> <strong className="text-primary">Tools Needed:</strong></p>
-                <ul className="list-disc list-inside ml-4 text-sm text-muted-foreground">
-                  {generatedPlan.tools.map((tool, idx) => <li key={idx}>{tool}</li>)}
-                </ul>
+            <div className="space-y-4 p-6 border border-border rounded-lg bg-card shadow-sm">
+              <h3 className="text-xl font-semibold text-primary flex items-center"><Info className="w-5 h-5 mr-2" />Plan Overview</h3>
+              <p><strong className="text-foreground">Category:</strong> <span className="text-muted-foreground">{generatedPlan.category}</span></p>
+              <div className="flex items-start">
+                <CalendarDays className="inline mr-2 h-4 w-4 text-primary mt-1 flex-shrink-0" /> 
+                <p><strong className="text-foreground">Timeline:</strong> <span className="text-muted-foreground">{generatedPlan.timeline}</span></p>
               </div>
+              {generatedPlan.tools.length > 0 && (
+                <div>
+                  <p className="flex items-center"><Wrench className="inline mr-2 h-4 w-4 text-primary flex-shrink-0" /> <strong className="text-foreground">Tools & Resources:</strong></p>
+                  <ul className="list-disc list-inside ml-6 text-sm text-muted-foreground space-y-1 mt-1">
+                    {generatedPlan.tools.map((tool, idx) => <li key={idx}>{tool}</li>)}
+                  </ul>
+                </div>
+              )}
             </div>
             
-            <div className="space-y-4 p-4 border rounded-lg bg-background/50">
-              <h3 className="text-xl font-semibold text-foreground">Actionable Steps <ListChecks className="inline ml-2 h-5 w-5 text-primary" /></h3>
-              <ul className="space-y-3">
+            <div className="space-y-4 p-6 border border-border rounded-lg bg-card shadow-sm">
+              <h3 className="text-xl font-semibold text-primary flex items-center"><ListChecks className="inline mr-2 h-5 w-5" />Actionable Steps</h3>
+              <ul className="space-y-3 divide-y divide-border">
                 {generatedPlan.steps.map((step, idx) => (
-                  <li key={idx} className="p-3 border rounded-md bg-card shadow-sm">
-                    <p className="font-medium text-foreground">{idx + 1}. {step.description}</p>
-                    {step.deadline && <p className="text-xs text-muted-foreground"><CalendarDays className="inline mr-1 h-3 w-3" /> Deadline: {step.deadline}</p>}
+                  <li key={idx} className="p-4 first:pt-0 last:pb-0">
+                    <p className="font-semibold text-foreground text-base">{idx + 1}. {step.description}</p>
+                    {step.deadline && <p className="text-xs text-muted-foreground mt-1"><CalendarDays className="inline mr-1 h-3 w-3" /> Deadline: {step.deadline}</p>}
+                     {step.startDate && <p className="text-xs text-muted-foreground"><CalendarDays className="inline mr-1 h-3 w-3" /> Start: {step.startDate}</p>}
+                     {step.endDate && <p className="text-xs text-muted-foreground"><CalendarDays className="inline mr-1 h-3 w-3" /> End: {step.endDate}</p>}
+                     {step.repeatInterval && <p className="text-xs text-muted-foreground">Repeat: {step.repeatInterval.charAt(0).toUpperCase() + step.repeatInterval.slice(1)}</p>}
                     {step.resources && step.resources.length > 0 && (
-                      <div>
-                        <p className="text-xs text-muted-foreground mt-1">Resources:</p>
-                        <ul className="list-disc list-inside ml-4 text-xs text-muted-foreground">
+                      <div className="mt-2">
+                        <p className="text-xs text-muted-foreground font-medium">Helpful Resources:</p>
+                        <ul className="list-disc list-inside ml-4 text-xs text-muted-foreground/80 space-y-0.5">
                           {step.resources.map((res, rIdx) => <li key={rIdx} className="truncate" title={res}>{res}</li>)}
                         </ul>
                       </div>
@@ -181,18 +219,26 @@ export default function GoalSetupForm() {
           </div>
         )}
       </CardContent>
-      {generatedPlan && ( // Show footer buttons if plan is generated, irrespective of loading state for the buttons themselves.
-        <CardFooter className="flex flex-col sm:flex-row gap-2">
-            <Button variant="outline" onClick={() => { setGeneratedPlan(null); form.reset(); setApiError(null); }} className="w-full sm:w-auto" disabled={isGlobalLoading}>
-              Reset & Edit Goal
+      {generatedPlan && !isGeneratingPlan && (
+        <CardFooter className="flex flex-col sm:flex-row gap-3 p-6 bg-primary/5 rounded-b-lg border-t border-primary/10">
+            <Button 
+              variant="outline" 
+              onClick={() => { setGeneratedPlan(null); form.reset(); setApiError(null); }} 
+              className="w-full sm:w-auto border-primary text-primary hover:bg-primary/10 py-3 text-base rounded-lg shadow-sm hover:shadow-md transition-all duration-300" 
+              disabled={isSavingGoal}
+            >
+              Edit Goal & Regenerate
             </Button>
-            <Button onClick={handleSaveGoal} className="w-full sm:w-auto bg-accent hover:bg-accent/90 text-accent-foreground" disabled={isGlobalLoading}>
-             {isGlobalLoading ? <LoadingSpinner className="mr-2" /> :  <CheckCircle className="mr-2 h-4 w-4" />}
-              Save Goal & Start Tracking
+            <Button 
+              onClick={handleSaveGoal} 
+              className="w-full sm:w-auto bg-gradient-to-r from-accent to-orange-500 hover:from-accent/90 hover:to-orange-500/90 text-accent-foreground py-3 text-base font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-[1.02] transition-all duration-300" 
+              disabled={isSavingGoal}
+            >
+             {isSavingGoal ? <LoadingSpinner className="mr-2" /> :  <CheckCircle className="mr-2 h-5 w-5" />}
+              {isSavingGoal ? 'Saving Your Goal...' : 'Save & Start Achieving'}
             </Button>
         </CardFooter>
       )}
     </Card>
   );
 }
-
