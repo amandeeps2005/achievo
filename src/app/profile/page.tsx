@@ -224,7 +224,7 @@ export default function ProfilePage() {
           )}
         </CardContent>
         <CardFooter className="bg-muted/20 p-6 border-t border-border">
-          <Button asChild variant="outline" className="w-full sm:w-auto mx-auto border-primary text-primary hover:bg-primary/10">
+          <Button asChild variant="outline" className="w-full sm:w-auto mx-auto border-primary text-primary hover:bg-primary hover:text-primary-foreground">
             <Link href="/dashboard">Back to Dashboard</Link>
           </Button>
         </CardFooter>
@@ -232,3 +232,4 @@ export default function ProfilePage() {
     </div>
   );
 }
+
