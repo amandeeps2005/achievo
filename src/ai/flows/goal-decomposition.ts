@@ -28,7 +28,7 @@ const GoalDecompositionOutputSchema = z.object({
           .describe('A list of relevant resources (e.g., tutorials, tools, books) for this step.'),
         startDate: z.string().optional().describe('The suggested start date for this step in YYYY-MM-DD format. This must be a future date relative to the current date.'),
         endDate: z.string().optional().describe('The suggested end date for this step in YYYY-MM-DD format. This must be a future date relative to the current date and after the start date.'),
-        repeatInterval: z.enum(['daily', 'weekly']).optional().describe('How often this step should be repeated, if applicable.'),
+        repeatInterval: z.enum(['daily', 'weekly']).optional().describe('How often this step should be repeated, if applicable (e.g., for habits).'),
       })
     )
     .describe('A list of steps required to achieve the goal.'),
@@ -46,15 +46,17 @@ const goalDecompositionPrompt = ai.definePrompt({
   name: 'goalDecompositionPrompt',
   input: {schema: GoalDecompositionInputSchema},
   output: {schema: GoalDecompositionOutputSchema},
-  prompt: `You are an AI assistant designed to help users break down complex goals into actionable steps.
+  prompt: `You are an AI assistant designed to help users break down complex goals into actionable steps and build habits.
   The current date is {{{currentDate}}}. All suggested deadlines, start dates, and end dates must be in the future relative to this current date.
 
   Given the user's goal, your task is to:
-  1.  Decompose the goal into a list of specific, actionable steps. For each step, provide:
-      - A clear description.
-      - A realistic deadline (in YYYY-MM-DD format, must be in the future).
-      - A list of relevant resources.
-      - Optionally, a suggested start date (YYYY-MM-DD, future), end date (YYYY-MM-DD, future, after start date), and a repeat interval ('daily' or 'weekly') if the step is a recurring task.
+  1.  Decompose the goal into a list of specific, actionable steps. For each step:
+      - Provide a clear description.
+      - Set a realistic deadline (in YYYY-MM-DD format, must be in the future).
+      - List relevant resources.
+      - For each step, determine if it's a recurring task suitable for habit building (e.g., 'exercise', 'study', 'practice'). 
+        If so, provide a 'repeatInterval' ('daily' or 'weekly'). 
+      - Also provide a 'startDate' (YYYY-MM-DD, future) and 'endDate' (YYYY-MM-DD, future, after start date) where appropriate, especially for recurring tasks or time-bound activities. Ensure endDate is after startDate.
   2.  Suggest a realistic overall timeline with deadlines for each step. Ensure all dates are in the future.
   3.  Provide a list of relevant tools and resources needed to achieve the goal.
   4.  Categorize the goal into one of the following categories: Fitness, Learning, Career, Finance, Hobby, Other.
@@ -67,28 +69,34 @@ const goalDecompositionPrompt = ai.definePrompt({
   - timeline: A short string describing a timeline with deadlines for each step (all future dates).
   - tools: A list of tools that will be needed to achieve the goal.
 
-  Example (assuming current date is 2025-05-10):
+  Example (assuming current date is 2025-05-10 for a goal like "Learn to play guitar in 3 months"):
   {
     "steps": [
       {
-        "description": "Learn the basics of Python syntax and data structures.",
-        "deadline": "2025-07-15",
-        "resources": ["https://www.learnpython.org", "https://www.codecademy.com/learn/learn-python-3"],
-        "startDate": "2025-06-01",
-        "endDate": "2025-07-15"
+        "description": "Research and buy a suitable beginner acoustic guitar and essential accessories (tuner, picks).",
+        "deadline": "2025-05-20",
+        "resources": ["https://www.justinguitar.com/guitar-lessons/what-guitar-should-i-buy-bc-102", "Local music stores"],
+        "startDate": "2025-05-13",
+        "endDate": "2025-05-20"
       },
       {
-        "description": "Practice writing simple Python programs daily.",
-        "deadline": "2025-07-22",
-        "resources": ["https://www.practicepython.org", "https://codingbat.com/python"],
-        "startDate": "2025-07-16",
-        "endDate": "2025-07-22",
+        "description": "Practice basic chords (A, D, E, G, C) for 30 minutes daily.",
+        "deadline": "2025-08-10",
+        "resources": ["https://www.justinguitar.com/guitar-lessons/ imprescindible-chords-bc-104"],
+        "startDate": "2025-05-21",
+        "endDate": "2025-08-10",
         "repeatInterval": "daily"
+      },
+      {
+        "description": "Learn to play a simple song using learned chords.",
+        "deadline": "2025-06-30",
+        "resources": ["Search for 'easy 3 chord songs guitar tutorial' on YouTube"],
+        "startDate": "2025-06-15"
       }
     ],
-    "category": "Learning",
-    "timeline": "Start with basic syntax by July 15th, 2025, complete simple programs by July 22nd, 2025",
-    "tools": ["Python interpreter", "Text editor or IDE"]
+    "category": "Hobby",
+    "timeline": "Acquire guitar by May 20th, 2025, practice chords daily until August 10th, 2025, learn a song by June 30th, 2025.",
+    "tools": ["Acoustic Guitar", "Guitar Tuner", "Guitar Picks", "Online tutorials (e.g., JustinGuitar)"]
   }
   `,
 });
@@ -104,33 +112,70 @@ const goalDecompositionFlow = ai.defineFlow(
     // Ensure all step deadlines are in the future relative to input.currentDate
     if (output && output.steps) {
         const currentDateObj = new Date(input.currentDate);
+        currentDateObj.setHours(0, 0, 0, 0); // Normalize current date to start of day
+
         output.steps = output.steps.map(step => {
             if (step.deadline) {
                 const deadlineDateObj = new Date(step.deadline);
                 if (deadlineDateObj <= currentDateObj) {
-                    // Attempt to fix deadline by setting it to one month from current date
                     const futureDate = new Date(currentDateObj);
                     futureDate.setMonth(futureDate.getMonth() + 1);
                     step.deadline = futureDate.toISOString().split('T')[0];
                 }
             }
             if (step.startDate) {
-                const startDateObj = new Date(step.startDate);
+                let startDateObj = new Date(step.startDate);
                 if (startDateObj <= currentDateObj) {
                      const futureStartDate = new Date(currentDateObj);
-                     futureStartDate.setDate(futureStartDate.getDate() + 1); // Start tomorrow
+                     futureStartDate.setDate(futureStartDate.getDate() + 1); 
                      step.startDate = futureStartDate.toISOString().split('T')[0];
+                     startDateObj = futureStartDate; // Update for end date comparison
+                }
+                 // Ensure startDate is not after deadline if deadline exists
+                if (step.deadline) {
+                    const deadlineDateObj = new Date(step.deadline);
+                    if (startDateObj > deadlineDateObj) {
+                        const newStartDate = new Date(deadlineDateObj);
+                        newStartDate.setDate(deadlineDateObj.getDate() - 7); // e.g. start 1 week before deadline
+                        if (newStartDate <= currentDateObj) { // if new start is still in past, set to tomorrow
+                            newStartDate.setTime(currentDateObj.getTime());
+                            newStartDate.setDate(currentDateObj.getDate() + 1);
+                        }
+                        step.startDate = newStartDate.toISOString().split('T')[0];
+                        startDateObj = newStartDate; // Update for end date comparison
+                    }
+                }
+
+            }
+            if (step.endDate) {
+                 let endDateObj = new Date(step.endDate);
+                 const effectiveStartDate = step.startDate ? new Date(step.startDate) : new Date(currentDateObj.getTime() + 86400000); // use start date or tomorrow
+
+                 if (endDateObj <= effectiveStartDate) {
+                     const futureEndDate = new Date(effectiveStartDate);
+                     futureEndDate.setDate(futureEndDate.getDate() + 7); 
+                     step.endDate = futureEndDate.toISOString().split('T')[0];
+                     endDateObj = futureEndDate;
+                 }
+                 // Ensure endDate is not after deadline if deadline exists
+                 if (step.deadline) {
+                    const deadlineDateObj = new Date(step.deadline);
+                    if (endDateObj > deadlineDateObj) {
+                        step.endDate = step.deadline; // Cap end date at deadline
+                    }
+                 }
+            } else if (step.startDate && step.repeatInterval) { // If it's a repeating task with a start date but no end date, set end date to deadline or 1 month from start
+                const startDateObj = new Date(step.startDate);
+                if (step.deadline) {
+                    step.endDate = step.deadline;
+                } else {
+                    const futureEndDate = new Date(startDateObj);
+                    futureEndDate.setMonth(futureEndDate.getMonth() + 1);
+                    step.endDate = futureEndDate.toISOString().split('T')[0];
                 }
             }
-            if (step.endDate && step.startDate) {
-                 const endDateObj = new Date(step.endDate);
-                 const startDateObj = new Date(step.startDate);
-                 if (endDateObj <= startDateObj) {
-                     const futureEndDate = new Date(startDateObj);
-                     futureEndDate.setDate(futureEndDate.getDate() + 7); // End one week after start
-                     step.endDate = futureEndDate.toISOString().split('T')[0];
-                 }
-            }
+
+
             return step;
         });
     }

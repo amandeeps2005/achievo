@@ -1,13 +1,16 @@
+
 "use client";
 
 import type { StepUi } from '@/types';
 import { useGoals } from '@/context/goal-context';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { CalendarDays, Link as LinkIcon, Info } from 'lucide-react';
+import { CalendarDays, Link as LinkIcon, Info, Bell, Repeat } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface StepCardProps {
   step: StepUi;
@@ -24,15 +27,30 @@ export default function StepCard({ step, goalId, stepNumber }: StepCardProps) {
     }
   };
 
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return '';
+    try {
+      // Attempt to create a date object. If the dateString is already in a good format (like YYYY-MM-DD),
+      // this will work. If it's something else, it might be problematic, so ensure AI provides consistent format.
+      const date = new Date(dateString);
+      // Adjust for timezone to avoid off-by-one day errors
+      const userTimezoneOffset = date.getTimezoneOffset() * 60000;
+      return new Date(date.getTime() + userTimezoneOffset).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    } catch (e) {
+      console.warn("Invalid date string for formatting:", dateString, e);
+      return dateString; // fallback to original string if date is invalid
+    }
+  };
+
   return (
-    <Card className={`transition-all duration-300 ${step.completed ? 'bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-700 opacity-70' : 'bg-card'}`}>
+    <Card className={`transition-all duration-300 ${step.completed ? 'bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-700 opacity-80' : 'bg-card shadow-sm hover:shadow-md'}`}>
       <CardHeader className="flex flex-row items-start space-x-4 p-4">
         <Checkbox
           id={`step-${step.id}`}
           checked={step.completed}
           onCheckedChange={handleCheckedChange}
           aria-label={`Mark step ${stepNumber} as ${step.completed ? 'incomplete' : 'complete'}`}
-          className="mt-1 border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
+          className="mt-1.5 border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
         />
         <div className="flex-1">
           <Label htmlFor={`step-${step.id}`} className="cursor-pointer">
@@ -40,16 +58,48 @@ export default function StepCard({ step, goalId, stepNumber }: StepCardProps) {
                {step.description}
             </CardTitle>
           </Label>
-          {step.deadline && (
-            <CardDescription className="text-xs mt-1 flex items-center">
-              <CalendarDays className="w-3 h-3 mr-1.5" />
-              Deadline: {step.deadline}
-              {new Date(step.deadline) < new Date() && !step.completed && (
-                <Badge variant="destructive" className="ml-2">Overdue</Badge>
-              )}
-            </CardDescription>
-          )}
+          <div className="mt-1.5 space-y-1">
+            {step.deadline && (
+              <CardDescription className="text-xs flex items-center text-muted-foreground">
+                <CalendarDays className="w-3.5 h-3.5 mr-1.5 text-primary/70" />
+                Deadline: {formatDate(step.deadline)}
+                {new Date(step.deadline) < new Date() && !step.completed && (
+                  <Badge variant="destructive" className="ml-2 text-xs px-1.5 py-0.5">Overdue</Badge>
+                )}
+              </CardDescription>
+            )}
+            {step.startDate && (
+              <CardDescription className="text-xs flex items-center text-muted-foreground">
+                <CalendarDays className="w-3.5 h-3.5 mr-1.5 text-primary/70" />
+                Start: {formatDate(step.startDate)}
+              </CardDescription>
+            )}
+            {step.endDate && step.repeatInterval && ( // Only show end date if it's a repeating task, otherwise deadline implies end
+              <CardDescription className="text-xs flex items-center text-muted-foreground">
+                <CalendarDays className="w-3.5 h-3.5 mr-1.5 text-primary/70" />
+                End: {formatDate(step.endDate)}
+              </CardDescription>
+            )}
+            {step.repeatInterval && (
+              <CardDescription className="text-xs flex items-center text-muted-foreground">
+                <Repeat className="w-3.5 h-3.5 mr-1.5 text-primary/70" />
+                Repeat: {step.repeatInterval.charAt(0).toUpperCase() + step.repeatInterval.slice(1)}
+              </CardDescription>
+            )}
+          </div>
         </div>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary" onClick={() => alert('Reminder functionality coming soon!')}>
+                <Bell className="w-4 h-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Set Reminder (Coming Soon)</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </CardHeader>
       {(step.resources && step.resources.length > 0) && (
         <CardContent className="p-4 pt-0">
@@ -61,10 +111,10 @@ export default function StepCard({ step, goalId, stepNumber }: StepCardProps) {
                 </div>
               </AccordionTrigger>
               <AccordionContent className="pt-2 pb-0">
-                <ul className="list-none space-y-1 pl-0">
+                <ul className="list-none space-y-1.5 pl-0">
                   {step.resources.map((resource, idx) => (
                     <li key={idx} className="text-xs text-muted-foreground flex items-center">
-                      <LinkIcon className="w-3 h-3 mr-1.5 shrink-0" />
+                      <LinkIcon className="w-3.5 h-3.5 mr-1.5 shrink-0" />
                       {resource.startsWith('http') ? (
                         <a href={resource} target="_blank" rel="noopener noreferrer" className="hover:text-primary hover:underline truncate" title={resource}>
                           {resource}

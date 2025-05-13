@@ -5,7 +5,7 @@ import type { Goal } from '@/types';
 import ActionRoadmap from './action-roadmap';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Tag, CalendarDays, Wrench, Target, Lightbulb, Trash2 } from 'lucide-react';
+import { Tag, CalendarDays, Wrench, Target, Lightbulb, Trash2, CalendarPlus, BarChartHorizontalBig, TrendingUp } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useGoals } from '@/context/goal-context';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { Separator } from '@/components/ui/separator';
 
 interface GoalDetailViewProps {
   goal: Goal;
@@ -85,7 +86,7 @@ export default function GoalDetailView({ goal }: GoalDetailViewProps) {
             </div>
           )}
         </CardContent>
-        <CardFooter>
+        <CardFooter className="flex flex-col sm:flex-row justify-between items-center gap-3">
              <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
                 <AlertDialogTrigger asChild>
                   <Button variant="destructive" className="w-full sm:w-auto">
@@ -109,18 +110,46 @@ export default function GoalDetailView({ goal }: GoalDetailViewProps) {
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
+               <Button variant="outline" className="w-full sm:w-auto" onClick={() => alert('Connect to Calendar functionality coming soon!')}>
+                <CalendarPlus className="mr-2 h-4 w-4" /> Connect to Calendar
+              </Button>
         </CardFooter>
       </Card>
+      
+      <Card className="shadow-md">
+        <CardHeader>
+          <CardTitle className="text-2xl font-semibold text-foreground flex items-center">
+            <BarChartHorizontalBig className="w-6 h-6 mr-3 text-primary" />
+            Action Roadmap
+          </CardTitle>
+          <CardDescription>Your personalized steps to achieve this goal.</CardDescription>
+        </CardHeader>
+        <CardContent>
+           <ActionRoadmap goal={goal} />
+        </CardContent>
+      </Card>
 
-      <div>
-        <h2 className="text-2xl font-semibold text-foreground mb-4">Action Roadmap</h2>
-        <ActionRoadmap goal={goal} />
-      </div>
+      <Card className="shadow-md">
+        <CardHeader>
+          <CardTitle className="text-2xl font-semibold text-foreground flex items-center">
+            <TrendingUp className="w-6 h-6 mr-3 text-accent" />
+            Habit Tracking
+          </CardTitle>
+          <CardDescription>Monitor your consistency and build strong habits.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-6">
+            <p className="text-muted-foreground">Streak tracking and daily planner integration coming soon!</p>
+            <p className="text-sm text-muted-foreground/80">Keep completing your steps to build momentum.</p>
+          </div>
+        </CardContent>
+      </Card>
+
 
       {goal.progress === 100 && (
-        <Alert className="bg-green-50 border-green-200 dark:bg-green-900/50 dark:border-green-700 mt-8">
+        <Alert className="bg-green-50 border-green-200 dark:bg-green-900/50 dark:border-green-700 mt-8 shadow-lg">
           <Lightbulb className="h-5 w-5 text-green-600 dark:text-green-400" />
-          <AlertTitle className="text-green-700 dark:text-green-300 font-semibold">Congratulations!</AlertTitle>
+          <AlertTitle className="text-green-700 dark:text-green-300 font-semibold text-lg">Congratulations!</AlertTitle>
           <AlertDescription className="text-green-600 dark:text-green-400">
             You've successfully completed this goal. Amazing work! Time to celebrate and set a new challenge?
           </AlertDescription>
