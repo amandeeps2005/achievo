@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { Goal, StepUi } from '@/types';
@@ -8,6 +9,7 @@ import { toast } from "@/hooks/use-toast";
 interface GoalContextType {
   goals: Goal[];
   addGoal: (goal: Goal) => void;
+  deleteGoal: (goalId: string) => void;
   updateStepCompletion: (goalId: string, stepId: string, completed: boolean) => void;
   getGoalById: (goalId: string) => Goal | undefined;
   isLoading: boolean;
@@ -105,9 +107,23 @@ export const GoalProvider = ({ children }: { children: ReactNode }) => {
     setGoals(prevGoals => [...prevGoals, goalWithUser]);
     toast({
       title: "Goal Added!",
-      description: `Your goal "${goal.originalGoal.substring(0,30)}..." is set up.`,
+      description: `Your goal "${(goal.title || goal.originalGoal).substring(0,30)}..." is set up.`,
     });
   }, [calculateProgress, user]);
+
+  const deleteGoal = useCallback((goalId: string) => {
+    if (!user) {
+        toast({ title: "Error", description: "You must be logged in to delete a goal.", variant: "destructive"});
+        return;
+    }
+    const goalToDelete = goals.find(g => g.id === goalId);
+    setGoals(prevGoals => prevGoals.filter(goal => goal.id !== goalId));
+    toast({
+      title: "Goal Deleted",
+      description: `Goal "${(goalToDelete?.title || goalToDelete?.originalGoal || 'Selected goal').substring(0,30)}..." has been removed.`,
+      variant: "default",
+    });
+  }, [user, goals]);
 
   const updateStepCompletion = useCallback((goalId: string, stepId: string, completed: boolean) => {
     setGoals(prevGoals =>
@@ -120,7 +136,7 @@ export const GoalProvider = ({ children }: { children: ReactNode }) => {
           if (newProgress === 100 && goal.progress < 100) {
             toast({
               title: "Goal Completed!",
-              description: `Congratulations on completing "${goal.originalGoal.substring(0,30)}..."!`,
+              description: `Congratulations on completing "${(goal.title || goal.originalGoal).substring(0,30)}..."!`,
               variant: "default",
               duration: 5000,
             });
@@ -137,7 +153,7 @@ export const GoalProvider = ({ children }: { children: ReactNode }) => {
   }, [goals]);
 
   return (
-    <GoalContext.Provider value={{ goals, addGoal, updateStepCompletion, getGoalById, isLoading, setIsLoading }}>
+    <GoalContext.Provider value={{ goals, addGoal, deleteGoal, updateStepCompletion, getGoalById, isLoading, setIsLoading }}>
       {children}
     </GoalContext.Provider>
   );
@@ -150,4 +166,3 @@ export const useGoals = () => {
   }
   return context;
 };
-

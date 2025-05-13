@@ -1,18 +1,34 @@
+
 "use client";
 
 import type { Goal } from '@/types';
 import ActionRoadmap from './action-roadmap';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Tag, CalendarDays, Wrench, Target, Lightbulb } from 'lucide-react';
+import { Tag, CalendarDays, Wrench, Target, Lightbulb, Trash2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { useGoals } from '@/context/goal-context';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 interface GoalDetailViewProps {
   goal: Goal;
 }
 
 export default function GoalDetailView({ goal }: GoalDetailViewProps) {
+  const { deleteGoal } = useGoals();
+  const router = useRouter();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  const handleDelete = () => {
+    deleteGoal(goal.id);
+    setIsDeleteDialogOpen(false);
+    router.push('/dashboard');
+  };
+
   return (
     <div className="space-y-8">
       <Card className="shadow-lg">
@@ -69,6 +85,31 @@ export default function GoalDetailView({ goal }: GoalDetailViewProps) {
             </div>
           )}
         </CardContent>
+        <CardFooter>
+             <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" className="w-full sm:w-auto">
+                    <Trash2 className="mr-2 h-4 w-4" /> Delete This Goal
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete the goal 
+                      "<span className="font-semibold">{goal.title || goal.originalGoal}</span>" 
+                      and all its associated data.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
+                      Yes, Delete Goal
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+        </CardFooter>
       </Card>
 
       <div>
