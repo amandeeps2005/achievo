@@ -75,6 +75,13 @@ const RegisterPage: React.FC = () => {
       
       if (userCredential.user) {
         await updateProfile(userCredential.user, { displayName });
+        
+        // Save title to localStorage
+        const finalTitle = title === "other" ? customTitle.trim() : title;
+        if (userCredential.user.uid && finalTitle) {
+          localStorage.setItem(`user_${userCredential.user.uid}_title`, finalTitle);
+        }
+
         await sendEmailVerification(userCredential.user);
         setShowVerificationMessage(true);
         toast({
@@ -111,6 +118,7 @@ const RegisterPage: React.FC = () => {
       // Firebase user.emailVerified might reflect this.
       // If not (e.g. GitHub non-primary email), you might need to prompt differently or handle it.
       // For simplicity, we'll assume it's verified or Firebase handles it.
+      // Title is not collected in social sign-in, profile page will default to N/A or allow user to set it.
       if (result.user.emailVerified) {
         toast({
             title: "Sign In Successful!",
