@@ -43,7 +43,7 @@ export default function GoalSetupForm() {
 
   useEffect(() => {
     if (!authLoading && !user) {
-      redirect('/login');
+      redirect('/'); // Redirect to landing page if not authenticated
     }
   }, [user, authLoading]);
 
@@ -242,3 +242,4 @@ export default function GoalSetupForm() {
     </Card>
   );
 }
+
