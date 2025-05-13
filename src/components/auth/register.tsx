@@ -4,15 +4,16 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from "react";
-import { createUserWithEmailAndPassword, GoogleAuthProvider, GithubAuthProvider, signInWithPopup, updateProfile } from "firebase/auth";
+import { createUserWithEmailAndPassword, GoogleAuthProvider, GithubAuthProvider, signInWithPopup, updateProfile, sendEmailVerification } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Mail, Lock, UserPlus, Chrome, GithubIcon, User, Briefcase } from "lucide-react"; 
+import { Mail, Lock, UserPlus, Chrome, GithubIcon, User, Briefcase, Send } from "lucide-react"; 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useToast } from '@/hooks/use-toast';
 
 
 const titleOptions = [
@@ -36,11 +37,14 @@ const RegisterPage: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showVerificationMessage, setShowVerificationMessage] = useState(false);
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setShowVerificationMessage(false);
 
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
@@ -71,13 +75,17 @@ const RegisterPage: React.FC = () => {
       
       if (userCredential.user) {
         await updateProfile(userCredential.user, { displayName });
-        // Note: 'title' (and customTitle) are not standard Firebase Auth profile fields.
-        // To store them persistently associated with the user, you'd typically use
-        // a database like Firestore, keyed by userCredential.user.uid.
-        // For this example, we're only setting displayName.
+        await sendEmailVerification(userCredential.user);
+        setShowVerificationMessage(true);
+        toast({
+            title: "Registration Successful!",
+            description: "A verification email has been sent. Please check your inbox to verify your account.",
+            duration: 7000, 
+        });
+        // Do not redirect immediately, let user see the message
+        // router.push('/dashboard'); 
       }
       
-      router.push('/dashboard'); 
     } catch (err: any) {
       if (err.code === 'auth/email-already-in-use') {
         setError('The email address is already in use by another account.');
@@ -94,16 +102,35 @@ const RegisterPage: React.FC = () => {
 
   const handleSocialSignIn = async (providerType: 'google' | 'github') => {
     setError(null);
+    setShowVerificationMessage(false);
     setLoading(true);
     const provider = providerType === 'google' ? new GoogleAuthProvider() : new GithubAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider);
+      // For social sign-ins, email is usually pre-verified by the provider.
+      // Firebase user.emailVerified might reflect this.
+      // If not (e.g. GitHub non-primary email), you might need to prompt differently or handle it.
+      // For simplicity, we'll assume it's verified or Firebase handles it.
+      if (result.user.emailVerified) {
+        toast({
+            title: "Sign In Successful!",
+            description: `Welcome, ${result.user.displayName || result.user.email}!`,
+        });
+      } else if (result.user.email) { // If email exists but not verified (e.g. some GitHub cases)
+         await sendEmailVerification(result.user);
+         toast({
+            title: "Account Created & Verification Sent!",
+            description: `Welcome, ${result.user.displayName || result.user.email}! Please check your inbox to verify your email.`,
+            duration: 7000,
+         });
+      }
       router.push('/dashboard'); 
     } catch (err: any) {
       if (err.code === 'auth/account-exists-with-different-credential') {
         setError('An account already exists with the same email address but different sign-in credentials. Try signing in with the original method.');
       } else if (err.code === 'auth/popup-closed-by-user') {
-        setError('Sign-in popup was closed before completing. Please try again.');
+        // setError('Sign-in popup was closed before completing. Please try again.');
+        // Don't show error for popup closed, user might do it intentionally
       } else {
         setError(err.message || `Failed to sign in with ${providerType}.`);
       }
@@ -125,7 +152,7 @@ const RegisterPage: React.FC = () => {
 
 
   return (
-    <Card className="w-full max-w-lg shadow-xl my-8"> {/* Increased max-w for more fields */}
+    <Card className="w-full max-w-lg shadow-xl my-8">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl font-bold text-primary">Create an Account</CardTitle>
         <CardDescription>Join Achievo and start achieving your goals today!</CardDescription>
@@ -137,6 +164,16 @@ const RegisterPage: React.FC = () => {
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
+        {showVerificationMessage && !error && (
+          <Alert variant="default" className="bg-green-50 border-green-200 dark:bg-green-900/30 dark:border-green-700">
+            <Send className="h-5 w-5 text-green-600 dark:text-green-400" />
+            <AlertTitle className="text-green-700 dark:text-green-300">Verification Email Sent!</AlertTitle>
+            <AlertDescription className="text-green-600 dark:text-green-500">
+              Please check your email <strong>{email}</strong> to verify your account. You can then <Link href="/login" className="font-semibold underline hover:text-green-700 dark:hover:text-green-300">sign in</Link>.
+            </AlertDescription>
+          </Alert>
+        )}
+        {!showVerificationMessage && (
         <form onSubmit={handleRegister} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -279,6 +316,7 @@ const RegisterPage: React.FC = () => {
             )}
           </Button>
         </form>
+        )}
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t" />
@@ -290,10 +328,10 @@ const RegisterPage: React.FC = () => {
           </div>
         </div>
         <div className="grid grid-cols-2 gap-4">
-          <Button variant="outline" onClick={() => handleSocialSignIn('google')} disabled={loading}>
+          <Button variant="outline" onClick={() => handleSocialSignIn('google')} disabled={loading || showVerificationMessage}>
             <Chrome className="mr-2 h-4 w-4" /> Google
           </Button>
-          <Button variant="outline" onClick={() => handleSocialSignIn('github')} disabled={loading}>
+          <Button variant="outline" onClick={() => handleSocialSignIn('github')} disabled={loading || showVerificationMessage}>
             <GithubIcon className="mr-2 h-4 w-4" /> GitHub
           </Button>
         </div>

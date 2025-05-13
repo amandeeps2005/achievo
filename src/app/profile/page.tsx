@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import LoadingSpinner from '@/components/loading-spinner';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User, Mail, ShieldCheck, CalendarClock, Briefcase, Edit3, Save, XCircle } from 'lucide-react';
+import { User, Mail, ShieldCheck, CalendarClock, Briefcase, Edit3, Save, XCircle, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
@@ -17,9 +17,11 @@ import { z } from 'zod';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
-import { updateProfile } from 'firebase/auth';
+import { updateProfile, sendEmailVerification } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+
 
 const profileFormSchema = z.object({
   displayName: z.string().min(3, "Display name must be at least 3 characters.").max(50, "Display name can be at most 50 characters."),
@@ -31,6 +33,7 @@ export default function ProfilePage() {
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isResendingVerification, setIsResendingVerification] = useState(false);
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileFormSchema),
@@ -81,7 +84,6 @@ export default function ProfilePage() {
 
   const handleEditToggle = () => {
     if (isEditing) {
-      // Reset form to current user values if canceling
       form.reset({ displayName: user.displayName || "" });
     }
     setIsEditing(!isEditing);
@@ -99,14 +101,40 @@ export default function ProfilePage() {
       });
       toast({ title: "Success", description: "Profile updated successfully." });
       setIsEditing(false);
-      // The onAuthStateChanged listener in AuthContext should pick up the change
-      // and update the user object globally. If not, a manual refresh might be needed.
     } catch (error: any) {
       toast({ title: "Error", description: error.message || "Failed to update profile.", variant: "destructive" });
     } finally {
       setIsSaving(false);
     }
   };
+
+  const handleResendVerificationEmail = async () => {
+    if (!auth.currentUser) {
+      toast({ title: "Error", description: "Not authenticated.", variant: "destructive" });
+      return;
+    }
+    setIsResendingVerification(true);
+    try {
+      await sendEmailVerification(auth.currentUser);
+      toast({
+        title: "Verification Email Sent",
+        description: "A new verification email has been sent to your address. Please check your inbox (and spam folder).",
+      });
+    } catch (error: any) {
+      let description = "Failed to send verification email. Please try again later.";
+      if (error.code === 'auth/too-many-requests') {
+        description = "Too many requests. Please wait a while before trying to resend the verification email.";
+      }
+      toast({
+        title: "Error",
+        description: description,
+        variant: "destructive",
+      });
+    } finally {
+      setIsResendingVerification(false);
+    }
+  };
+
 
   return (
     <div className="container mx-auto py-8 md:py-12">
@@ -128,6 +156,26 @@ export default function ProfilePage() {
           </Button>
         </CardHeader>
         <CardContent className="p-6 md:p-8 space-y-6">
+          {!user.emailVerified && (
+            <Alert variant="default" className="bg-yellow-50 border-yellow-300 dark:bg-yellow-900/30 dark:border-yellow-700">
+               <ShieldCheck className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+              <AlertTitle className="text-yellow-700 dark:text-yellow-300">Verify Your Email</AlertTitle>
+              <AlertDescription className="text-yellow-600 dark:text-yellow-500">
+                Your email address is not verified. Please check your inbox for a verification link, or resend it.
+                <Button
+                  variant="link"
+                  size="sm"
+                  onClick={handleResendVerificationEmail}
+                  disabled={isResendingVerification}
+                  className="p-0 h-auto ml-1 text-yellow-700 dark:text-yellow-300 hover:text-yellow-800 dark:hover:text-yellow-200 underline"
+                >
+                  {isResendingVerification ? <LoadingSpinner size={16} className="mr-1" /> : <Send className="mr-1 h-3 w-3" />}
+                  {isResendingVerification ? "Sending..." : "Resend Verification Email"}
+                </Button>
+              </AlertDescription>
+            </Alert>
+          )}
+
           {isEditing ? (
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -188,7 +236,7 @@ export default function ProfilePage() {
                     <ShieldCheck className={`w-7 h-7 shrink-0 ${user.emailVerified ? 'text-green-500' : 'text-yellow-500'}`} />
                     <div>
                       <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Email Verification</p>
-                      <p className={`text-md font-semibold ${user.emailVerified ? 'text-green-600' : 'text-yellow-600'}`}>
+                      <p className={`text-md font-semibold ${user.emailVerified ? 'text-green-600 dark:text-green-400' : 'text-yellow-600 dark:text-yellow-400'}`}>
                         {user.emailVerified ? "Verified" : "Not Verified"}
                       </p>
                     </div>
