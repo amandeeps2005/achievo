@@ -6,6 +6,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/context/theme-context';
 import AppHeader from '@/components/app-header';
 import { AuthProvider } from '@/context/auth-context'; // Import AuthProvider
+import { NotesProvider } from '@/context/notes-context'; // Import NotesProvider
 
 
 const geistSans = Geist({
@@ -33,13 +34,15 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans`}>
         <ThemeProvider storageKey="achievo-ui-theme">
           <AuthProvider>
-            <GoalProvider>
-              <AppHeader />
-              <main className="container mx-auto px-4 py-8">
-                {children}
-              </main>
-              <Toaster />
-            </GoalProvider>
+            <NotesProvider>
+              <GoalProvider>
+                <AppHeader />
+                <main className="container mx-auto px-4 py-8">
+                  {children}
+                </main>
+                <Toaster />
+              </GoalProvider>
+            </NotesProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

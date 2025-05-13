@@ -7,7 +7,7 @@ import LoadingSpinner from '@/components/loading-spinner';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth-context';
 import Link from 'next/link';
-import { PlusCircle, BarChartBig, Lightbulb, Brain, LayoutGrid, ArrowRight } from 'lucide-react';
+import { PlusCircle, BarChartBig, Lightbulb, Brain, LayoutGrid, ArrowRight, FileText } from 'lucide-react';
 import { redirect } from 'next/navigation';
 import GoalProgressChart from '@/components/goal-progress-chart';
 import {
@@ -19,13 +19,14 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription as ShadcnCardDescription, CardFooter } from '@/components/ui/card'; // Aliased CardDescription
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { getSmartSuggestions, type GenerateSmartSuggestionsResult } from '@/app/actions';
 import type { SmartSuggestionsOutput } from '@/ai/flows/smart-suggestions-flow';
 import type { Goal } from '@/types';
 import { useToast } from '@/hooks/use-toast';
+import NotesDialog from '@/components/notes/notes-dialog'; // Import NotesDialog
 
 
 const motivationalQuotes = [
@@ -49,6 +50,7 @@ export default function DashboardPage() {
 
   const [isOverviewModalOpen, setIsOverviewModalOpen] = useState(false);
   const [isSuggestionsModalOpen, setIsSuggestionsModalOpen] = useState(false);
+  const [isNotesModalOpen, setIsNotesModalOpen] = useState(false); // State for NotesDialog
   const [selectedGoalForSuggestions, setSelectedGoalForSuggestions] = useState<Goal | null>(null);
   const [smartSuggestions, setSmartSuggestions] = useState<SmartSuggestionsOutput | null>(null);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
@@ -146,7 +148,7 @@ export default function DashboardPage() {
             <Lightbulb className="w-10 h-10 text-accent animate-pulse" />
             <div>
                 <CardTitle className="text-2xl font-bold text-primary">Motivational Corner</CardTitle>
-                <CardDescription className="text-sm text-muted-foreground">A spark to ignite your ambition.</CardDescription>
+                <ShadcnCardDescription className="text-sm text-muted-foreground">A spark to ignite your ambition.</ShadcnCardDescription>
             </div>
           </CardHeader>
           <CardContent>
@@ -161,7 +163,7 @@ export default function DashboardPage() {
         </Card>
       )}
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 p-4 sm:p-0">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4 sm:p-0">
         {/* Card for My Goals */}
         <Card className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl">
           <CardHeader>
@@ -169,10 +171,9 @@ export default function DashboardPage() {
               <LayoutGrid className="w-8 h-8 text-primary" />
               <CardTitle className="text-2xl">My Goals</CardTitle>
             </div>
-            <CardDescription>View, manage, and track all your active and completed goals.</CardDescription>
+            <ShadcnCardDescription>View, manage, and track all your active and completed goals.</ShadcnCardDescription>
           </CardHeader>
           <CardContent className="flex-grow">
-            {/* You can add a small summary here if needed, e.g., number of active goals */}
              <p className="text-sm text-muted-foreground">You have {goals.length} goal(s) currently.</p>
           </CardContent>
           <CardFooter>
@@ -192,7 +193,7 @@ export default function DashboardPage() {
                 <BarChartBig className="w-8 h-8 text-primary" />
                 <CardTitle className="text-2xl">Progress Overview</CardTitle>
               </div>
-              <CardDescription>A visual summary of your current goal progress.</CardDescription>
+              <ShadcnCardDescription>A visual summary of your current goal progress.</ShadcnCardDescription>
             </CardHeader>
             <CardContent className="flex-grow">
               <p className="text-sm text-muted-foreground">See charts and summaries of how you're doing.</p>
@@ -241,7 +242,7 @@ export default function DashboardPage() {
                 <Brain className="w-8 h-8 text-accent" />
                 <CardTitle className="text-2xl text-accent">Smart Goal Suggestions</CardTitle>
               </div>
-              <CardDescription>Get AI-powered tips and ideas to boost your progress.</CardDescription>
+              <ShadcnCardDescription>Get AI-powered tips and ideas to boost your progress.</ShadcnCardDescription>
             </CardHeader>
             <CardContent className="flex-grow">
               <p className="text-sm text-muted-foreground">Select a goal to receive tailored advice.</p>
@@ -343,7 +344,7 @@ export default function DashboardPage() {
               <PlusCircle className="w-8 h-8 text-primary" />
               <CardTitle className="text-2xl">Add New Goal</CardTitle>
             </div>
-            <CardDescription>Define a new ambition and let Achievo help you get started.</CardDescription>
+            <ShadcnCardDescription>Define a new ambition and let Achievo help you get started.</ShadcnCardDescription>
           </CardHeader>
           <CardContent className="flex-grow">
             <p className="text-sm text-muted-foreground">Describe what you want to achieve, and we'll break it down.</p>
@@ -356,6 +357,27 @@ export default function DashboardPage() {
             </Button>
           </CardFooter>
         </Card>
+
+        {/* Card for My Notes */}
+        <Card className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl">
+          <CardHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <FileText className="w-8 h-8 text-primary" />
+              <CardTitle className="text-2xl">My Notes</CardTitle>
+            </div>
+            <ShadcnCardDescription>Jot down thoughts, ideas, and reminders related to your goals or general topics.</ShadcnCardDescription>
+          </CardHeader>
+          <CardContent className="flex-grow">
+            <p className="text-sm text-muted-foreground">Organize your notes and link them to specific goals if needed.</p>
+          </CardContent>
+          <CardFooter>
+            <Button size="lg" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg" onClick={() => setIsNotesModalOpen(true)}>
+              Manage Notes <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </CardFooter>
+        </Card>
+        <NotesDialog isOpen={isNotesModalOpen} onOpenChange={setIsNotesModalOpen} />
+
       </div>
       
       {goals.length === 0 && !goalsLoading && (

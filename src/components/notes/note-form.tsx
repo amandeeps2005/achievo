@@ -1,0 +1,131 @@
+// src/components/notes/note-form.tsx
+"use client";
+
+import { useForm, type SubmitHandler } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Form, FormControl, FormField, FormItem, FormMessage, FormDescription, FormLabel } from '@/components/ui/form';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel as RadixSelectLabel } from "@/components/ui/select"; // Renamed SelectLabel to avoid conflict
+import type { Goal, Note } from '@/types';
+import { useNotes } from '@/context/notes-context';
+import { useEffect } from 'react';
+
+const noteFormSchema = z.object({
+  title: z.string().min(3, "Title must be at least 3 characters.").max(100, "Title too long."),
+  content: z.string().min(5, "Content must be at least 5 characters.").max(5000, "Content too long."),
+  goalId: z.string().optional(),
+});
+
+type NoteFormData = z.infer<typeof noteFormSchema>;
+
+interface NoteFormProps {
+  goals: Goal[];
+  existingNote?: Note;
+  onSave: () => void; // Callback to close form/dialog
+  defaultGoalId?: string;
+}
+
+export default function NoteForm({ goals, existingNote, onSave, defaultGoalId }: NoteFormProps) {
+  const { addNote, updateNote } = useNotes();
+
+  const form = useForm<NoteFormData>({
+    resolver: zodResolver(noteFormSchema),
+    defaultValues: {
+      title: existingNote?.title || "",
+      content: existingNote?.content || "",
+      goalId: existingNote?.goalId || defaultGoalId || undefined,
+    },
+  });
+
+  useEffect(() => {
+    // If defaultGoalId changes and it's a new note form, update the form value
+    if (!existingNote && defaultGoalId) {
+      form.setValue('goalId', defaultGoalId);
+    }
+  }, [defaultGoalId, existingNote, form]);
+
+
+  const onSubmit: SubmitHandler<NoteFormData> = (data) => {
+    if (existingNote) {
+      updateNote(existingNote.id, data);
+    } else {
+      addNote(data);
+    }
+    form.reset({ title: "", content: "", goalId: data.goalId || undefined }); // Reset but keep goalId if selected
+    onSave();
+  };
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <FormField
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Note Title</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter note title..." {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="content"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Note Content</FormLabel>
+              <FormControl>
+                <Textarea placeholder="Type your note here..." {...field} rows={6} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="goalId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Link to Goal (Optional)</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value || ""}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a goal or leave for general note" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectGroup>
+                    <RadixSelectLabel>Link to Goal</RadixSelectLabel>
+                    <SelectItem value="">General Note (No specific goal)</SelectItem>
+                    {goals.map((goal) => (
+                      <SelectItem key={goal.id} value={goal.id}>
+                        {goal.title || goal.originalGoal}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+              <FormDescription>
+                Associate this note with one of your existing goals, or keep it as a general note.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <div className="flex justify-end space-x-3">
+          <Button type="button" variant="outline" onClick={onSave}>
+            Cancel
+          </Button>
+          <Button type="submit">{existingNote ? 'Save Changes' : 'Add Note'}</Button>
+        </div>
+      </form>
+    </Form>
+  );
+}
