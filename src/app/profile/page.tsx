@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 import LoadingSpinner from '@/components/loading-spinner';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User, Mail, ShieldCheck, CalendarClock } from 'lucide-react';
+import { User, Mail, ShieldCheck, CalendarClock, Briefcase } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
@@ -55,6 +55,10 @@ export default function ProfilePage() {
     ? formatDistanceToNow(new Date(user.metadata.creationTime), { addSuffix: true })
     : 'N/A';
 
+  // Title is not stored in Firebase Auth user object by default.
+  // If it were stored (e.g., in Firestore), you would fetch it here.
+  // For now, we'll just display fields available in the user object.
+  const userTitle = "N/A"; // Placeholder as title is not in user object
 
   return (
     <div className="container mx-auto py-8 md:py-12">
@@ -73,6 +77,16 @@ export default function ProfilePage() {
         </CardHeader>
         <CardContent className="p-6 md:p-8 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {user.displayName && (
+              <div className="flex items-center space-x-4 p-4 bg-muted/30 rounded-lg border border-border">
+                <User className="w-7 h-7 text-primary shrink-0" />
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Full Name</p>
+                  <p className="text-md font-semibold text-foreground break-words">{user.displayName}</p>
+                </div>
+              </div>
+            )}
+            
             <div className="flex items-center space-x-4 p-4 bg-muted/30 rounded-lg border border-border">
               <Mail className="w-7 h-7 text-primary shrink-0" />
               <div>
@@ -92,6 +106,16 @@ export default function ProfilePage() {
                 </div>
               </div>
             )}
+
+            {/* Placeholder for Title - This would require fetching from a database like Firestore */}
+            <div className="flex items-center space-x-4 p-4 bg-muted/30 rounded-lg border border-border">
+              <Briefcase className="w-7 h-7 text-primary shrink-0" />
+              <div>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Title</p>
+                <p className="text-md font-semibold text-foreground">{userTitle}</p>
+                 {userTitle === "N/A" && <p className="text-xs text-muted-foreground">(Title information is not stored in user profile)</p>}
+              </div>
+            </div>
           </div>
 
            <div className="flex items-center space-x-4 p-4 bg-muted/30 rounded-lg border border-border">
