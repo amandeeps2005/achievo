@@ -1,7 +1,8 @@
 "use client";
 
 import type { Goal, StepUi } from '@/types';
-import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback, useRef } from 'react';
+import { useAuth } from '@/context/auth-context'; // Import useAuth
 import { toast } from "@/hooks/use-toast";
 
 interface GoalContextType {
@@ -17,16 +18,39 @@ const GoalContext = createContext<GoalContextType | undefined>(undefined);
 
 export const GoalProvider = ({ children }: { children: ReactNode }) => {
   const [goals, setGoals] = useState<Goal[]>(() => {
-    if (typeof window !== 'undefined') {
-      const savedGoals = localStorage.getItem('achievoGoals');
-      return savedGoals ? JSON.parse(savedGoals) : [];
-    }
     return [];
   });
   const [isLoading, setIsLoading] = useState(false);
+  const { user, loading: authLoading } = useAuth(); // Get user and authLoading state
+  const hasFetchedGoals = useRef(false); // Prevent fetching on every render
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (!authLoading && user && !hasFetchedGoals.current) {
+      setIsLoading(true);
+      // In a real application, you would fetch user-specific goals from a database here.
+      // For this example, we'll simulate fetching from local storage,
+      // filtering by a hypothetical 'userId' field.
+      if (typeof window !== 'undefined') {
+        const savedGoals = localStorage.getItem('achievoGoals');
+        if (savedGoals) {
+          try {
+            const allGoals: Goal[] = JSON.parse(savedGoals);
+            // Filter goals by the current user's ID
+            const userGoals = allGoals.filter(goal => goal.userId === user.uid);
+            setGoals(userGoals);
+          } catch (error) {
+            console.error("Failed to parse goals from localStorage", error);
+            setGoals([]);
+          }
+        } else {
+          setGoals([]);
+        }
+      } else {
+        setGoals([]);
+      }
+      setIsLoading(false);
+      hasFetchedGoals.current = true; // Mark as fetched
+    } else if (!authLoading && !user) {
       localStorage.setItem('achievoGoals', JSON.stringify(goals));
     }
   }, [goals]);

@@ -14,8 +14,9 @@ import { generateGoalPlan, type GenerateGoalPlanResult } from '@/app/actions';
 import type { GoalDecompositionOutput } from '@/ai/flows/goal-decomposition';
 import { useGoals } from '@/context/goal-context';
 import type { Goal, StepUi } from '@/types';
-import LoadingSpinner from './loading-spinner';
 import { Info, ListChecks, CalendarDays, Wrench, CheckCircle, Lightbulb } from 'lucide-react';
+import LoadingSpinner from '@/components/loading-spinner';
+import { useAuth } from '@/context/auth-context';
 
 const formSchema = z.object({
   goalDescription: z.string().min(10, "Goal description must be at least 10 characters.").max(500, "Goal description must be at most 500 characters."),
@@ -24,16 +25,12 @@ type FormData = z.infer<typeof formSchema>;
 
 export default function GoalSetupForm() {
   const router = useRouter();
-  const { addGoal, setIsLoading: setGlobalLoading, isLoading: isGlobalLoading } = useGoals();
+  const { user } = useAuth(); // Get the authenticated user from context
   const [apiError, setApiError] = useState<string | null>(null);
   const [generatedPlan, setGeneratedPlan] = useState<GoalDecompositionOutput | null>(null);
+  const [isGlobalLoading, setGlobalLoading] = useState(false); // Define isGlobalLoading state
+  const { addGoal } = useGoals();
 
-  const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      goalDescription: '',
-    },
-  });
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     setGlobalLoading(true);
@@ -51,12 +48,16 @@ export default function GoalSetupForm() {
   };
 
   const handleSaveGoal = () => {
-    if (!generatedPlan || !form.getValues().goalDescription) return;
+    if (!generatedPlan || !form.getValues().goalDescription || !user) {
+      // Optionally show an error if user is not logged in, though the page should be protected
+      console.error("Cannot save goal: plan not generated, description missing, or user not authenticated.");
+      return;
+    }
+    setGlobalLoading(true); // Add loading state for saving
     
     const newGoal: Goal = {
       id: crypto.randomUUID(),
       originalGoal: form.getValues().goalDescription,
-      title: form.getValues().goalDescription.substring(0, 50) + (form.getValues().goalDescription.length > 50 ? '...' : ''), // Simple title
       category: generatedPlan.category,
       timeline: generatedPlan.timeline,
       tools: generatedPlan.tools,
@@ -65,10 +66,13 @@ export default function GoalSetupForm() {
         id: crypto.randomUUID(),
         completed: false,
       })),
+      userId: user.uid, // Associate goal with the user
       createdAt: new Date().toISOString(),
       progress: 0, // Will be calculated in context
     };
+     newGoal.title = newGoal.originalGoal.substring(0, 50) + (newGoal.originalGoal.length > 50 ? '...' : ''); // Simple title based on original goal
     addGoal(newGoal);
+    setGlobalLoading(false); // Reset loading state
     router.push(`/goal/${newGoal.id}`);
   };
 
@@ -170,9 +174,9 @@ export default function GoalSetupForm() {
           </div>
         )}
       </CardContent>
-      {generatedPlan && !isGlobalLoading && (
+      {generatedPlan && ( // Show footer buttons if plan is generated, irrespective of loading state for the buttons themselves.
         <CardFooter className="flex flex-col sm:flex-row gap-2">
-            <Button variant="outline" onClick={() => { setGeneratedPlan(null); form.reset(); }} className="w-full sm:w-auto" disabled={isGlobalLoading}>
+            <Button variant="outline" onClick={() => { setGeneratedPlan(null); form.reset(); setApiError(null); }} className="w-full sm:w-auto" disabled={isGlobalLoading}>
               Reset & Edit Goal
             </Button>
             <Button onClick={handleSaveGoal} className="w-full sm:w-auto bg-accent hover:bg-accent/90 text-accent-foreground" disabled={isGlobalLoading}>

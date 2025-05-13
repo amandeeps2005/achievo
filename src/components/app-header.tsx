@@ -3,12 +3,14 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { PlusCircle, LayoutDashboard } from 'lucide-react'; // Added LayoutDashboard for home/dashboard link
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Target } from 'lucide-react'; // App icon
+import { useAuth } from '@/context/auth-context'; // Import useAuth
 
 export default function AppHeader() {
   const pathname = usePathname();
-
+  const router = useRouter();
+  const { user, logout } = useAuth(); // Get user and logout function
   return (
     <header className="bg-card border-b border-border shadow-sm sticky top-0 z-50">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
@@ -31,6 +33,15 @@ export default function AppHeader() {
                 <PlusCircle className="mr-2 h-4 w-4" />
                 New Goal
               </Link>
+            </Button>
+          )}
+          {user && ( // Display logout button only when user is logged in
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={async () => { await logout(); router.push('/login'); }} // Call logout function and redirect
+            >
+              Logout
             </Button>
           )}
         </nav>

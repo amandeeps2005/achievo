@@ -4,6 +4,8 @@ import './globals.css';
 import { GoalProvider } from '@/context/goal-context';
 import { Toaster } from '@/components/ui/toaster';
 import AppHeader from '@/components/app-header';
+import { AuthProvider } from '@/context/auth-context'; // Import AuthProvider
+
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -28,13 +30,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans`}>
-        <GoalProvider>
-          <AppHeader />
-          <main className="container mx-auto px-4 py-8">
-            {children}
-          </main>
-          <Toaster />
-        </GoalProvider>
+        <AuthProvider>
+          <GoalProvider>
+            <AppHeader />
+            <main className="container mx-auto px-4 py-8">
+              {children}
+            </main>
+            <Toaster />
+          </GoalProvider>
+        </AuthProvider>
       </body>
     </html>
   );

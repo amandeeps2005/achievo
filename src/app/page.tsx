@@ -1,11 +1,14 @@
 "use client";
 
+import { useEffect } from 'react';
 import GoalList from '@/components/goal-list';
 import { useGoals } from '@/context/goal-context';
 import LoadingSpinner from '@/components/loading-spinner';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/context/auth-context';
 import Link from 'next/link';
 import { PlusCircle } from 'lucide-react';
+import { redirect } from 'next/navigation';
 
 export default function DashboardPage() {
   const { goals, isLoading } = useGoals();
@@ -20,6 +23,16 @@ export default function DashboardPage() {
     );
   }
   
+  const { user, loading: authLoading } = useAuth();
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      redirect('/login');
+    }
+  }, [user, authLoading]);
+
+  if (authLoading || (!user && !authLoading)) return null; // Render nothing while auth is loading or if redirecting
+
   return (
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 p-4 bg-card rounded-lg shadow">
