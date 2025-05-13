@@ -7,8 +7,8 @@ import LoadingSpinner from '@/components/loading-spinner';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth-context';
 import Link from 'next/link';
-import { PlusCircle, BarChartBig, Lightbulb, Brain, LayoutGrid, ArrowRight, FileText } from 'lucide-react';
-import { redirect } from 'next/navigation';
+import { PlusCircle, BarChartBig, Lightbulb, Brain, LayoutGrid, ArrowRight, FileText, NotebookPen } from 'lucide-react';
+import { useRouter } from 'next/navigation'; // Changed from next/navigation redirect
 import GoalProgressChart from '@/components/goal-progress-chart';
 import {
   Dialog,
@@ -19,13 +19,14 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription as ShadcnCardDescription, CardFooter } from '@/components/ui/card'; // Aliased CardDescription
+import { Card, CardContent, CardHeader, CardTitle, CardDescription as ShadcnCardDescription, CardFooter } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { getSmartSuggestions, type GenerateSmartSuggestionsResult } from '@/app/actions';
 import type { SmartSuggestionsOutput } from '@/ai/flows/smart-suggestions-flow';
 import type { Goal } from '@/types';
 import { useToast } from '@/hooks/use-toast';
+import NotesDialog from '@/components/notes/notes-dialog';
 
 
 const motivationalQuotes = [
@@ -45,6 +46,7 @@ export default function DashboardPage() {
   const { goals, isLoading: goalsLoading } = useGoals();
   const [currentQuote, setCurrentQuote] = useState("");
   const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
   const { toast } = useToast();
 
   const [isOverviewModalOpen, setIsOverviewModalOpen] = useState(false);
@@ -53,13 +55,14 @@ export default function DashboardPage() {
   const [smartSuggestions, setSmartSuggestions] = useState<SmartSuggestionsOutput | null>(null);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   const [suggestionsError, setSuggestionsError] = useState<string | null>(null);
+  const [isNotesModalOpen, setIsNotesModalOpen] = useState(false);
 
 
   useEffect(() => {
     if (!authLoading && !user) {
-      redirect('/'); 
+      router.replace('/'); 
     }
-  }, [user, authLoading]);
+  }, [user, authLoading, router]);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && motivationalQuotes.length > 0) {
@@ -111,16 +114,18 @@ export default function DashboardPage() {
     );
   };
 
-
-  if (authLoading || (!user && !authLoading) ) {
+  if (authLoading || !user) {
      return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
         <LoadingSpinner size={64} />
-        <p className="mt-4 text-lg text-foreground font-semibold">Authenticating...</p>
+        <p className="mt-4 text-lg text-foreground font-semibold">
+          { authLoading ? 'Authenticating...' : 'Redirecting...' }
+        </p>
       </div>
     );
   }
-
+  
+  // This loading state is specifically for goals, after user is confirmed.
   if (goalsLoading && typeof window !== 'undefined' && !localStorage.getItem('achievoGoals')) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
@@ -360,10 +365,10 @@ export default function DashboardPage() {
         <Card className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl">
           <CardHeader>
             <div className="flex items-center gap-3 mb-2">
-              <FileText className="w-8 h-8 text-primary" />
+              <NotebookPen className="w-8 h-8 text-primary" />
               <CardTitle className="text-2xl">My Notes</CardTitle>
             </div>
-            <ShadcnCardDescription>Jot down thoughts, ideas, and reminders related to your goals or general topics.</ShadcnCardDescription>
+            <ShadcnCardDescription>Jot down thoughts, ideas, and reminders.</ShadcnCardDescription>
           </CardHeader>
           <CardContent className="flex-grow">
             <p className="text-sm text-muted-foreground">Organize your notes and link them to specific goals if needed.</p>
@@ -392,8 +397,13 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       )}
+      
+      <NotesDialog 
+        isOpen={isNotesModalOpen} 
+        onClose={() => setIsNotesModalOpen(false)} 
+        goals={goals} 
+      />
 
     </div>
   );
 }
-
