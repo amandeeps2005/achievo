@@ -8,7 +8,7 @@ import LoadingSpinner from '@/components/loading-spinner';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Target, Brain, Map, CalendarDays, BarChartBig, Wand2, CheckCircle, ArrowRight, Zap } from 'lucide-react';
+import { Target, Brain, Map, CalendarDays, BarChartBig, Wand2, ArrowRight, Zap } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const features = [
@@ -82,12 +82,12 @@ export default function LandingPage() {
           </Button>
            <div className="mt-16">
             <Image 
-              src="https://picsum.photos/seed/dashboardmockup/1000/600" 
-              alt="Achievo Dashboard Mockup"
+              src="https://picsum.photos/seed/bridge-sea/1000/600" 
+              alt="Scenic view of a bridge over water, symbolizing a journey towards goals"
               width={1000}
               height={600}
               className="rounded-xl shadow-2xl mx-auto border-4 border-primary/20"
-              data-ai-hint="dashboard mockup"
+              data-ai-hint="bridge sea"
               priority
             />
           </div>
@@ -171,3 +171,4 @@ export default function LandingPage() {
     </div>
   );
 }
+
