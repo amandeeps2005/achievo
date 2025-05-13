@@ -2,6 +2,9 @@ import type { GoalDecompositionOutput } from '@/ai/flows/goal-decomposition';
 
 export interface StepUi extends GoalDecompositionOutput['steps'][0] {
   id: string;
+  startDate?: string; // ISO date string
+  endDate?: string; // ISO date string
+  repeatInterval?: 'daily' | 'weekly';
   completed: boolean;
 }
 
