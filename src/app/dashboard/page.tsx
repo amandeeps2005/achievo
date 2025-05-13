@@ -2,13 +2,13 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import GoalList from '@/components/goal-list';
+// import GoalList from '@/components/goal-list'; // Removed GoalList import
 import { useGoals } from '@/context/goal-context';
 import LoadingSpinner from '@/components/loading-spinner';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth-context';
 import Link from 'next/link';
-import { PlusCircle, BarChartBig, Lightbulb, Brain } from 'lucide-react';
+import { PlusCircle, BarChartBig, Lightbulb, Brain, LayoutGrid } from 'lucide-react'; // Added LayoutGrid
 import { redirect } from 'next/navigation';
 import GoalProgressChart from '@/components/goal-progress-chart';
 import {
@@ -20,7 +20,7 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'; // Added CardDescription
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { getSmartSuggestions, type GenerateSmartSuggestionsResult } from '@/app/actions';
@@ -123,11 +123,12 @@ export default function DashboardPage() {
   }
 
   // Use goalsLoading (from useGoals context) for the primary loading state of goals
+  // This is primarily for the GoalProgressChart now
   if (goalsLoading && typeof window !== 'undefined' && !localStorage.getItem('achievoGoals')) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
         <LoadingSpinner size={48} />
-        <p className="mt-4 text-muted-foreground">Loading your goals...</p>
+        <p className="mt-4 text-muted-foreground">Loading dashboard data...</p>
       </div>
     );
   }
@@ -140,7 +141,14 @@ export default function DashboardPage() {
           <h1 className="text-3xl font-bold text-primary">My Goals Dashboard</h1>
           <p className="text-muted-foreground">Your journey to achievement starts here. Track your progress and stay motivated!</p>
         </div>
-        <div className="flex flex-col sm:flex-row items-center gap-3 mt-4 sm:mt-0 self-center sm:self-auto">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mt-4 sm:mt-0 self-center sm:self-auto w-full sm:w-auto">
+          <Button asChild variant="outline" size="lg" className="rounded-lg shadow-md transform hover:scale-105 transition-transform w-full sm:w-auto">
+            <Link href="/my-goals">
+              <LayoutGrid className="mr-2 h-5 w-5" />
+              My Goals
+            </Link>
+          </Button>
+          
           <Dialog open={isOverviewModalOpen} onOpenChange={setIsOverviewModalOpen}>
             <DialogTrigger asChild>
               <Button variant="outline" size="lg" className="rounded-lg shadow-md transform hover:scale-105 transition-transform w-full sm:w-auto">
@@ -280,7 +288,7 @@ export default function DashboardPage() {
       {currentQuote && (
         <Card className="bg-gradient-to-r from-primary/10 via-card to-card/50 shadow-lg rounded-xl border-primary/20">
           <CardHeader className="flex flex-row items-center gap-3 pb-3">
-            <Lightbulb className="w-10 h-10 text-accent animate-pulse" /> {/* Increased size and added pulse */}
+            <Lightbulb className="w-10 h-10 text-accent animate-pulse" />
             <div>
                 <CardTitle className="text-2xl font-bold text-primary">Motivational Corner</CardTitle>
                 <CardDescription className="text-sm text-muted-foreground">A spark to ignite your ambition.</CardDescription>
@@ -298,7 +306,34 @@ export default function DashboardPage() {
         </Card>
       )}
       
-      <GoalList goals={goals} />
+      {/* <GoalList goals={goals} /> Removed GoalList direct display */}
+      
+      {goals.length === 0 && !goalsLoading && (
+        <Card className="mt-8 text-center py-12 bg-card shadow-md rounded-xl">
+          <CardHeader>
+            <CardTitle className="text-2xl font-semibold text-primary">Ready to Start Achieving?</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+              You haven't set any goals yet. Click "Add New Goal" to begin your journey or explore "My Goals" to manage existing ones.
+            </p>
+            <div className="flex justify-center gap-4">
+                <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                    <Link href="/new-goal">
+                    <PlusCircle className="mr-2 h-5 w-5" />
+                    Add First Goal
+                    </Link>
+                </Button>
+                <Button asChild variant="outline" size="lg">
+                    <Link href="/my-goals">
+                    <LayoutGrid className="mr-2 h-5 w-5" />
+                    Go to My Goals
+                    </Link>
+                </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
     </div>
   );
