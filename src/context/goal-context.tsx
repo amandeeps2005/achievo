@@ -2,7 +2,7 @@
 
 import type { Goal, StepUi } from '@/types';
 import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback, useRef } from 'react';
-import { useAuth } from '@/context/auth-context'; // Import useAuth
+import { useAuth } from '@/context/auth-context'; 
 import { toast } from "@/hooks/use-toast";
 
 interface GoalContextType {
@@ -11,49 +11,83 @@ interface GoalContextType {
   updateStepCompletion: (goalId: string, stepId: string, completed: boolean) => void;
   getGoalById: (goalId: string) => Goal | undefined;
   isLoading: boolean;
-  setIsLoading: (loading: boolean) => void;
+  setIsLoading: (loading: boolean) => void; // Exposed for potential external control if ever needed
 }
 
 const GoalContext = createContext<GoalContextType | undefined>(undefined);
 
 export const GoalProvider = ({ children }: { children: ReactNode }) => {
-  const [goals, setGoals] = useState<Goal[]>(() => {
-    return [];
-  });
-  const [isLoading, setIsLoading] = useState(false);
-  const { user, loading: authLoading } = useAuth(); // Get user and authLoading state
-  const hasFetchedGoals = useRef(false); // Prevent fetching on every render
+  const [goals, setGoals] = useState<Goal[]>([]); // Holds goals for the current user
+  const [isLoading, setIsLoading] = useState(true); // True initially, and during auth/goal loading
+  const { user, loading: authLoading } = useAuth();
+  const initialLoadDone = useRef(false); // Tracks if initial goal load for the user session is done
 
+  // Effect for LOADING goals when user changes or on initial auth load
   useEffect(() => {
-    if (!authLoading && user && !hasFetchedGoals.current) {
+    if (authLoading) {
+      setIsLoading(true); // If auth is in progress, goal loading is also pending
+      initialLoadDone.current = false; // Reset initial load flag if auth state is changing
+      return;
+    }
+
+    if (user) {
       setIsLoading(true);
-      // In a real application, you would fetch user-specific goals from a database here.
-      // For this example, we'll simulate fetching from local storage,
-      // filtering by a hypothetical 'userId' field.
       if (typeof window !== 'undefined') {
-        const savedGoals = localStorage.getItem('achievoGoals');
-        if (savedGoals) {
+        const savedGoalsString = localStorage.getItem('achievoGoals');
+        let allGoalsInStorage: Goal[] = [];
+        if (savedGoalsString) {
           try {
-            const allGoals: Goal[] = JSON.parse(savedGoals);
-            // Filter goals by the current user's ID
-            const userGoals = allGoals.filter(goal => goal.userId === user.uid);
-            setGoals(userGoals);
+            allGoalsInStorage = JSON.parse(savedGoalsString);
           } catch (error) {
-            console.error("Failed to parse goals from localStorage", error);
-            setGoals([]);
+            console.error("Failed to parse goals from localStorage on load", error);
           }
-        } else {
-          setGoals([]);
         }
+        // Filter goals from storage that belong to the current user
+        const userGoals = allGoalsInStorage.filter(g => g.userId === user.uid);
+        setGoals(userGoals);
       } else {
-        setGoals([]);
+        setGoals([]); // Should not happen in browser, but as a fallback
       }
       setIsLoading(false);
-      hasFetchedGoals.current = true; // Mark as fetched
-    } else if (!authLoading && !user) {
-      localStorage.setItem('achievoGoals', JSON.stringify(goals));
+      initialLoadDone.current = true;
+    } else {
+      // No user logged in
+      setGoals([]); // Clear goals
+      setIsLoading(false); // No data to load
+      initialLoadDone.current = true; // Consider "load" done for non-user state
     }
-  }, [goals]);
+  }, [user, authLoading]);
+
+  // Effect for SAVING goals to localStorage
+  useEffect(() => {
+    // Only save if:
+    // 1. Initial load for the current user session is complete (to avoid overwriting with empty/stale data on mount).
+    // 2. A user is logged in.
+    // 3. We are in a browser environment.
+    if (initialLoadDone.current && user && typeof window !== 'undefined') {
+      const allGoalsString = localStorage.getItem('achievoGoals');
+      let allGoalsInStorage: Goal[] = [];
+      if (allGoalsString) {
+        try {
+          allGoalsInStorage = JSON.parse(allGoalsString);
+        } catch (e) {
+          console.error("Error parsing allGoals from localStorage for saving:", e);
+          // Potentially corrupted storage, might be safer to start fresh for this user
+          // or try to recover other users' data if critical. For now, log and proceed.
+        }
+      }
+
+      // Filter out any existing goals of the current user from what was read from storage
+      const otherUserGoalsFromStorage = allGoalsInStorage.filter(g => g.userId !== user.uid);
+      
+      // Combine the goals of other users (from storage) with the current user's goals (from context state)
+      // The 'goals' state variable here contains ONLY the current user's goals.
+      const goalsToSave = [...otherUserGoalsFromStorage, ...goals];
+      
+      localStorage.setItem('achievoGoals', JSON.stringify(goalsToSave));
+    }
+  }, [goals, user]); // Re-run when current user's goals change or user identity changes (after initial load)
+
 
   const calculateProgress = useCallback((steps: StepUi[]): number => {
     if (steps.length === 0) return 0;
@@ -62,13 +96,18 @@ export const GoalProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const addGoal = useCallback((goal: Goal) => {
-    const goalWithProgress = { ...goal, progress: calculateProgress(goal.steps) };
-    setGoals(prevGoals => [...prevGoals, goalWithProgress]);
+    if (!user) {
+        toast({ title: "Error", description: "You must be logged in to add a goal.", variant: "destructive"});
+        return;
+    }
+    // Ensure the goal has the current userId, even if it was somehow missed
+    const goalWithUser = { ...goal, userId: user.uid, progress: calculateProgress(goal.steps) };
+    setGoals(prevGoals => [...prevGoals, goalWithUser]);
     toast({
       title: "Goal Added!",
       description: `Your goal "${goal.originalGoal.substring(0,30)}..." is set up.`,
     });
-  }, [calculateProgress]);
+  }, [calculateProgress, user]);
 
   const updateStepCompletion = useCallback((goalId: string, stepId: string, completed: boolean) => {
     setGoals(prevGoals =>
@@ -111,3 +150,4 @@ export const useGoals = () => {
   }
   return context;
 };
+

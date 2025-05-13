@@ -13,6 +13,8 @@ export interface Goal {
   timeline: GoalDecompositionOutput['timeline'];
   tools: GoalDecompositionOutput['tools'];
   steps: StepUi[];
+  userId: string; // To associate the goal with a specific user
   createdAt: string; // ISO date string
   progress: number; // Calculated: (completed steps / total steps) * 100
 }
+
