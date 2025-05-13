@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -28,9 +29,15 @@ export default function GoalSetupForm() {
   const { user } = useAuth(); // Get the authenticated user from context
   const [apiError, setApiError] = useState<string | null>(null);
   const [generatedPlan, setGeneratedPlan] = useState<GoalDecompositionOutput | null>(null);
-  const [isGlobalLoading, setGlobalLoading] = useState(false); // Define isGlobalLoading state
+  const [isGlobalLoading, setGlobalLoading] = useState(false); 
   const { addGoal } = useGoals();
 
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      goalDescription: '',
+    },
+  });
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     setGlobalLoading(true);
@@ -188,3 +195,4 @@ export default function GoalSetupForm() {
     </Card>
   );
 }
+
