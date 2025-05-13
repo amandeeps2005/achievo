@@ -26,7 +26,6 @@ import { getSmartSuggestions, type GenerateSmartSuggestionsResult } from '@/app/
 import type { SmartSuggestionsOutput } from '@/ai/flows/smart-suggestions-flow';
 import type { Goal } from '@/types';
 import { useToast } from '@/hooks/use-toast';
-import NotesDialog from '@/components/notes/notes-dialog'; // Import NotesDialog
 
 
 const motivationalQuotes = [
@@ -50,7 +49,6 @@ export default function DashboardPage() {
 
   const [isOverviewModalOpen, setIsOverviewModalOpen] = useState(false);
   const [isSuggestionsModalOpen, setIsSuggestionsModalOpen] = useState(false);
-  const [isNotesModalOpen, setIsNotesModalOpen] = useState(false); // State for NotesDialog
   const [selectedGoalForSuggestions, setSelectedGoalForSuggestions] = useState<Goal | null>(null);
   const [smartSuggestions, setSmartSuggestions] = useState<SmartSuggestionsOutput | null>(null);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
@@ -371,12 +369,13 @@ export default function DashboardPage() {
             <p className="text-sm text-muted-foreground">Organize your notes and link them to specific goals if needed.</p>
           </CardContent>
           <CardFooter>
-            <Button size="lg" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg" onClick={() => setIsNotesModalOpen(true)}>
-              Manage Notes <ArrowRight className="ml-2 h-5 w-5" />
+             <Button asChild size="lg" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg">
+              <Link href="/my-notes">
+                Manage Notes <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
             </Button>
           </CardFooter>
         </Card>
-        <NotesDialog isOpen={isNotesModalOpen} onOpenChange={setIsNotesModalOpen} />
 
       </div>
       
