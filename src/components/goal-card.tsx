@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from 'next/link';
@@ -68,7 +67,7 @@ export default function GoalCard({ goal }: GoalCardProps) {
         </Button>
         <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
           <AlertDialogTrigger asChild>
-            <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 ml-2 shrink-0">
+            <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive hover:text-destructive-foreground ml-2 shrink-0">
               <Trash2 className="h-4 w-4" />
             </Button>
           </AlertDialogTrigger>
