@@ -80,17 +80,6 @@ export default function LandingPage() {
               Get Started Free <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>
-           <div className="mt-16">
-            <Image 
-              src="https://picsum.photos/seed/success-path/1000/600" 
-              alt="Path leading to a bright future, symbolizing goal achievement with Achievo"
-              width={1000}
-              height={600}
-              className="rounded-xl shadow-2xl mx-auto border-4 border-primary/20"
-              data-ai-hint="success path"
-              priority
-            />
-          </div>
         </div>
       </section>
 
