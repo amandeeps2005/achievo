@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
@@ -23,7 +24,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
 }) => {
   const [theme, setThemeState] = useState<Theme>(() => {
     if (typeof window === 'undefined') {
-      return 'light'; // Default for server-side or before hydration
+      return 'dark'; // Default for server-side or before hydration
     }
     try {
       const storedTheme = localStorage.getItem(storageKey) as Theme | null;
@@ -31,13 +32,27 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
         return storedTheme;
       }
       // Fallback to system preference if stored value is invalid or not set
+      // If no system preference, default to dark.
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      return prefersDark ? 'dark' : 'light';
+      return prefersDark ? 'dark' : 'light'; // System preference respected, else light
     } catch (e) {
       console.error("Error reading theme from localStorage", e);
-      return 'light'; // Fallback in case of error
+      return 'dark'; // Fallback to dark in case of error or no preference
     }
   });
+
+  // Initialize with dark theme if no theme is set after hydration
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const storedTheme = localStorage.getItem(storageKey) as Theme | null;
+      if (!storedTheme || (storedTheme !== "light" && storedTheme !== "dark")) {
+         // If nothing valid in storage, check system pref, then default to dark
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        setThemeState(prefersDark ? 'dark' : 'dark'); // Defaulting to dark if no strong light pref
+      }
+    }
+  }, [storageKey]);
+
 
   useEffect(() => {
     // This effect runs only on the client after hydration
@@ -77,3 +92,4 @@ export const useTheme = () => {
   }
   return context;
 };
+
