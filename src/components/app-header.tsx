@@ -1,8 +1,9 @@
+
 "use client";
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, LayoutDashboard } from 'lucide-react'; // Added LayoutDashboard for home/dashboard link
+import { LayoutDashboard } from 'lucide-react'; // Added LayoutDashboard for home/dashboard link
 import { usePathname, useRouter } from 'next/navigation';
 import { Target } from 'lucide-react'; // App icon
 import { useAuth } from '@/context/auth-context'; // Import useAuth
@@ -27,14 +28,7 @@ export default function AppHeader() {
               </Link>
             </Button>
           )}
-          {pathname !== '/new-goal' && (
-            <Button variant="default" size="sm" asChild className="bg-accent hover:bg-accent/90 text-accent-foreground">
-              <Link href="/new-goal">
-                <PlusCircle className="mr-2 h-4 w-4" />
-                New Goal
-              </Link>
-            </Button>
-          )}
+          {/* The "New Goal" button was previously here and has been removed due to redundancy */}
           {user && ( // Display logout button only when user is logged in
             <Button
               variant="outline"
@@ -49,3 +43,4 @@ export default function AppHeader() {
     </header>
   );
 }
+
