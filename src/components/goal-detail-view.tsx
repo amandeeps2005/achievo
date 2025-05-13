@@ -1,4 +1,3 @@
-
 "use client";
 
 import type { Goal } from '@/types';
@@ -14,6 +13,7 @@ import { useGoals } from '@/context/goal-context';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Separator } from '@/components/ui/separator';
+import { useToast } from '@/hooks/use-toast'; // Added import for useToast
 
 interface GoalDetailViewProps {
   goal: Goal;
@@ -23,11 +23,20 @@ export default function GoalDetailView({ goal }: GoalDetailViewProps) {
   const { deleteGoal } = useGoals();
   const router = useRouter();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const { toast } = useToast(); // Instantiate toast
 
   const handleDelete = () => {
     deleteGoal(goal.id);
     setIsDeleteDialogOpen(false);
     router.push('/dashboard');
+  };
+
+  const handleConnectToCalendar = () => {
+    toast({
+      title: "Feature Coming Soon!",
+      description: "Connecting to your calendar will be available in a future update.",
+      variant: "default",
+    });
   };
 
   return (
@@ -110,7 +119,7 @@ export default function GoalDetailView({ goal }: GoalDetailViewProps) {
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
-               <Button variant="outline" className="w-full sm:w-auto" onClick={() => alert('Connect to Calendar functionality coming soon!')}>
+               <Button variant="outline" className="w-full sm:w-auto" onClick={handleConnectToCalendar}>
                 <CalendarPlus className="mr-2 h-4 w-4" /> Connect to Calendar
               </Button>
         </CardFooter>
@@ -158,3 +167,4 @@ export default function GoalDetailView({ goal }: GoalDetailViewProps) {
     </div>
   );
 }
+
