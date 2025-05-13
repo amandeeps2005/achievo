@@ -9,38 +9,43 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Target, Brain, Map, CalendarDays, BarChartBig, Wand2, ArrowRight, Zap } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 
 const features = [
   {
     icon: Brain,
     title: "Smart Goal Decomposition",
-    description: "Our AI-powered Goal Setup Wizard interprets your ambition, categorizes it, and generates actionable steps with a clear timeline, deadlines, and necessary resources.",
-    dataAiHint: "ai brain"
+    description: "Our AI interprets your ambition, categorizes it, and generates actionable steps with a timeline and resources.",
+    dataAiHint: "ai brain",
+    href: "/features/smart-goal-decomposition"
   },
   {
     icon: Map,
     title: "Personalized Action Roadmap",
-    description: "Visually track your journey with interactive cards and progress bars. Each step includes a checklist, and you'll receive milestone rewards and feedback to keep you motivated.",
-    dataAiHint: "map journey"
+    description: "Visually track your journey with interactive cards and progress bars. Each step includes a checklist.",
+    dataAiHint: "map journey",
+    href: "/features/action-roadmap"
   },
   {
     icon: CalendarDays,
     title: "Daily Planner + Habit Sync",
-    description: "Integrate your action roadmap into a daily planner. Get reminders and track your streaks to build habits that align with your long-term goals.",
-    dataAiHint: "calendar schedule"
+    description: "Integrate your roadmap into a daily planner. Get reminders and track streaks to build habits.",
+    dataAiHint: "calendar schedule",
+    href: "/features/daily-planner-sync"
   },
   {
     icon: BarChartBig,
     title: "Progress Dashboard",
-    description: "Monitor your success with an intuitive dashboard. View progress percentages per goal through charts, receive motivation boosters, and celebrate your milestone achievements.",
-    dataAiHint: "charts analytics"
+    description: "Monitor your success with an intuitive dashboard. View progress charts and get motivation boosters.",
+    dataAiHint: "charts analytics",
+    href: "/features/progress-dashboard"
   },
   {
     icon: Wand2,
     title: "Smart Suggestions Engine",
-    description: "Get intelligent suggestions for topics, time allocation estimates, and sample project ideas tailored to your goal category, available time, and commitment level.",
-    dataAiHint: "magic suggestion"
+    description: "Get AI tips for topics, time allocation, and project ideas tailored to your goal and commitment.",
+    dataAiHint: "magic suggestion",
+    href: "/features/smart-suggestions-engine"
   },
 ];
 
@@ -104,6 +109,13 @@ export default function LandingPage() {
                 <CardContent className="text-center text-muted-foreground flex-grow">
                   <p>{feature.description}</p>
                 </CardContent>
+                <CardFooter>
+                  <Button asChild size="sm" variant="outline" className="w-full border-primary text-primary hover:bg-primary/10">
+                    <Link href={feature.href}>
+                      Learn More <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
+                </CardFooter>
               </Card>
             ))}
           </div>
