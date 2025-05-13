@@ -1,21 +1,19 @@
+
 "use client";
 
 import type { Goal } from '@/types';
 import ActionRoadmap from './action-roadmap';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Tag, CalendarDays, Wrench, Target, Lightbulb, Trash2, CalendarPlus, BarChartHorizontalBig, TrendingUp, Brain } from 'lucide-react';
+import { Tag, CalendarDays, Wrench, Target, Lightbulb, Trash2, CalendarPlus, BarChartHorizontalBig, TrendingUp } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useGoals } from '@/context/goal-context';
 import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { getSmartSuggestions, type GenerateSmartSuggestionsResult } from '@/app/actions';
-import type { SmartSuggestionsOutput } from '@/ai/flows/smart-suggestions-flow';
-import LoadingSpinner from './loading-spinner';
 
 interface GoalDetailViewProps {
   goal: Goal;
@@ -26,10 +24,6 @@ export default function GoalDetailView({ goal }: GoalDetailViewProps) {
   const router = useRouter();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const { toast } = useToast();
-
-  const [smartSuggestions, setSmartSuggestions] = useState<SmartSuggestionsOutput | null>(null);
-  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
-  const [suggestionsError, setSuggestionsError] = useState<string | null>(null);
 
   const handleDelete = () => {
     deleteGoal(goal.id);
@@ -45,46 +39,11 @@ export default function GoalDetailView({ goal }: GoalDetailViewProps) {
   const handleConnectToCalendar = () => {
     toast({
       title: "Feature Coming Soon!",
-      description: "Connecting to your calendar will be available in a future update.",
+      description: "Connecting to your calendar will be available in a future update. This will allow you to sync goal steps and deadlines directly to your preferred calendar application.",
       variant: "default",
+      duration: 7000,
     });
   };
-
-  const fetchSmartSuggestions = async () => {
-    setIsLoadingSuggestions(true);
-    setSuggestionsError(null);
-    setSmartSuggestions(null);
-    const result: GenerateSmartSuggestionsResult = await getSmartSuggestions({
-      goalTitle: goal.title || goal.originalGoal,
-      category: goal.category,
-      timeframe: goal.timeline,
-    });
-    if (result.error || !result.data) {
-      setSuggestionsError(result.error || "Failed to load suggestions.");
-      toast({
-        title: "Error",
-        description: result.error || "Could not fetch smart suggestions.",
-        variant: "destructive",
-      });
-    } else {
-      setSmartSuggestions(result.data);
-    }
-    setIsLoadingSuggestions(false);
-  };
-
-
-  const renderSuggestionsList = (title: string, items?: string[]) => {
-    if (!items || items.length === 0) return null;
-    return (
-      <div className="mt-3">
-        <h4 className="font-semibold text-foreground">{title}:</h4>
-        <ul className="list-disc list-inside text-muted-foreground text-sm space-y-1 pl-4">
-          {items.map((item, index) => <li key={index}>{item}</li>)}
-        </ul>
-      </div>
-    );
-  };
-
 
   return (
     <div className="space-y-8">
@@ -182,56 +141,6 @@ export default function GoalDetailView({ goal }: GoalDetailViewProps) {
         </CardHeader>
         <CardContent>
            <ActionRoadmap goal={goal} />
-        </CardContent>
-      </Card>
-
-      <Card className="shadow-md">
-        <CardHeader>
-          <CardTitle className="text-2xl font-semibold text-foreground flex items-center">
-            <Brain className="w-6 h-6 mr-3 text-accent" />
-            Smart Suggestions
-          </CardTitle>
-          <CardDescription>Get AI-powered tips and ideas to boost your progress.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {!smartSuggestions && !isLoadingSuggestions && !suggestionsError && (
-            <Button onClick={fetchSmartSuggestions} className="w-full sm:w-auto" variant="outline">
-              <Lightbulb className="mr-2 h-4 w-4" /> Get Suggestions
-            </Button>
-          )}
-          {isLoadingSuggestions && (
-            <div className="flex items-center justify-center py-6">
-              <LoadingSpinner size={32} />
-              <p className="ml-3 text-muted-foreground">Generating suggestions...</p>
-            </div>
-          )}
-          {suggestionsError && !isLoadingSuggestions && (
-            <Alert variant="destructive">
-              <AlertTitle>Error</AlertTitle>
-              <AlertDescription>
-                {suggestionsError}
-                <Button onClick={fetchSmartSuggestions} variant="link" className="p-0 h-auto ml-1 text-destructive-foreground underline">Try again</Button>
-              </AlertDescription>
-            </Alert>
-          )}
-          {smartSuggestions && !isLoadingSuggestions && (
-            <div className="space-y-4 py-4">
-              {renderSuggestionsList("Topics to Cover", smartSuggestions.topicsToCover)}
-              {smartSuggestions.dailyOrWeeklyTimeSuggestion && (
-                <div>
-                  <h4 className="font-semibold text-foreground">Time Commitment:</h4>
-                  <p className="text-muted-foreground text-sm">{smartSuggestions.dailyOrWeeklyTimeSuggestion}</p>
-                </div>
-              )}
-              {renderSuggestionsList("Sample Projects/Activities", smartSuggestions.sampleProjectsOrActivities)}
-              {renderSuggestionsList("Diet & Nutrition Tips", smartSuggestions.dietAndNutritionTips)}
-              {renderSuggestionsList("Workout Routine Ideas", smartSuggestions.workoutRoutineIdeas)}
-              {renderSuggestionsList("General Tips", smartSuggestions.generalTips)}
-              <Button onClick={fetchSmartSuggestions} variant="outline" size="sm" className="mt-4">
-                 <Lightbulb className="mr-2 h-4 w-4" /> Regenerate Suggestions
-              </Button>
-            </div>
-          )}
         </CardContent>
       </Card>
 
