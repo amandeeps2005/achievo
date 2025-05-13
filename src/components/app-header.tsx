@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from 'next/link';
@@ -67,11 +66,14 @@ export default function AppHeader() {
           ) : user ? (
             <>
               {pathname !== '/dashboard' && (
-                <Button variant="ghost" size="sm" asChild className="text-sm">
-                  <Link href="/dashboard">
-                    <LayoutDashboard className="mr-1.5 h-4 w-4" />
-                    Dashboard
-                  </Link>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-sm" 
+                  onClick={() => router.push('/dashboard')}
+                >
+                  <LayoutDashboard className="mr-1.5 h-4 w-4" />
+                  Dashboard
                 </Button>
               )}
               <DropdownMenu>
