@@ -10,7 +10,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-export const SmartSuggestionsInputSchema = z.object({
+const SmartSuggestionsInputSchema = z.object({
   goalTitle: z.string().describe("The title or main objective of the goal."),
   category: z.string().describe("The category of the goal (e.g., Learning, Fitness, Career, Hobby)."),
   timeframe: z.string().describe("The total time allocated for the goal or a description of the timeline (e.g., '1 month', 'Complete project by EOY', 'Ongoing')."),
@@ -18,7 +18,7 @@ export const SmartSuggestionsInputSchema = z.object({
 });
 export type SmartSuggestionsInput = z.infer<typeof SmartSuggestionsInputSchema>;
 
-export const SmartSuggestionsOutputSchema = z.object({
+const SmartSuggestionsOutputSchema = z.object({
   topicsToCover: z.array(z.string()).optional().describe("Key topics or areas to focus on, especially for learning or skill-based goals."),
   dailyOrWeeklyTimeSuggestion: z.string().optional().describe("Suggested time to dedicate daily or weekly (e.g., '1-2 hours daily', '3 sessions per week of 1 hour')."),
   sampleProjectsOrActivities: z.array(z.string()).optional().describe("Ideas for practical projects, activities, or exercises related to the goal."),
