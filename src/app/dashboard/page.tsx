@@ -153,7 +153,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <blockquote className="text-xl italic text-foreground pl-6 border-l-4 border-accent relative">
-              <span className="absolute -left-3 top-0 text-4xl text-accent opacity-50">&ldquo;</span>
+              <span className="absolute left-1 top-0 text-4xl text-accent opacity-50">&ldquo;</span>
               {currentQuote.split(" - ")[0]}
               {currentQuote.includes(" - ") && (
                  <footer className="text-base text-muted-foreground mt-3 not-italic tracking-wide">- {currentQuote.split(" - ")[1]}</footer>
