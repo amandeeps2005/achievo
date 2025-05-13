@@ -1,0 +1,90 @@
+"use client";
+
+import type { Goal } from '@/types';
+import ActionRoadmap from './action-roadmap';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { Tag, CalendarDays, Wrench, Target, Lightbulb } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+
+interface GoalDetailViewProps {
+  goal: Goal;
+}
+
+export default function GoalDetailView({ goal }: GoalDetailViewProps) {
+  return (
+    <div className="space-y-8">
+      <Card className="shadow-lg">
+        <CardHeader>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+            <CardTitle className="text-3xl font-bold text-primary flex items-center">
+              <Target className="w-8 h-8 mr-3 shrink-0" /> {goal.title || goal.originalGoal}
+            </CardTitle>
+            {goal.progress === 100 && <Badge className="bg-green-500 text-white py-1 px-3 text-sm">Completed!</Badge>}
+          </div>
+          <CardDescription className="flex items-center text-base text-muted-foreground pt-1">
+            <Tag className="w-4 h-4 mr-2" />
+            {goal.category}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-sm font-medium text-foreground">Overall Progress</span>
+              <span className="text-sm font-semibold text-primary">{goal.progress}%</span>
+            </div>
+            <Progress value={goal.progress} aria-label={`${goal.progress}% completed`} className="h-4" />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div className="flex items-start p-3 bg-muted/50 rounded-md">
+              <CalendarDays className="w-5 h-5 mr-3 mt-1 text-primary shrink-0" />
+              <div>
+                <strong className="text-foreground">Timeline:</strong>
+                <p className="text-muted-foreground">{goal.timeline}</p>
+              </div>
+            </div>
+            <div className="flex items-start p-3 bg-muted/50 rounded-md">
+              <Wrench className="w-5 h-5 mr-3 mt-1 text-primary shrink-0" />
+              <div>
+                <strong className="text-foreground">Tools & Resources:</strong>
+                {goal.tools.length > 0 ? (
+                  <ul className="list-disc list-inside text-muted-foreground">
+                    {goal.tools.map((tool, idx) => <li key={idx}>{tool}</li>)}
+                  </ul>
+                ) : (
+                  <p className="text-muted-foreground">No specific tools listed.</p>
+                )}
+              </div>
+            </div>
+          </div>
+          {goal.originalGoal && goal.title !== goal.originalGoal && (
+             <div className="flex items-start p-3 bg-muted/50 rounded-md">
+              <Lightbulb className="w-5 h-5 mr-3 mt-1 text-primary shrink-0" />
+              <div>
+                <strong className="text-foreground">Original Goal Statement:</strong>
+                <p className="text-muted-foreground italic">"{goal.originalGoal}"</p>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <div>
+        <h2 className="text-2xl font-semibold text-foreground mb-4">Action Roadmap</h2>
+        <ActionRoadmap goal={goal} />
+      </div>
+
+      {goal.progress === 100 && (
+        <Alert className="bg-green-50 border-green-200 dark:bg-green-900/50 dark:border-green-700 mt-8">
+          <Lightbulb className="h-5 w-5 text-green-600 dark:text-green-400" />
+          <AlertTitle className="text-green-700 dark:text-green-300 font-semibold">Congratulations!</AlertTitle>
+          <AlertDescription className="text-green-600 dark:text-green-400">
+            You've successfully completed this goal. Amazing work! Time to celebrate and set a new challenge?
+          </AlertDescription>
+        </Alert>
+      )}
+    </div>
+  );
+}
