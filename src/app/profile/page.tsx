@@ -21,10 +21,23 @@ import { updateProfile, sendEmailVerification } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+const titleOptions = [
+  { value: "N/A", label: "N/A (Not Specified)" },
+  { value: "student", label: "Student" },
+  { value: "employee", label: "Employee" },
+  { value: "businessman", label: "Business Owner" },
+  { value: "entrepreneur", label: "Entrepreneur" },
+  { value: "homemaker", label: "Homemaker" },
+  { value: "freelancer", label: "Freelancer" },
+  { value: "researcher", label: "Researcher" },
+  { value: "other", label: "Other" },
+];
 
 const profileFormSchema = z.object({
   displayName: z.string().min(3, "Display name must be at least 3 characters.").max(50, "Display name can be at most 50 characters."),
+  title: z.string().optional(), // Title is optional
 });
 type ProfileFormData = z.infer<typeof profileFormSchema>;
 
@@ -34,11 +47,13 @@ export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isResendingVerification, setIsResendingVerification] = useState(false);
+  const [profileTitle, setProfileTitle] = useState<string>("N/A");
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
-      displayName: user?.displayName || "",
+      displayName: "",
+      title: "N/A",
     },
   });
 
@@ -47,7 +62,14 @@ export default function ProfilePage() {
       redirect('/');
     }
     if (user) {
-      form.reset({ displayName: user.displayName || "" });
+      // Load title from localStorage for demo persistence
+      const storedTitle = localStorage.getItem(`user_${user.uid}_title`);
+      const currentTitle = storedTitle || "N/A";
+      setProfileTitle(currentTitle);
+      form.reset({ 
+        displayName: user.displayName || "",
+        title: currentTitle,
+      });
     }
   }, [user, authLoading, form]);
 
@@ -80,11 +102,19 @@ export default function ProfilePage() {
     ? formatDistanceToNow(new Date(user.metadata.creationTime), { addSuffix: true })
     : 'N/A';
 
-  const userTitle = "N/A"; // Placeholder as title is not in user object
-
   const handleEditToggle = () => {
     if (isEditing) {
-      form.reset({ displayName: user.displayName || "" });
+      // Reset form to current profile values when canceling edit
+      form.reset({ 
+        displayName: user.displayName || "",
+        title: profileTitle,
+       });
+    } else {
+      // Ensure form is populated with current values when starting edit
+       form.reset({ 
+        displayName: user.displayName || "",
+        title: profileTitle,
+       });
     }
     setIsEditing(!isEditing);
   };
@@ -99,6 +129,11 @@ export default function ProfilePage() {
       await updateProfile(auth.currentUser, {
         displayName: data.displayName,
       });
+      const newTitle = data.title || "N/A";
+      setProfileTitle(newTitle);
+      // Save title to localStorage for demo persistence
+      localStorage.setItem(`user_${auth.currentUser.uid}_title`, newTitle);
+      
       toast({ title: "Success", description: "Profile updated successfully." });
       setIsEditing(false);
     } catch (error: any) {
@@ -195,6 +230,32 @@ export default function ProfilePage() {
                     </FormItem>
                   )}
                 />
+
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <Label htmlFor="title" className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Title</Label>
+                       <Select onValueChange={field.onChange} value={field.value || "N/A"} disabled={isSaving}>
+                          <SelectTrigger id="title" className="w-full">
+                            <div className="flex items-center">
+                              <Briefcase className="mr-2 h-4 w-4 text-muted-foreground" />
+                              <SelectValue placeholder="Select your title" />
+                            </div>
+                          </SelectTrigger>
+                          <SelectContent>
+                            {titleOptions.map(option => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 
                 <div className="flex items-center space-x-4 p-4 bg-muted/30 rounded-lg border border-border">
                   <Mail className="w-7 h-7 text-primary shrink-0" />
@@ -247,8 +308,8 @@ export default function ProfilePage() {
                   <Briefcase className="w-7 h-7 text-primary shrink-0" />
                   <div>
                     <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Title</p>
-                    <p className="text-md font-semibold text-foreground">{userTitle}</p>
-                    {userTitle === "N/A" && <p className="text-xs text-muted-foreground">(Title information is not stored in user profile)</p>}
+                    <p className="text-md font-semibold text-foreground">{profileTitle}</p>
+                    {profileTitle === "N/A" && <p className="text-xs text-muted-foreground">(Title information is not stored in user profile)</p>}
                   </div>
                 </div>
               </div>
@@ -280,4 +341,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-
