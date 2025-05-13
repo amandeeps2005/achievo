@@ -8,7 +8,7 @@ import LoadingSpinner from '@/components/loading-spinner';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth-context';
 import Link from 'next/link';
-import { PlusCircle, BarChartBig } from 'lucide-react';
+import { PlusCircle, BarChartBig, Lightbulb } from 'lucide-react';
 import { redirect } from 'next/navigation';
 import GoalProgressChart from '@/components/goal-progress-chart';
 import {
@@ -20,6 +20,8 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
 
 const motivationalQuotes = [
   "The secret of getting ahead is getting started. - Mark Twain",
@@ -117,17 +119,26 @@ export default function DashboardPage() {
           </Button>
         </div>
       </div>
+
+      {currentQuote && (
+        <Card className="bg-gradient-to-r from-primary/10 via-card to-card/50 shadow-lg rounded-xl border-primary/20">
+          <CardHeader className="flex flex-row items-center gap-3 pb-3">
+            <Lightbulb className="w-8 h-8 text-accent" />
+            <CardTitle className="text-2xl font-semibold text-primary">Motivational Spark</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <blockquote className="text-lg italic text-foreground pl-4 border-l-4 border-accent">
+              "{currentQuote.split(" - ")[0]}"
+              {currentQuote.includes(" - ") && (
+                 <footer className="text-sm text-muted-foreground mt-2 not-italic">- {currentQuote.split(" - ")[1]}</footer>
+              )}
+            </blockquote>
+          </CardContent>
+        </Card>
+      )}
       
       <GoalList goals={goals} />
 
-      {goals.length > 0 && currentQuote && (
-        <div className="mt-12 p-6 bg-card rounded-xl shadow-lg">
-          <h3 className="text-xl font-semibold text-primary mb-3">Motivational Corner</h3>
-          <p className="text-muted-foreground italic text-lg">
-            "{currentQuote}"
-          </p>
-        </div>
-      )}
     </div>
   );
 }
