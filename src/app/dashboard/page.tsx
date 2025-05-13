@@ -10,6 +10,7 @@ import { useAuth } from '@/context/auth-context';
 import Link from 'next/link';
 import { PlusCircle } from 'lucide-react';
 import { redirect } from 'next/navigation';
+import GoalProgressChart from '@/components/goal-progress-chart'; // Import new component
 
 const motivationalQuotes = [
   "The secret of getting ahead is getting started. - Mark Twain",
@@ -37,8 +38,10 @@ export default function DashboardPage() {
 
   useEffect(() => {
     // Select a random quote on component mount (client-side)
-    const randomIndex = Math.floor(Math.random() * motivationalQuotes.length);
-    setCurrentQuote(motivationalQuotes[randomIndex]);
+    if (motivationalQuotes.length > 0) {
+      const randomIndex = Math.floor(Math.random() * motivationalQuotes.length);
+      setCurrentQuote(motivationalQuotes[randomIndex]);
+    }
   }, []);
 
 
@@ -76,6 +79,9 @@ export default function DashboardPage() {
           </Link>
         </Button>
       </div>
+
+      {/* Progress Chart Section */}
+      <GoalProgressChart goals={goals} />
       
       <GoalList goals={goals} />
 
