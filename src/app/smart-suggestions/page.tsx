@@ -105,7 +105,7 @@ export default function SmartSuggestionsPage() {
            form.reset({
              customTitle: existingGoal.title || existingGoal.originalGoal,
              customCategory: existingGoal.category,
-             customTimeframe: existingGoal.overallDeadline || existingGoal.timeline, // Use overallDeadline, fallback to timeline
+             customTimeframe: existingGoal.overallDeadline || existingGoal.timeline,
            });
            setLoadedFromGoalId(goalId);
         }
@@ -113,16 +113,38 @@ export default function SmartSuggestionsPage() {
   };
 
   const renderSuggestionsList = (title: string, items?: string[]) => {
-    if (!items || items.length === 0) return null;
+    // Filter out empty or whitespace-only strings from the items array
+    const validItems = items?.filter(item => typeof item === 'string' && item.trim() !== "");
+
+    if (!validItems || validItems.length === 0) {
+      return null; // If no valid items, render nothing (not even the title)
+    }
+
     return (
       <div className="mt-3">
         <h4 className="font-semibold text-foreground text-sm">{title}:</h4>
         <ul className="list-disc list-inside text-muted-foreground text-xs space-y-1 pl-4">
-          {items.map((item, index) => <li key={index}>{item}</li>)}
+          {validItems.map((item, index) => <li key={index}>{item}</li>)}
         </ul>
       </div>
     );
   };
+  
+  const allSuggestionsEmpty = (suggestions: SmartSuggestionsOutput | null): boolean => {
+    if (!suggestions) return true;
+    return Object.values(suggestions).every(value => {
+      if (value === undefined || value === null) return true;
+      if (typeof value === 'string') return value.trim() === ""; // Check if string fields are empty
+      if (Array.isArray(value)) {
+        // Check if array fields are empty or contain only empty/whitespace strings
+        return value.filter(item => typeof item === 'string' && item.trim() !== "").length === 0;
+      }
+      // For any other type, if it's present, consider it not empty.
+      // Based on SmartSuggestionsOutputSchema, values are string or array of strings or undefined.
+      return false; 
+    });
+  };
+
 
   if (authLoading || (!user && !authLoading)) {
     return (
@@ -269,7 +291,7 @@ export default function SmartSuggestionsPage() {
               </CardHeader>
               <CardContent className="space-y-3 text-sm">
                 {renderSuggestionsList("Key Topics to Cover", smartSuggestions.topicsToCover)}
-                {smartSuggestions.dailyOrWeeklyTimeSuggestion && (
+                {smartSuggestions.dailyOrWeeklyTimeSuggestion && smartSuggestions.dailyOrWeeklyTimeSuggestion.trim() !== "" && (
                   <div>
                     <h4 className="font-semibold text-foreground">Suggested Time Commitment:</h4>
                     <p className="text-muted-foreground text-xs">{smartSuggestions.dailyOrWeeklyTimeSuggestion}</p>
@@ -279,7 +301,7 @@ export default function SmartSuggestionsPage() {
                 {renderSuggestionsList("Diet & Nutrition Tips", smartSuggestions.dietAndNutritionTips)}
                 {renderSuggestionsList("Workout Routine Ideas", smartSuggestions.workoutRoutineIdeas)}
                 {renderSuggestionsList("General Tips & Advice", smartSuggestions.generalTips)}
-                 {Object.values(smartSuggestions).every(val => val === undefined || (Array.isArray(val) && val.length === 0)) && (
+                 {allSuggestionsEmpty(smartSuggestions) && (
                     <p className="text-muted-foreground">No specific suggestions were generated for this goal type. Try rephrasing or providing more detail.</p>
                 )}
               </CardContent>
