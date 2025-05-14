@@ -7,7 +7,7 @@ import LoadingSpinner from '@/components/loading-spinner';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth-context';
 import Link from 'next/link';
-import { PlusCircle, BarChartBig, Lightbulb, Brain, LayoutGrid, ArrowRight, FileText, NotebookPen } from 'lucide-react';
+import { PlusCircle, BarChartBig, Lightbulb, Brain, LayoutGrid, ArrowRight, NotebookPen } from 'lucide-react';
 import { useRouter } from 'next/navigation'; // Changed from next/navigation redirect
 import GoalProgressChart from '@/components/goal-progress-chart';
 import {
@@ -26,7 +26,6 @@ import { getSmartSuggestions, type GenerateSmartSuggestionsResult } from '@/app/
 import type { SmartSuggestionsOutput } from '@/ai/flows/smart-suggestions-flow';
 import type { Goal } from '@/types';
 import { useToast } from '@/hooks/use-toast';
-import NotesDialog from '@/components/notes/notes-dialog';
 
 
 const motivationalQuotes = [
@@ -55,7 +54,6 @@ export default function DashboardPage() {
   const [smartSuggestions, setSmartSuggestions] = useState<SmartSuggestionsOutput | null>(null);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   const [suggestionsError, setSuggestionsError] = useState<string | null>(null);
-  const [isNotesModalOpen, setIsNotesModalOpen] = useState(false);
 
 
   useEffect(() => {
@@ -398,12 +396,7 @@ export default function DashboardPage() {
         </Card>
       )}
       
-      <NotesDialog 
-        isOpen={isNotesModalOpen} 
-        onClose={() => setIsNotesModalOpen(false)} 
-        goals={goals} 
-      />
-
     </div>
   );
 }
+
