@@ -23,6 +23,54 @@ import HabitForm from '@/components/habits/habit-form';
 import HabitItem from '@/components/habits/habit-item';
 import { format } from 'date-fns';
 
+// Helper component defined outside MyHabitsPage
+interface RenderHabitsListComponentProps {
+  habitsLoading: boolean;
+  habits: Habit[];
+  currentDate: string;
+  handleOpenHabitForm: (habit?: Habit) => void;
+}
+
+function RenderHabitsListComponent({
+  habitsLoading,
+  habits,
+  currentDate,
+  handleOpenHabitForm,
+}: RenderHabitsListComponentProps) {
+  if (habitsLoading) {
+    return (
+      <div className="flex flex-col justify-center items-center py-12 min-h-[200px]">
+        <LoadingSpinner size={32} /> <p className="ml-2 mt-3 text-muted-foreground">Loading habits...</p>
+      </div>
+    );
+  }
+  
+  const activeHabits = habits.filter(h => !h.archived);
+  if (activeHabits.length === 0) {
+    return (
+      <div className="text-center py-12 min-h-[200px] flex flex-col items-center justify-center">
+          <CheckSquare className="w-16 h-16 text-primary opacity-30 mb-4" />
+          <p className="text-muted-foreground">
+          No habits defined yet. Click "Add New Habit" to start building positive routines!
+          </p>
+      </div>
+    );
+  }
+  return (
+    <div className="space-y-4">
+      {activeHabits.map(habit => (
+        <HabitItem 
+          key={habit.id} 
+          habit={habit} 
+          date={currentDate}
+          onEditRequest={() => handleOpenHabitForm(habit)}
+        />
+      ))}
+    </div>
+  );
+}
+
+
 export default function MyHabitsPage() {
   const { user, loading: authLoading } = useAuth();
   const { habits, isLoading: habitsLoading } = useHabits();
@@ -60,40 +108,6 @@ export default function MyHabitsPage() {
     );
   }
 
-  const RenderHabitsListComponent = () => {
-    if (habitsLoading) {
-      return (
-        <div className="flex flex-col justify-center items-center py-12 min-h-[200px]">
-          <LoadingSpinner size={32} /> <p className="ml-2 mt-3 text-muted-foreground">Loading habits...</p>
-        </div>
-      );
-    }
-    
-    const activeHabits = habits.filter(h => !h.archived);
-    if (activeHabits.length === 0) {
-      return (
-        <div className="text-center py-12 min-h-[200px] flex flex-col items-center justify-center">
-            <CheckSquare className="w-16 h-16 text-primary opacity-30 mb-4" />
-            <p className="text-muted-foreground">
-            No habits defined yet. Click "Add New Habit" to start building positive routines!
-            </p>
-        </div>
-      );
-    }
-    return (
-      <div className="space-y-4">
-        {activeHabits.map(habit => (
-          <HabitItem 
-            key={habit.id} 
-            habit={habit} 
-            date={currentDate}
-            onEditRequest={() => handleOpenHabitForm(habit)}
-          />
-        ))}
-      </div>
-    );
-  }; // Explicit semicolon added here
-
   return (
     <div className="space-y-8">
       <div className="mb-6 flex justify-start">
@@ -121,13 +135,12 @@ export default function MyHabitsPage() {
             </Button>
         </CardHeader>
         <CardContent className="p-6">
-          {/* Placeholder for date navigation - Future Feature */}
-          {/* <div className="mb-4 flex justify-center items-center">
-            <Button variant="outline" size="icon" onClick={() => {/* Decrement date */}}><ChevronLeft /></Button>
-            <span className="mx-4 font-semibold text-lg">{format(new Date(currentDate), "PPP")}</span>
-            <Button variant="outline" size="icon" onClick={() => {/* Increment date */}}><ChevronRight /></Button>
-          </div> */}
-          <RenderHabitsListComponent />
+          <RenderHabitsListComponent
+            habitsLoading={habitsLoading}
+            habits={habits}
+            currentDate={currentDate}
+            handleOpenHabitForm={handleOpenHabitForm}
+          />
         </CardContent>
         <CardFooter className="p-6 bg-muted/20 border-t border-border justify-center">
              <Button variant="outline" className="w-full sm:w-auto">
