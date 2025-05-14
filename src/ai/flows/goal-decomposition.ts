@@ -35,6 +35,7 @@ const GoalDecompositionOutputSchema = z.object({
   category: z.string().describe('The category of the goal (e.g., Fitness, Learning, Career).'),
   timeline: z.string().describe('A timeline with deadlines for each step. All deadlines must be in the future.'),
   tools: z.array(z.string()).describe('The tools required to achieve the goal.'),
+  overallDeadline: z.string().describe('The overall deadline for the goal in YYYY-MM-DD format.'),
 });
 export type GoalDecompositionOutput = z.infer<typeof GoalDecompositionOutputSchema>;
 
@@ -68,6 +69,7 @@ const goalDecompositionPrompt = ai.definePrompt({
   - category: The category of the goal.
   - timeline: A short string describing a timeline with deadlines for each step (all future dates).
   - tools: A list of tools that will be needed to achieve the goal.
+  - overallDeadline: The overall deadline for the goal (YYYY-MM-DD, future).
 
   Example (assuming current date is 2025-05-10 for a goal like "Learn to play guitar in 3 months"):
   {
@@ -96,7 +98,8 @@ const goalDecompositionPrompt = ai.definePrompt({
     ],
     "category": "Hobby",
     "timeline": "Acquire guitar by May 20th, 2025, practice chords daily until August 10th, 2025, learn a song by June 30th, 2025.",
-    "tools": ["Acoustic Guitar", "Guitar Tuner", "Guitar Picks", "Online tutorials (e.g., JustinGuitar)"]
+    "tools": ["Acoustic Guitar", "Guitar Tuner", "Guitar Picks", "Online tutorials (e.g., JustinGuitar)"],
+    "overallDeadline": "2025-08-10"
   }
   `,
 });

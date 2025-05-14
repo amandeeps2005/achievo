@@ -77,6 +77,7 @@ export default function GoalSetupForm() {
       title: generatedPlan.category ? `${generatedPlan.category}: ${form.getValues().goalDescription.substring(0, 40)}...` : form.getValues().goalDescription.substring(0, 50) + (form.getValues().goalDescription.length > 50 ? '...' : ''),
       category: generatedPlan.category,
       timeline: generatedPlan.timeline,
+      overallDeadline: generatedPlan.overallDeadline, // Save overall deadline
       tools: generatedPlan.tools,
       steps: generatedPlan.steps.map((step): StepUi => ({
         ...step,
@@ -184,6 +185,12 @@ export default function GoalSetupForm() {
                 <CalendarDays className="inline mr-2 h-4 w-4 text-primary mt-1 flex-shrink-0" /> 
                 <p><strong className="text-foreground">Timeline:</strong> <span className="text-muted-foreground">{generatedPlan.timeline}</span></p>
               </div>
+               {generatedPlan.overallDeadline && (
+                <div className="flex items-start">
+                  <CalendarDays className="inline mr-2 h-4 w-4 text-accent mt-1 flex-shrink-0" />
+                  <p><strong className="text-foreground">Overall Deadline:</strong> <span className="text-muted-foreground">{generatedPlan.overallDeadline}</span></p>
+                </div>
+              )}
               {generatedPlan.tools.length > 0 && (
                 <div>
                   <p className="flex items-center"><Wrench className="inline mr-2 h-4 w-4 text-primary flex-shrink-0" /> <strong className="text-foreground">Tools &amp; Resources:</strong></p>

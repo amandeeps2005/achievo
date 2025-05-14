@@ -5,7 +5,7 @@ import type { Goal } from '@/types';
 import ActionRoadmap from './action-roadmap';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Tag, CalendarDays, Wrench, Target, Lightbulb, Trash2, CalendarPlus, BarChartHorizontalBig } from 'lucide-react';
+import { Tag, CalendarDays, Wrench, Target, Lightbulb, Trash2, CalendarPlus, BarChartHorizontalBig, CalendarClock } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -45,6 +45,18 @@ export default function GoalDetailView({ goal }: GoalDetailViewProps) {
     });
   };
 
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString);
+      const userTimezoneOffset = date.getTimezoneOffset() * 60000;
+      return new Date(date.getTime() + userTimezoneOffset).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+    } catch (e) {
+      console.warn("Invalid date string for formatting:", dateString, e);
+      return dateString;
+    }
+  };
+
   return (
     <div className="space-y-8">
       <Card className="shadow-lg">
@@ -73,11 +85,18 @@ export default function GoalDetailView({ goal }: GoalDetailViewProps) {
             <div className="flex items-start p-3 bg-muted/50 rounded-md">
               <CalendarDays className="w-5 h-5 mr-3 mt-1 text-primary shrink-0" />
               <div>
-                <strong className="text-foreground">Timeline:</strong>
+                <strong className="text-foreground">Timeline Summary:</strong>
                 <p className="text-muted-foreground">{goal.timeline}</p>
               </div>
             </div>
             <div className="flex items-start p-3 bg-muted/50 rounded-md">
+              <CalendarClock className="w-5 h-5 mr-3 mt-1 text-accent shrink-0" />
+              <div>
+                <strong className="text-foreground">Overall Deadline:</strong>
+                <p className="text-muted-foreground">{goal.overallDeadline ? formatDate(goal.overallDeadline) : 'Not Set'}</p>
+              </div>
+            </div>
+            <div className="flex items-start p-3 bg-muted/50 rounded-md md:col-span-2">
               <Wrench className="w-5 h-5 mr-3 mt-1 text-primary shrink-0" />
               <div>
                 <strong className="text-foreground">Tools & Resources:</strong>
@@ -156,3 +175,4 @@ export default function GoalDetailView({ goal }: GoalDetailViewProps) {
     </div>
   );
 }
+

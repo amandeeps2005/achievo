@@ -15,6 +15,7 @@ export interface Goal {
   title?: string; // Potentially a shorter title derived from originalGoal or user input
   category: GoalDecompositionOutput['category'];
   timeline: GoalDecompositionOutput['timeline'];
+  overallDeadline: string; // Added overall deadline
   tools: GoalDecompositionOutput['tools'];
   steps: StepUi[];
   userId: string; // To associate the goal with a specific user
@@ -56,3 +57,4 @@ export interface HabitLog {
   completed: boolean;
   notes?: string; // Optional notes for a specific day's log
 }
+
