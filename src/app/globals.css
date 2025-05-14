@@ -45,6 +45,16 @@ body {
     --chart-5: 50 70% 60%;  /* Yellow-Orange */
 
     --radius: 0.5rem;
+
+    /* Sidebar Variables */
+    --sidebar-background: hsl(0 0% 7%); /* Same as card */
+    --sidebar-foreground: hsl(210 20% 90%); /* Same as main foreground */
+    --sidebar-primary: hsl(180 100% 35%); /* Same as main primary */
+    --sidebar-primary-foreground: hsl(180 100% 95%); /* Same as main primary foreground */
+    --sidebar-accent: hsl(var(--accent)); /* Use main accent for sidebar active items */
+    --sidebar-accent-foreground: hsl(var(--accent-foreground)); /* Use main accent foreground */
+    --sidebar-border: hsl(0 0% 15%); /* Slightly lighter than main border */
+    --sidebar-ring: hsl(var(--primary)); /* Use main primary for rings */
   }
 }
 

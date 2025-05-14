@@ -9,7 +9,19 @@ import { AuthProvider } from '@/context/auth-context';
 import { JournalProvider } from '@/context/journal-context';
 import { HabitProvider } from '@/context/habit-context';
 import AppFooter from '@/components/app-footer';
-import ChatbotWidget from '@/components/chatbot/chatbot-widget'; // Import ChatbotWidget
+import ChatbotWidget from '@/components/chatbot/chatbot-widget';
+import {
+  SidebarProvider,
+  Sidebar,
+  SidebarHeader,
+  SidebarContent,
+  SidebarFooter,
+  SidebarInset,
+} from '@/components/ui/sidebar';
+import { SidebarNavigation, SidebarAccountMenu } from '@/components/sidebar/sidebar-client-content';
+import { Target } from 'lucide-react';
+import Link from 'next/link';
+
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -31,19 +43,40 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (<html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans flex flex-col min-h-screen`}>
+  return (
+    <html lang="en">
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans`}>
           <AuthProvider>
             <GoalProvider>
               <JournalProvider>
                 <HabitProvider>
-                  <AppHeader />
-                  <main className="container mx-auto px-4 py-8 flex-grow">
-                    {children}
-                  </main>
-                  <Toaster />
-                  <AppFooter />
-                  <ChatbotWidget /> {/* Add ChatbotWidget here */}
+                  <SidebarProvider defaultOpen={false} > {/* Sidebar collapsed by default, can be changed */}
+                    <Sidebar collapsible="icon" className="border-r border-sidebar-border">
+                      <SidebarHeader className="p-4">
+                        <Link href="/" className="flex items-center gap-2 text-xl font-bold text-primary hover:opacity-80 transition-opacity">
+                          <Target className="w-7 h-7" />
+                          {/* Text span is hidden when sidebar is icon-only */}
+                          <span className="group-data-[state=collapsed]:hidden group-data-[collapsible=icon]:hidden">Achievo</span>
+                        </Link>
+                      </SidebarHeader>
+                      <SidebarContent>
+                        <SidebarNavigation />
+                      </SidebarContent>
+                      <SidebarFooter>
+                        <SidebarAccountMenu />
+                      </SidebarFooter>
+                    </Sidebar>
+
+                    <SidebarInset className="flex flex-col min-h-screen bg-background">
+                      <AppHeader />
+                      <main className="container mx-auto px-4 py-8 flex-grow">
+                        {children}
+                      </main>
+                      <Toaster />
+                      <AppFooter />
+                      <ChatbotWidget />
+                    </SidebarInset>
+                  </SidebarProvider>
                 </HabitProvider>
               </JournalProvider>
             </GoalProvider>

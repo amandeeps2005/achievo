@@ -3,9 +3,9 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { LayoutDashboard, LogIn, UserPlus, LogOut, ShieldCheck, User } from 'lucide-react';
+import { LayoutDashboard, LogIn, UserPlus, LogOut, ShieldCheck, User, PanelLeft } from 'lucide-react'; // Added PanelLeft
 import { usePathname, useRouter } from 'next/navigation';
-import { Target } from 'lucide-react';
+// Target icon removed as logo is now in sidebar
 import { useAuth } from '@/context/auth-context';
 import LoadingSpinner from './loading-spinner';
 import { useEffect, useState } from 'react';
@@ -18,6 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { SidebarTrigger } from '@/components/ui/sidebar'; // Import SidebarTrigger
 
 export default function AppHeader() {
   const pathname = usePathname();
@@ -50,15 +51,18 @@ export default function AppHeader() {
     return <User className="h-5 w-5 text-muted-foreground" />;
   };
 
-  const logoHref = '/'; // Always link to landing page
+  // Logo link now always goes to landing page, as per previous request
+  // const logoHref = user ? '/dashboard' : '/'; (old logic)
+  // const logoHref = '/'; (new logic, but logo is moved to sidebar)
 
   return (
     <header className="bg-card border-b border-border shadow-sm sticky top-0 z-50">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-        <Link href={logoHref} className="flex items-center gap-2 text-2xl font-bold text-primary hover:opacity-80 transition-opacity">
-          <Target className="w-8 h-8" />
-          <span>Achievo</span>
-        </Link>
+        <div className="flex items-center gap-2">
+           {/* SidebarTrigger is for mobile, desktop sidebar has its own rail handle */}
+          <SidebarTrigger className="md:hidden" /> 
+          {/* Achievo logo removed from here, it's now in SidebarHeader */}
+        </div>
         <nav className="flex items-center gap-2 sm:gap-3">
           {authLoading ? (
             <div className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground">
@@ -66,7 +70,8 @@ export default function AppHeader() {
             </div>
           ) : user ? (
             <>
-              {pathname !== '/dashboard' && (
+              {/* Dashboard button can be removed if sidebar is primary nav */}
+              {/* {pathname !== '/dashboard' && (
                 <Button
                   variant="ghost"
                   size="sm"
@@ -76,7 +81,7 @@ export default function AppHeader() {
                   <LayoutDashboard className="mr-1.5 h-4 w-4" />
                   Dashboard
                 </Button>
-              )}
+              )} */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0">
