@@ -10,25 +10,25 @@ body {
 @layer base {
   :root {
     /* Light Theme - Based on user input */
-    --background: 204 17% 93%; /* from #ecf0f1 */
-    --foreground: 224 71% 10%; /* Dark blue-gray for contrast */
+    --background: 204 17% 93%; /* from #ecf0f1 - Clouds */
+    --foreground: 220 13% 20%; /* Darker cool gray for contrast */
 
     --card: 0 0% 100%; /* White */
-    --card-foreground: 224 71% 10%; /* Dark blue-gray */
+    --card-foreground: 220 13% 20%;
 
     --popover: 0 0% 100%; /* White */
-    --popover-foreground: 224 71% 10%; /* Dark blue-gray */
+    --popover-foreground: 220 13% 20%;
 
-    --primary: 204 70% 53%; /* from #3498db */
+    --primary: 180 60% 40%; /* Teal - from #008080 */
     --primary-foreground: 0 0% 100%; /* White */
 
     --secondary: 204 17% 88%; /* Lighter version of background */
-    --secondary-foreground: 224 71% 10%; /* Dark blue-gray */
+    --secondary-foreground: 220 13% 20%;
 
     --muted: 204 17% 88%; /* Light cool gray */
     --muted-foreground: 204 10% 45%; /* Medium cool gray */
 
-    --accent: 28 80% 52%; /* from #e67e22 */
+    --accent: 28 80% 52%; /* Orange - from #e67e22 */
     --accent-foreground: 0 0% 100%; /* White */
 
     --destructive: 0 72% 51%; /* Vivid Red */
@@ -36,10 +36,10 @@ body {
 
     --border: 204 17% 85%; /* Slightly darker than secondary for borders */
     --input: 204 17% 90%; /* Slightly lighter than background for inputs */
-    --ring: 204 70% 53%; /* Primary color for rings */
+    --ring: 180 60% 40%; /* Primary color (Teal) for rings */
 
-    --chart-1: 204 70% 53%; /* Primary */
-    --chart-2: 28 80% 52%;  /* Accent */
+    --chart-1: 180 60% 40%; /* Primary (Teal) */
+    --chart-2: 28 80% 52%;  /* Accent (Orange) */
     --chart-3: 140 60% 45%; /* Green */
     --chart-4: 280 70% 60%; /* Purple */
     --chart-5: 50 80% 55%;  /* Yellow-Orange */
@@ -58,7 +58,7 @@ body {
     --popover: 220 13% 16%;
     --popover-foreground: 210 20% 90%;
 
-    --primary: 204 70% 60%; /* Lighter blue for dark mode */
+    --primary: 180 60% 50%; /* Lighter Teal for dark mode */
     --primary-foreground: 220 13% 5%; /* Very dark for contrast on primary */
 
     --secondary: 220 13% 20%; /* Medium dark cool gray/blue */
@@ -75,10 +75,10 @@ body {
 
     --border: 220 13% 25%; /* Darker cool gray border */
     --input: 220 13% 18%; /* Darker than card for inputs */
-    --ring: 204 70% 60%; /* Primary dark color for rings */
+    --ring: 180 60% 50%; /* Primary dark color (Teal) for rings */
 
-    --chart-1: 204 70% 60%; /* Primary (dark mode) */
-    --chart-2: 28 80% 60%;  /* Accent (dark mode) */
+    --chart-1: 180 60% 50%; /* Primary (Teal - dark mode) */
+    --chart-2: 28 80% 60%;  /* Accent (Orange - dark mode) */
     --chart-3: 140 60% 55%; /* Green (dark mode) */
     --chart-4: 280 70% 70%; /* Purple (dark mode) */
     --chart-5: 50 80% 65%;  /* Yellow-Orange (dark mode) */
