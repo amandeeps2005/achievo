@@ -194,7 +194,7 @@ export default function JournalEntryDetailPage() {
                           id="entryTitle"
                           placeholder="Enter journal entry title..."
                           {...field}
-                          className="text-3xl font-bold text-primary border-2 border-primary/30 focus:border-primary p-2 h-auto"
+                          className="text-3xl font-bold text-primary border-2 border-primary/30 focus:border-primary p-2 h-auto focus-visible:ring-0 focus-visible:ring-offset-0"
                         />
                       </FormControl>
                       <FormMessage />
@@ -231,7 +231,7 @@ export default function JournalEntryDetailPage() {
                             value={field.value === undefined ? GENERAL_JOURNAL_ENTRY_VALUE : field.value}
                             >
                             <FormControl>
-                                <SelectTrigger className="h-9">
+                                <SelectTrigger className="h-9 focus:ring-primary focus:border-primary">
                                 <SelectValue placeholder="Select a goal or leave for general entry" />
                                 </SelectTrigger>
                             </FormControl>
@@ -276,7 +276,7 @@ export default function JournalEntryDetailPage() {
                           placeholder="Type your journal entry here..."
                           {...field}
                           rows={15}
-                          className="prose dark:prose-invert max-w-none text-foreground whitespace-pre-wrap break-words text-base leading-relaxed border-2 border-primary/30 focus:border-primary"
+                          className="prose dark:prose-invert max-w-none text-foreground whitespace-pre-wrap break-words text-base leading-relaxed border-2 border-primary/30 focus:border-primary focus-visible:ring-0 focus-visible:ring-offset-0"
                         />
                       </FormControl>
                         <div className="flex justify-end items-center mt-1">
