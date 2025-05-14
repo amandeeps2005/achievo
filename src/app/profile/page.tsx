@@ -148,7 +148,7 @@ export default function ProfilePage() {
       return;
     }
     setIsSaving(true);
-    let photoURL = user.photoURL; // Start with current photoURL
+    let photoURL = user.photoURL; 
 
     try {
       if (selectedFile) {
@@ -160,31 +160,25 @@ export default function ProfilePage() {
 
       await updateProfile(auth.currentUser, {
         displayName: data.displayName,
-        photoURL: photoURL, // This will be the new URL if uploaded, or existing if not
+        photoURL: photoURL, 
       });
       
       const newTitle = data.title || "N/A";
       setProfileTitle(newTitle);
       localStorage.setItem(`user_${auth.currentUser.uid}_title`, newTitle);
       
-      // Force a refresh of the user object in the AuthContext if possible
-      // This depends on how AuthContext is implemented. A common way is to re-fetch or re-set the user.
-      // For simplicity, we rely on onAuthStateChanged, but for immediate UI update, manual update might be needed.
-      // Example: if useAuth exposes a way to update the user object:
-      if (setAuthUser) { // Check if setAuthUser exists from useAuth()
+      if (setAuthUser) { 
           const updatedUser = { ...auth.currentUser, displayName: data.displayName, photoURL: photoURL };
-          setAuthUser(updatedUser as any); // Type assertion might be needed depending on User type
+          setAuthUser(updatedUser as any); 
       }
-
 
       toast({ title: "Success", description: "Profile updated successfully." });
       setIsEditing(false);
-      setSelectedFile(null); // Clear selected file after saving
-      // previewUrl will be updated by useEffect if user.photoURL changes from onAuthStateChanged
+      setSelectedFile(null); 
     } catch (error: any) {
       toast({ title: "Error", description: error.message || "Failed to update profile.", variant: "destructive" });
     } finally {
-      setIsSaving(false);
+      setIsSaving(false); // Ensure isSaving is reset in all cases
     }
   };
 
@@ -408,4 +402,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-
