@@ -78,7 +78,7 @@ export default function MyHabitsPage() {
             No habits defined yet. Click "Add New Habit" to start building positive routines!
             </p>
         </div>
-        );
+      );
     }
     return (
       <div className="space-y-4">
