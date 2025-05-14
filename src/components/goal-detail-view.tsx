@@ -5,7 +5,7 @@ import type { Goal } from '@/types';
 import ActionRoadmap from './action-roadmap';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Tag, CalendarDays, Wrench, Target, Lightbulb, Trash2, CalendarPlus, BarChartHorizontalBig, TrendingUp } from 'lucide-react';
+import { Tag, CalendarDays, Wrench, Target, Lightbulb, Trash2, CalendarPlus, BarChartHorizontalBig } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -141,22 +141,6 @@ export default function GoalDetailView({ goal }: GoalDetailViewProps) {
         </CardHeader>
         <CardContent>
            <ActionRoadmap goal={goal} />
-        </CardContent>
-      </Card>
-
-      <Card className="shadow-md">
-        <CardHeader>
-          <CardTitle className="text-2xl font-semibold text-foreground flex items-center">
-            <TrendingUp className="w-6 h-6 mr-3 text-accent" />
-            Habit Tracking
-          </CardTitle>
-          <CardDescription>Monitor your consistency and build strong habits.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-6">
-            <p className="text-muted-foreground">Streak tracking and daily planner integration coming soon!</p>
-            <p className="text-sm text-muted-foreground/80">Keep completing your steps to build momentum.</p>
-          </div>
         </CardContent>
       </Card>
 

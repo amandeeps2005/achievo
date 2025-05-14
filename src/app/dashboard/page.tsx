@@ -7,7 +7,7 @@ import LoadingSpinner from '@/components/loading-spinner';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth-context';
 import Link from 'next/link';
-import { PlusCircle, BarChartBig, Lightbulb, Brain, LayoutGrid, ArrowRight, NotebookPen } from 'lucide-react';
+import { PlusCircle, BarChartBig, Lightbulb, Brain, LayoutGrid, ArrowRight, NotebookPen, CheckSquare } from 'lucide-react'; // Added CheckSquare
 import { useRouter } from 'next/navigation'; 
 import GoalProgressChart from '@/components/goal-progress-chart';
 import {
@@ -369,6 +369,26 @@ export default function DashboardPage() {
              <Button asChild size="lg" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg">
               <Link href="/my-journal">
                 Open Journal <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
+          </CardFooter>
+        </Card>
+        
+        <Card className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl">
+          <CardHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <CheckSquare className="w-8 h-8 text-primary" />
+              <CardTitle className="text-2xl">Habit Tracking</CardTitle>
+            </div>
+            <ShadcnCardDescription>Build and maintain your daily habits.</ShadcnCardDescription>
+          </CardHeader>
+          <CardContent className="flex-grow">
+            <p className="text-sm text-muted-foreground">Define habits, track your progress, and build consistency.</p>
+          </CardContent>
+          <CardFooter>
+             <Button asChild size="lg" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg">
+              <Link href="/my-habits">
+                Track Habits <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
           </CardFooter>

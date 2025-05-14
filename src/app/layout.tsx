@@ -7,8 +7,8 @@ import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/context/theme-context';
 import AppHeader from '@/components/app-header';
 import { AuthProvider } from '@/context/auth-context';
-import { JournalProvider } from '@/context/journal-context'; // Changed from NotesProvider
-
+import { JournalProvider } from '@/context/journal-context';
+import { HabitProvider } from '@/context/habit-context'; // Added HabitProvider
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -35,15 +35,17 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans`}>
         <ThemeProvider storageKey="achievo-ui-theme">
           <AuthProvider>
-            <JournalProvider> {/* Changed from NotesProvider */}
-              <GoalProvider>
-                <AppHeader />
-                <main className="container mx-auto px-4 py-8">
-                  {children}
-                </main>
-                <Toaster />
-              </GoalProvider>
-            </JournalProvider> {/* Changed from NotesProvider */}
+            <GoalProvider>
+              <JournalProvider>
+                <HabitProvider> {/* Added HabitProvider */}
+                  <AppHeader />
+                  <main className="container mx-auto px-4 py-8">
+                    {children}
+                  </main>
+                  <Toaster />
+                </HabitProvider>
+              </JournalProvider>
+            </GoalProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

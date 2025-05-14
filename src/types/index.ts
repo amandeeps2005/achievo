@@ -35,3 +35,24 @@ export interface JournalEntry {
 
 // Represents an item that can have journal entries (either a Goal or a "General" category)
 export type Journalable = Goal | { id: 'general'; title: string; originalGoal: string };
+
+// Habit Tracking Types
+export interface Habit {
+  id: string;
+  userId: string;
+  name: string;
+  description?: string;
+  frequency: 'daily'; // For now, only daily. Can be expanded later.
+  color?: string; // Optional: for UI theming of the habit
+  createdAt: string; // ISO date string
+  archived?: boolean; // To allow hiding without deleting
+}
+
+export interface HabitLog {
+  id: string; // compound key of habitId_date might be useful, or just UUID
+  habitId: string;
+  userId: string;
+  date: string; // YYYY-MM-DD format
+  completed: boolean;
+  notes?: string; // Optional notes for a specific day's log
+}
