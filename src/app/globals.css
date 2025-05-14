@@ -9,77 +9,79 @@ body {
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Light Theme - Vibrant */
+    --background: 210 15% 98%; /* Very light cool off-white */
+    --foreground: 224 71% 4%; /* Dark blue-gray */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%; /* White */
+    --card-foreground: 224 71% 4%; /* Dark blue-gray */
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%; /* White */
+    --popover-foreground: 224 71% 4%; /* Dark blue-gray */
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 205 79% 46%; /* Vibrant Cyan-Blue */
+    --primary-foreground: 0 0% 100%; /* White */
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 210 15% 90%; /* Light cool gray */
+    --secondary-foreground: 224 71% 4%; /* Dark blue-gray */
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 210 15% 90%; /* Light cool gray */
+    --muted-foreground: 215 20% 45%; /* Medium cool gray */
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 25 95% 53%; /* Saturated Orange */
+    --accent-foreground: 0 0% 100%; /* White */
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 72% 51%; /* Vivid Red */
+    --destructive-foreground: 0 0% 100%; /* White */
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 210 15% 88%; /* Light cool gray border */
+    --input: 210 15% 92%; /* Lighter cool gray for inputs */
+    --ring: 205 79% 46%; /* Vibrant Cyan-Blue for rings */
 
-    --chart-1: 222.2 47.4% 11.2%;
-    --chart-2: 166 40% 50%;
-    --chart-3: 38 90% 50%;
-    --chart-4: 280 70% 60%;
-    --chart-5: 0 75% 60%;
+    --chart-1: 205 79% 46%; /* Primary */
+    --chart-2: 25 95% 53%;  /* Accent */
+    --chart-3: 140 60% 45%; /* Green */
+    --chart-4: 280 70% 60%; /* Purple */
+    --chart-5: 50 80% 55%;  /* Yellow-Orange */
 
     --radius: 0.5rem;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    /* Dark Theme - Vibrant */
+    --background: 220 18% 12%; /* Deep cool dark blue */
+    --foreground: 210 20% 90%; /* Light cool gray (off-white) */
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 220 15% 16%; /* Slightly lighter deep cool dark blue */
+    --card-foreground: 210 20% 90%; /* Light cool gray (off-white) */
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 220 15% 16%; /* Slightly lighter deep cool dark blue */
+    --popover-foreground: 210 20% 90%; /* Light cool gray (off-white) */
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 205 79% 56%; /* Slightly lighter Vibrant Cyan-Blue for dark mode */
+    --primary-foreground: 220 18% 12%; /* Deep cool dark blue */
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 220 15% 22%; /* Medium deep cool dark blue */
+    --secondary-foreground: 210 20% 90%; /* Light cool gray (off-white) */
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 220 15% 22%; /* Medium deep cool dark blue */
+    --muted-foreground: 210 15% 65%; /* Medium cool gray */
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 25 95% 63%; /* Slightly lighter Saturated Orange for dark mode */
+    --accent-foreground: 220 18% 12%; /* Deep cool dark blue */
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 72% 61%; /* Slightly lighter Vivid Red for dark mode */
+    --destructive-foreground: 220 18% 12%; /* Deep cool dark blue */
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --border: 220 15% 25%; /* Dark cool gray border */
+    --input: 220 15% 20%; /* Darker cool gray for inputs */
+    --ring: 205 79% 56%; /* Slightly lighter Vibrant Cyan-Blue for rings */
 
-    --chart-1: 210 40% 98%;
-    --chart-2: 166 45% 70%;
-    --chart-3: 38 95% 70%;
-    --chart-4: 280 75% 75%;
-    --chart-5: 0 80% 75%;
+    --chart-1: 205 79% 56%; /* Primary (dark mode) */
+    --chart-2: 25 95% 63%;  /* Accent (dark mode) */
+    --chart-3: 140 60% 55%; /* Green (dark mode) */
+    --chart-4: 280 70% 70%; /* Purple (dark mode) */
+    --chart-5: 50 80% 65%;  /* Yellow-Orange (dark mode) */
   }
 }
 
