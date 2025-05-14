@@ -8,7 +8,8 @@ import AppHeader from '@/components/app-header';
 import { AuthProvider } from '@/context/auth-context';
 import { JournalProvider } from '@/context/journal-context';
 import { HabitProvider } from '@/context/habit-context';
-import AppFooter from '@/components/app-footer'; // Import the AppFooter
+import AppFooter from '@/components/app-footer';
+import ChatbotWidget from '@/components/chatbot/chatbot-widget'; // Import ChatbotWidget
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -41,7 +42,8 @@ export default function RootLayout({
                     {children}
                   </main>
                   <Toaster />
-                  <AppFooter /> {/* Add AppFooter here */}
+                  <AppFooter />
+                  <ChatbotWidget /> {/* Add ChatbotWidget here */}
                 </HabitProvider>
               </JournalProvider>
             </GoalProvider>

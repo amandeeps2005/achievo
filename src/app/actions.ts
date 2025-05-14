@@ -1,7 +1,9 @@
+
 // @/app/actions.ts
 'use server';
 import { goalDecomposition, type GoalDecompositionInput, type GoalDecompositionOutput } from '@/ai/flows/goal-decomposition';
 import { generateSmartSuggestions as generateSmartSuggestionsFlow, type SmartSuggestionsInput, type SmartSuggestionsOutput } from '@/ai/flows/smart-suggestions-flow';
+import { achievoChatbot, type AchievoChatbotInput, type AchievoChatbotOutput } from '@/ai/flows/chatbot-flow'; // Added chatbot import
 
 export interface GenerateGoalPlanResult {
   data?: GoalDecompositionOutput;
@@ -68,3 +70,30 @@ export async function getSmartSuggestions(
   }
 }
 
+// New Server Action for Chatbot
+export interface GetChatbotResponseResult {
+  data?: AchievoChatbotOutput;
+  error?: string;
+}
+
+export async function getChatbotResponse(input: AchievoChatbotInput): Promise<GetChatbotResponseResult> {
+  try {
+    const result = await achievoChatbot(input);
+    if (!result || !result.answer) {
+      return { error: 'Chatbot could not generate a response. Please try rephrasing your question.' };
+    }
+    return { data: result };
+  } catch (e: unknown) {
+    console.error("Error in getChatbotResponse:", e);
+    let errorMessage = 'Failed to get chatbot response. An unexpected error occurred.';
+    if (e instanceof Error) {
+      const lowerCaseMessage = e.message.toLowerCase();
+      if (lowerCaseMessage.includes('timeout') || lowerCaseMessage.includes('deadline')) {
+        errorMessage = "The chatbot request timed out. Please try again.";
+      } else if (lowerCaseMessage.includes('service unavailable')) {
+        errorMessage = "The chatbot service is temporarily unavailable.";
+      }
+    }
+    return { error: errorMessage };
+  }
+}
