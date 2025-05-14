@@ -38,8 +38,9 @@ export function SidebarNavigation() {
         </SidebarMenuButton>
       </SidebarMenuItem>
       <SidebarMenuItem>
-        <SidebarMenuButton asChild isActive={isActive('/progress-overview')} tooltip="Progress Overview">
-          <Link href="/progress-overview"><BarChartBig /> <span className="group-data-[collapsible=icon]:hidden">Progress</span></Link>
+        {/* Link to dashboard as Progress Overview is now part of it */}
+        <SidebarMenuButton asChild isActive={pathname === '/dashboard' && pathname.includes('progress')} tooltip="Progress Overview">
+          <Link href="/dashboard"><BarChartBig /> <span className="group-data-[collapsible=icon]:hidden">Progress</span></Link>
         </SidebarMenuButton>
       </SidebarMenuItem>
       <SidebarMenuItem>

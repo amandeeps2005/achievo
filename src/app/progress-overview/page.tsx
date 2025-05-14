@@ -1,4 +1,7 @@
 
+// This page is deprecated as its content (GoalProgressChart) is now directly integrated into the dashboard.
+// You can delete this file.
+
 "use client";
 
 import { useEffect } from 'react';
@@ -12,7 +15,7 @@ import { redirect } from 'next/navigation';
 import GoalProgressChart from '@/components/goal-progress-chart';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-export default function ProgressOverviewPage() {
+export default function ProgressOverviewPage_DEPRECATED() {
   const { goals, isLoading: goalsLoading } = useGoals();
   const { user, loading: authLoading } = useAuth();
 
@@ -58,10 +61,10 @@ export default function ProgressOverviewPage() {
             <CardHeader className="p-6 bg-primary/5">
                 <CardTitle className="text-3xl font-bold text-primary flex items-center">
                     <BarChartBig className="mr-3 h-7 w-7" />
-                    All Goals Progress Overview
+                    All Goals Progress Overview (DEPRECATED PAGE)
                 </CardTitle>
                 <CardDescription className="text-primary/80">
-                    A visual summary of your progress across all your goals.
+                    This page is no longer in use. Progress charts are now on the main dashboard.
                 </CardDescription>
             </CardHeader>
             <CardContent className="p-6">

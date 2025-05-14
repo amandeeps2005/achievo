@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/card';
 import { useHabits } from '@/context/habit-context';
 import { format } from 'date-fns';
+import GoalProgressChart from '@/components/goal-progress-chart'; // Import GoalProgressChart
 
 
 const motivationalQuotes = [
@@ -85,7 +86,7 @@ export default function DashboardPage() {
 
   const isDataLoading = (goalsLoading || habitsLoading) && typeof window !== 'undefined' && (!localStorage.getItem('achievoGoals') || !localStorage.getItem('achievoHabits'));
 
-  if (isDataLoading) {
+  if (isDataLoading && !user) { // Check !user to avoid brief flash for logged in users
     return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
         <LoadingSpinner size={48} />
@@ -146,6 +147,29 @@ export default function DashboardPage() {
         </Card>
       )}
 
+      {/* Integrated Goal Progress Chart */}
+      <Card className="shadow-xl border-primary/20 rounded-xl overflow-hidden">
+        <CardHeader className="p-6 bg-primary/5">
+            <CardTitle className="text-3xl font-bold text-primary flex items-center">
+                <BarChartBig className="mr-3 h-7 w-7" />
+                My Goal Progress
+            </CardTitle>
+            <ShadcnCardDescription className="text-primary/80">
+                A visual summary of your progress across all your goals.
+            </ShadcnCardDescription>
+        </CardHeader>
+        <CardContent className="p-6">
+          {goalsLoading && !localStorage.getItem('achievoGoals') ? (
+              <div className="flex flex-col items-center justify-center min-h-[250px]">
+                <LoadingSpinner size={48} />
+                <p className="mt-4 text-muted-foreground">Loading progress data...</p>
+              </div>
+            ) : (
+              <GoalProgressChart goals={goals} />
+            )}
+        </CardContent>
+      </Card>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4 sm:p-0">
         <Card className="flex flex-col shadow-xl hover:shadow-2xl transition-all duration-300 rounded-xl transform hover:-translate-y-1 border border-border hover:border-primary/30">
           <CardHeader className="bg-card">
@@ -168,27 +192,7 @@ export default function DashboardPage() {
             </Button>
           </CardFooter>
         </Card>
-
-        <Card className="flex flex-col shadow-xl hover:shadow-2xl transition-all duration-300 rounded-xl transform hover:-translate-y-1 border border-border hover:border-primary/30">
-            <CardHeader className="bg-card">
-              <div className="flex items-center gap-3 mb-2">
-                <BarChartBig className="w-8 h-8 text-primary" />
-                <CardTitle className="text-2xl">Progress Overview</CardTitle>
-              </div>
-              <ShadcnCardDescription>A visual summary of your current goal progress.</ShadcnCardDescription>
-            </CardHeader>
-            <CardContent className="flex-grow">
-              <p className="text-sm text-muted-foreground">See charts and summaries of how you're doing across all goals.</p>
-            </CardContent>
-            <CardFooter>
-                <Button asChild size="lg" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg">
-                <Link href="/progress-overview">
-                    View Overview <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-                </Button>
-            </CardFooter>
-        </Card>
-
+        
          <Card className="flex flex-col shadow-xl hover:shadow-2xl transition-all duration-300 rounded-xl transform hover:-translate-y-1 border border-border hover:border-primary/30">
             <CardHeader className="bg-card">
               <div className="flex items-center gap-3 mb-2">
@@ -253,7 +257,6 @@ export default function DashboardPage() {
             </Button>
           </CardFooter>
         </Card>
-
       </div>
 
       {goals.length === 0 && !goalsLoading && (
@@ -269,8 +272,6 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       )}
-
     </div>
   );
 }
-
