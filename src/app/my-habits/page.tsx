@@ -2,7 +2,7 @@
 // src/app/my-habits/page.tsx
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter, redirect } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -16,12 +16,17 @@ import { Button } from '@/components/ui/button';
 import type { Habit } from '@/types';
 import { useHabits } from '@/context/habit-context';
 import { useAuth } from '@/context/auth-context';
-import { PlusCircle, CheckSquare, ArrowLeft, Edit3, Trash2, CalendarDays } from 'lucide-react';
+import { PlusCircle, CheckSquare, ArrowLeft, Edit3, Trash2, CalendarDays, Eye, X } from 'lucide-react';
 import LoadingSpinner from '@/components/loading-spinner';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription as ShadcnCardDescription, CardFooter } from '@/components/ui/card';
 import HabitForm from '@/components/habits/habit-form';
 import HabitItem from '@/components/habits/habit-item';
-import { format } from 'date-fns';
+import { format, startOfMonth, endOfMonth, getDaysInMonth, setDate as setDateOnMonth, parseISO } from 'date-fns';
+import { Calendar } from '@/components/ui/calendar';
+import type { DayProps } from 'react-day-picker';
+import * as DayPickerPrimitive from 'react-day-picker';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { cn } from '@/lib/utils';
 
 // Helper component defined outside MyHabitsPage
 interface RenderHabitsListComponentProps {
@@ -70,15 +75,67 @@ function RenderHabitsListComponent({
   );
 }
 
+interface CustomDayComponentProps extends DayProps {
+  heatmapData: Record<string, { completedCount: number; totalTrackedHabits: number }>;
+}
+
+const CustomDayComponent: React.FC<CustomDayComponentProps> = ({ date, displayMonth, heatmapData }) => {
+    const dayStr = format(date, 'yyyy-MM-dd');
+    const dayData = heatmapData[dayStr];
+    
+    let cellClassName = "hover:bg-accent/50 focus-visible:ring-1 focus-visible:ring-ring"; // Base hover/focus for clickable area
+    let tooltipText = format(date, "PPP"); 
+
+    if (date.getMonth() === displayMonth.getMonth()) { 
+        if (dayData && dayData.totalTrackedHabits > 0) {
+            const completionRatio = dayData.completedCount / dayData.totalTrackedHabits;
+            if (completionRatio === 1) {
+                cellClassName = cn(cellClassName, "bg-primary text-primary-foreground hover:bg-primary/90");
+                tooltipText = `${dayData.completedCount}/${dayData.totalTrackedHabits} habits completed`;
+            } else if (completionRatio > 0) {
+                cellClassName = cn(cellClassName, "bg-primary/60 text-primary-foreground hover:bg-primary/50");
+                tooltipText = `${dayData.completedCount}/${dayData.totalTrackedHabits} habits completed`;
+            } else { 
+                cellClassName = cn(cellClassName, "bg-muted/50 hover:bg-muted text-muted-foreground");
+                tooltipText = `0/${dayData.totalTrackedHabits} habits completed`;
+            }
+        } else if (dayData && dayData.totalTrackedHabits === 0) {
+             tooltipText = "No habits tracked on this day";
+        }
+    } else {
+        cellClassName = cn(cellClassName, "text-muted-foreground opacity-50"); 
+    }
+
+    return (
+        <TooltipProvider delayDuration={100}>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <DayPickerPrimitive.Day date={date} displayMonth={displayMonth} className={cn(
+                        "h-9 w-9 p-0 font-normal rounded-md transition-colors relative", 
+                        cellClassName
+                    )} />
+                </TooltipTrigger>
+                <TooltipContent side="top">
+                    <p>{tooltipText}</p>
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
+    );
+};
+const MemoizedCustomDay = React.memo(CustomDayComponent);
+
 
 export default function MyHabitsPage() {
   const { user, loading: authLoading } = useAuth();
-  const { habits, isLoading: habitsLoading } = useHabits();
+  const { habits, habitLogs, isLoading: habitsLoading } = useHabits();
   const router = useRouter();
 
   const [isHabitFormOpen, setIsHabitFormOpen] = useState(false);
   const [editingHabit, setEditingHabit] = useState<Habit | undefined>(undefined);
   const [currentDate, setCurrentDate] = useState(() => format(new Date(), 'yyyy-MM-dd'));
+
+  const [showHeatmap, setShowHeatmap] = useState(false);
+  const [heatmapDisplayMonth, setHeatmapDisplayMonth] = useState(new Date());
 
   useEffect(() => {
     if (typeof document !== 'undefined') {
@@ -98,6 +155,53 @@ export default function MyHabitsPage() {
     setIsHabitFormOpen(false);
     setEditingHabit(undefined);
   }, []);
+  
+  const heatmapDataForMonth = useMemo(() => {
+    const data: Record<string, { completedCount: number; totalTrackedHabits: number }> = {};
+    if (!user || !showHeatmap) return data;
+
+    const monthStart = startOfMonth(heatmapDisplayMonth);
+    const monthEnd = endOfMonth(heatmapDisplayMonth);
+    
+    const activeUserHabits = habits.filter(h => !h.archived && h.userId === user.uid);
+    if (activeUserHabits.length === 0) return data;
+
+    const userLogsForMonth = habitLogs.filter(log => {
+        try {
+             const d = parseISO(log.date);
+             return log.userId === user.uid && d >= monthStart && d <= monthEnd;
+        } catch (e) { return false; }
+    });
+
+    for (let dayIndex = 0; dayIndex < getDaysInMonth(heatmapDisplayMonth); dayIndex++) {
+        const currentDate = setDateOnMonth(heatmapDisplayMonth, dayIndex + 1);
+        const currentDateStr = format(currentDate, 'yyyy-MM-dd');
+
+        let completedOnDay = 0;
+        let trackedOnDay = 0;
+
+        activeUserHabits.forEach(habit => {
+            try {
+              const habitCreatedAt = parseISO(habit.createdAt);
+              if (habitCreatedAt <= currentDate) { 
+                  trackedOnDay++;
+                  const log = userLogsForMonth.find(l => l.habitId === habit.id && l.date === currentDateStr);
+                  if (log?.completed) {
+                      completedOnDay++;
+                  }
+              }
+            } catch (e) {
+              console.warn("Could not parse habit createdAt date:", habit.createdAt);
+            }
+        });
+
+        if (trackedOnDay > 0) {
+            data[currentDateStr] = { completedCount: completedOnDay, totalTrackedHabits: trackedOnDay };
+        }
+    }
+    return data;
+  }, [user, habits, habitLogs, heatmapDisplayMonth, showHeatmap]);
+
 
   if (authLoading || (!user && !authLoading)) {
     return (
@@ -119,35 +223,74 @@ export default function MyHabitsPage() {
         </Button>
       </div>
 
-      <Card className="shadow-xl border-primary/20 rounded-xl overflow-hidden">
-         <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-6 bg-primary/5">
-            <div>
+      {!showHeatmap && (
+        <Card className="shadow-xl border-primary/20 rounded-xl overflow-hidden">
+          <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-6 bg-primary/5">
+              <div>
+                  <CardTitle className="text-3xl font-bold text-primary flex items-center">
+                      <CheckSquare className="mr-3 h-7 w-7" />
+                      My Habits
+                  </CardTitle>
+                  <ShadcnCardDescription className="text-primary/80">
+                      Track your daily habits and build consistency. Today is {format(new Date(currentDate), "PPP")}.
+                  </ShadcnCardDescription>
+              </div>
+              <Button onClick={() => handleOpenHabitForm()} className="bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg shadow-md transform hover:scale-105 transition-transform w-full sm:w-auto">
+                  <PlusCircle className="w-5 h-5 mr-2" /> Add New Habit
+              </Button>
+          </CardHeader>
+          <CardContent className="p-6">
+            <RenderHabitsListComponent
+              habitsLoading={habitsLoading}
+              habits={habits}
+              currentDate={currentDate}
+              handleOpenHabitForm={handleOpenHabitForm}
+            />
+          </CardContent>
+        </Card>
+      )}
+
+      {showHeatmap && (
+        <Card className="shadow-xl border-primary/20 rounded-xl overflow-hidden">
+            <CardHeader className="p-6 bg-primary/5">
                 <CardTitle className="text-3xl font-bold text-primary flex items-center">
-                    <CheckSquare className="mr-3 h-7 w-7" />
-                    My Habits
+                    <CalendarDays className="mr-3 h-7 w-7" />
+                    Habit Completion Heatmap
                 </CardTitle>
                 <ShadcnCardDescription className="text-primary/80">
-                    Track your daily habits and build consistency. Today is {format(new Date(currentDate), "PPP")}.
+                    Visualize your habit consistency over the month. Darker means more habits completed.
                 </ShadcnCardDescription>
-            </div>
-            <Button onClick={() => handleOpenHabitForm()} className="bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg shadow-md transform hover:scale-105 transition-transform w-full sm:w-auto">
-                <PlusCircle className="w-5 h-5 mr-2" /> Add New Habit
+            </CardHeader>
+            <CardContent className="p-6 flex flex-col items-center">
+                <Calendar
+                    mode="single"
+                    month={heatmapDisplayMonth}
+                    onMonthChange={setHeatmapDisplayMonth}
+                    components={{
+                        Day: (props) => <MemoizedCustomDay {...props} heatmapData={heatmapDataForMonth} />,
+                    }}
+                    className="rounded-md border p-0 sm:p-3 self-center w-full max-w-md"
+                    selected={undefined} // Disable date selection behavior
+                    onSelect={() => {}} // Disable date selection behavior
+                    showOutsideDays
+                    fixedWeeks
+                />
+                <div className="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
+                    <div className="flex items-center"><span className="w-3 h-3 rounded-sm mr-1.5 bg-primary"></span>All Done</div>
+                    <div className="flex items-center"><span className="w-3 h-3 rounded-sm mr-1.5 bg-primary/60"></span>Some Done</div>
+                    <div className="flex items-center"><span className="w-3 h-3 rounded-sm mr-1.5 bg-muted/50"></span>None Done (Tracked)</div>
+                </div>
+            </CardContent>
+        </Card>
+      )}
+      
+      <CardFooter className="p-6 bg-card border-t border-border justify-center rounded-b-xl">
+            <Button variant="outline" onClick={() => setShowHeatmap(prev => !prev)} className="w-full sm:w-auto">
+                {showHeatmap ? <X className="mr-2 h-4 w-4" /> : <Eye className="mr-2 h-4 w-4" />}
+                {showHeatmap ? 'Hide Calendar Heatmap' : 'Show Calendar Heatmap & Stats'}
             </Button>
-        </CardHeader>
-        <CardContent className="p-6">
-          <RenderHabitsListComponent
-            habitsLoading={habitsLoading}
-            habits={habits}
-            currentDate={currentDate}
-            handleOpenHabitForm={handleOpenHabitForm}
-          />
-        </CardContent>
-        <CardFooter className="p-6 bg-muted/20 border-t border-border justify-center">
-             <Button variant="outline" className="w-full sm:w-auto">
-                <CalendarDays className="mr-2 h-4 w-4" /> View Calendar & Stats (Coming Soon)
-            </Button>
-        </CardFooter>
-      </Card>
+      </CardFooter>
+
 
       {isHabitFormOpen && (
          <Dialog open={isHabitFormOpen} onOpenChange={(open) => { if(!open) handleCloseHabitForm(); else setIsHabitFormOpen(true);}}>
@@ -171,3 +314,4 @@ export default function MyHabitsPage() {
     </div>
   );
 }
+
