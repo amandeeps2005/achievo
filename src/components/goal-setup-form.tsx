@@ -84,6 +84,9 @@ export default function GoalSetupForm() {
         ...step,
         id: crypto.randomUUID(),
         completed: false,
+        startDate: step.startDate,
+        endDate: step.endDate,
+        repeatInterval: step.repeatInterval,
       })),
       userId: user.uid, 
       createdAt: new Date().toISOString(),
@@ -171,10 +174,10 @@ export default function GoalSetupForm() {
 
         {generatedPlan && !isGeneratingPlan && (
           <div className="mt-8 space-y-6 animate-in fade-in duration-700">
-            <Alert variant="default" className="bg-teal-500/10 border-teal-500/30 text-teal-700 dark:bg-teal-600/20 dark:border-teal-500/50 dark:text-teal-300 rounded-lg">
-              <CheckCircle className="h-6 w-6" />
-              <AlertTitle className="font-semibold text-lg">Your AI-Generated Plan is Ready!</AlertTitle>
-              <AlertDescription>
+            <Alert variant="default" className="rounded-lg border-primary/50 bg-primary/20 p-4">
+              <CheckCircle className="h-6 w-6 text-primary" />
+              <AlertTitle className="font-semibold text-lg text-primary">Your AI-Generated Plan is Ready!</AlertTitle>
+              <AlertDescription className="text-foreground/90">
                 Review the detailed roadmap below. If it aligns with your vision, save it to begin your journey.
               </AlertDescription>
             </Alert>
