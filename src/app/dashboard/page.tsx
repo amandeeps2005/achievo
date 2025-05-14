@@ -7,8 +7,8 @@ import LoadingSpinner from '@/components/loading-spinner';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth-context';
 import Link from 'next/link';
-import { PlusCircle, BarChartBig, Lightbulb, Brain, LayoutGrid, ArrowRight, NotebookPen, CheckSquare } from 'lucide-react'; // Added CheckSquare
-import { useRouter } from 'next/navigation'; 
+import { PlusCircle, BarChartBig, Lightbulb, Brain, LayoutGrid, ArrowRight, NotebookPen, CheckSquare } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import GoalProgressChart from '@/components/goal-progress-chart';
 import {
   Dialog,
@@ -58,7 +58,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!authLoading && !user) {
-      router.replace('/'); 
+      router.replace('/');
     }
   }, [user, authLoading, router]);
 
@@ -112,7 +112,7 @@ export default function DashboardPage() {
     );
   };
 
-  if (authLoading || !user) {
+  if (authLoading || (!authLoading && user === null)) { // Show loading if auth is pending or user is null but auth finished
      return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
         <LoadingSpinner size={64} />
@@ -123,6 +123,10 @@ export default function DashboardPage() {
     );
   }
   
+  if (!user) { // Should be caught by above or useEffect redirect, but as a failsafe
+    return null; // Or a more explicit "Redirecting..." message
+  }
+  
   if (goalsLoading && typeof window !== 'undefined' && !localStorage.getItem('achievoGoals')) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
@@ -131,7 +135,7 @@ export default function DashboardPage() {
       </div>
     );
   }
-  
+
 
   return (
     <div className="space-y-8">
@@ -162,7 +166,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       )}
-      
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4 sm:p-0">
         <Card className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl">
           <CardHeader>
@@ -227,7 +231,7 @@ export default function DashboardPage() {
 
         <Dialog open={isSuggestionsModalOpen} onOpenChange={(isOpen) => {
             setIsSuggestionsModalOpen(isOpen);
-            if (!isOpen) { 
+            if (!isOpen) {
               setSelectedGoalForSuggestions(null);
               setSmartSuggestions(null);
               setSuggestionsError(null);
@@ -334,25 +338,7 @@ export default function DashboardPage() {
           </DialogContent>
         </Dialog>
 
-        <Card className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl">
-          <CardHeader>
-            <div className="flex items-center gap-3 mb-2">
-              <PlusCircle className="w-8 h-8 text-primary" />
-              <CardTitle className="text-2xl">Add New Goal</CardTitle>
-            </div>
-            <ShadcnCardDescription>Define a new ambition and let Achievo help you get started.</ShadcnCardDescription>
-          </CardHeader>
-          <CardContent className="flex-grow">
-            <p className="text-sm text-muted-foreground">Describe what you want to achieve, and we'll break it down.</p>
-          </CardContent>
-          <CardFooter>
-            <Button asChild size="lg" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg">
-              <Link href="/new-goal">
-                Create Goal <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-          </CardFooter>
-        </Card>
+        {/* Removed Add New Goal card from here */}
 
         <Card className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl">
           <CardHeader>
@@ -373,7 +359,7 @@ export default function DashboardPage() {
             </Button>
           </CardFooter>
         </Card>
-        
+
         <Card className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl">
           <CardHeader>
             <div className="flex items-center gap-3 mb-2">
@@ -395,7 +381,7 @@ export default function DashboardPage() {
         </Card>
 
       </div>
-      
+
       {goals.length === 0 && !goalsLoading && (
         <Card className="mt-8 text-center py-12 bg-card shadow-md rounded-xl">
           <CardHeader>
@@ -404,12 +390,12 @@ export default function DashboardPage() {
           <CardContent>
             <LayoutGrid className="w-16 h-16 mx-auto mb-6 text-primary opacity-30" />
             <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-              You haven't set any goals yet. Click the "Create Goal" button above to begin your journey.
+              You haven't set any goals yet. Click the "My Goals" section above and then "Add New Goal" to begin your journey.
             </p>
           </CardContent>
         </Card>
       )}
-      
+
     </div>
   );
 }

@@ -21,7 +21,7 @@ export default function MyGoalsPage() {
         document.title = "My Goals - Achievo";
     }
     if (!authLoading && !user) {
-      redirect('/'); 
+      redirect('/');
     }
   }, [user, authLoading]);
 
@@ -80,7 +80,7 @@ export default function MyGoalsPage() {
                  <LayoutGrid className="w-16 h-16 mx-auto mb-6 text-primary opacity-30" />
                 <h2 className="text-2xl font-semibold text-foreground mb-2">No Goals Here Yet!</h2>
                 <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                It looks like you haven't added any goals. Click the "Add New Goal" button to start your journey to achievement.
+                It looks like you haven't added any goals. Click the "Add New Goal" button above to start your journey to achievement.
                 </p>
                 <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
                 <Link href="/new-goal">
