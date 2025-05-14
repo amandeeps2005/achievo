@@ -3,13 +3,13 @@
 
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+// Removed useEffect as redirect is no longer needed from here
 import LoadingSpinner from '@/components/loading-spinner';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Target, Brain, Map, CalendarDays, BarChartBig, Wand2, ArrowRight, Zap } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import AppFooter from '@/components/app-footer'; // Import the new AppFooter
 
 const features = [
   {
@@ -53,13 +53,9 @@ export default function LandingPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
 
-  useEffect(() => {
-    if (!authLoading && user) {
-      router.replace('/dashboard');
-    }
-  }, [user, authLoading, router]);
+  // Removed useEffect that redirected to dashboard
 
-  if (authLoading || (!authLoading && user)) {
+  if (authLoading) { // Show loading spinner if auth state is still loading
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-background">
         <LoadingSpinner size={64} />
@@ -74,17 +70,25 @@ export default function LandingPage() {
       <section className="py-20 md:py-32 bg-gradient-to-br from-primary/10 via-background to-background">
         <div className="container mx-auto px-6 text-center">
           <Target className="w-24 h-24 text-primary mx-auto mb-8 animate-bounce" />
-          <h1 className="text-5xl md:text-7xl font-bold text-primary mb-6">
+          <h1 className="text-5xl md:text-7xl font-bold mb-6">
             Achieve Your Dreams with <span className="text-accent">Achievo</span>
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-3xl mx-auto">
             The smart, AI-powered platform to break down, track, and conquer your goals. Turn ambition into reality.
           </p>
-          <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground text-lg px-10 py-6 rounded-lg shadow-lg transform hover:scale-105 transition-transform">
-            <Link href="/register">
-              Get Started Free <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
-          </Button>
+          {user ? (
+            <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground text-lg px-10 py-6 rounded-lg shadow-lg transform hover:scale-105 transition-transform">
+              <Link href="/dashboard">
+                Go to Dashboard <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
+          ) : (
+            <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground text-lg px-10 py-6 rounded-lg shadow-lg transform hover:scale-105 transition-transform">
+              <Link href="/register">
+                Get Started Free <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
+          )}
         </div>
       </section>
 
@@ -147,35 +151,25 @@ export default function LandingPage() {
       </section>
 
       {/* Call to Action Section */}
-      <section className="py-20 md:py-28 bg-primary text-primary-foreground">
-        <div className="container mx-auto px-6 text-center">
-          <Zap className="w-16 h-16 mx-auto mb-6" />
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Start Achieving?</h2>
-          <p className="text-xl md:text-2xl mb-10 max-w-2xl mx-auto opacity-90">
-            Join thousands of users who are transforming their ambitions into accomplishments with Achievo.
-          </p>
-          <Button asChild size="lg" className="bg-accent hover:bg-accent/80 text-accent-foreground text-lg px-10 py-6 rounded-lg shadow-lg transform hover:scale-105 transition-transform">
-            <Link href="/register">
-              Sign Up Now - It's Free!
-            </Link>
-          </Button>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="py-10 bg-card border-t border-border">
-        <div className="container mx-auto px-6 text-center text-muted-foreground">
-          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mb-4">
-            <Link href="/about" className="hover:text-primary transition-colors">About Us</Link>
-            <Link href="/contact" className="hover:text-primary transition-colors">Contact</Link>
-            <Link href="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link>
-            <Link href="/terms" className="hover:text-primary transition-colors">Terms of Service</Link>
-            <Link href="/faq" className="hover:text-primary transition-colors">FAQ</Link>
+      {!user && ( // Only show this CTA if user is not logged in
+        <section className="py-20 md:py-28 bg-primary text-primary-foreground">
+          <div className="container mx-auto px-6 text-center">
+            <Zap className="w-16 h-16 mx-auto mb-6" />
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Start Achieving?</h2>
+            <p className="text-xl md:text-2xl mb-10 max-w-2xl mx-auto opacity-90">
+              Join thousands of users who are transforming their ambitions into accomplishments with Achievo.
+            </p>
+            <Button asChild size="lg" className="bg-accent hover:bg-accent/80 text-accent-foreground text-lg px-10 py-6 rounded-lg shadow-lg transform hover:scale-105 transition-transform">
+              <Link href="/register">
+                Sign Up Now - It's Free!
+              </Link>
+            </Button>
           </div>
-          <p>&copy; {new Date().getFullYear()} Achievo. All rights reserved.</p>
-          <p className="text-sm mt-1">Your Personal Goal Achievement System.</p>
-        </div>
-      </footer>
+        </section>
+      )}
+
+      {/* Footer - Replaced with AppFooter */}
+      <AppFooter />
     </div>
   );
 }

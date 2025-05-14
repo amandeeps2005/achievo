@@ -1,3 +1,4 @@
+
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
@@ -7,6 +8,7 @@ import AppHeader from '@/components/app-header';
 import { AuthProvider } from '@/context/auth-context';
 import { JournalProvider } from '@/context/journal-context';
 import { HabitProvider } from '@/context/habit-context';
+import AppFooter from '@/components/app-footer'; // Import the AppFooter
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -28,22 +30,22 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans`}>
-        <AuthProvider>
-          <GoalProvider>
-            <JournalProvider>
-              <HabitProvider>
-                <AppHeader />
-                <main className="container mx-auto px-4 py-8">
-                  {children}
-                </main>
-                <Toaster />
-              </HabitProvider>
-            </JournalProvider>
-          </GoalProvider>
-        </AuthProvider>
+  return (<html lang="en">
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans flex flex-col min-h-screen`}>
+          <AuthProvider>
+            <GoalProvider>
+              <JournalProvider>
+                <HabitProvider>
+                  <AppHeader />
+                  <main className="container mx-auto px-4 py-8 flex-grow">
+                    {children}
+                  </main>
+                  <Toaster />
+                  <AppFooter /> {/* Add AppFooter here */}
+                </HabitProvider>
+              </JournalProvider>
+            </GoalProvider>
+          </AuthProvider>
       </body>
     </html>
   );
