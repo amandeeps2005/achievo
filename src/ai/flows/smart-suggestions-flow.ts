@@ -57,7 +57,7 @@ const smartSuggestionsPrompt = ai.definePrompt({
       - Offer 'generalTips': Other useful advice, such as tracking methods, motivation strategies, or resource types. For example, for a fitness goal, 'Weekly weigh-in to track progress' is a good general tip.
 
   Be specific and actionable. Ensure the suggestions are appropriate for the given timeframe and commitment level.
-  If a suggestion category (e.g. diet tips for a coding goal) is not relevant, omit it or return an empty array for it.
+  IMPORTANT: If a suggestion category (e.g., 'dietAndNutritionTips' for a 'Learning' goal, or 'topicsToCover' for a 'Fitness' goal) is NOT RELEVANT to the goal's category and nature, COMPLETELY OMIT the field from the JSON output or provide an EMPTY ARRAY for array fields (e.g., "workoutRoutineIdeas": []). DO NOT include placeholder text like "No workout routines are necessary" or "Not applicable" within the arrays for these irrelevant fields. Only provide content for fields that directly apply to the given goal.
 
   Example for "Learn Python in 1 month" (Category: Learning, Timeframe: 1 month, Commitment: high):
   {
@@ -88,4 +88,3 @@ const smartSuggestionsFlow = ai.defineFlow(
     return output!;
   }
 );
-
