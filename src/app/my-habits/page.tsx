@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button';
 import type { Habit } from '@/types';
 import { useHabits } from '@/context/habit-context';
 import { useAuth } from '@/context/auth-context';
-import { PlusCircle, CheckSquare, ArrowLeft, Edit3, Trash2, CalendarDays, Eye, X } from 'lucide-react';
+import { PlusCircle, CheckSquare, ArrowLeft, CalendarDays, Eye, X } from 'lucide-react';
 import LoadingSpinner from '@/components/loading-spinner';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription as ShadcnCardDescription, CardFooter } from '@/components/ui/card';
 import HabitForm from '@/components/habits/habit-form';
@@ -134,7 +134,7 @@ export default function MyHabitsPage() {
   const [editingHabit, setEditingHabit] = useState<Habit | undefined>(undefined);
   const [currentDate, setCurrentDate] = useState(() => format(new Date(), 'yyyy-MM-dd'));
 
-  const [showHeatmap, setShowHeatmap] = useState(false);
+  // Heatmap will always be shown, manage its display month
   const [heatmapDisplayMonth, setHeatmapDisplayMonth] = useState(new Date());
 
   useEffect(() => {
@@ -158,7 +158,7 @@ export default function MyHabitsPage() {
   
   const heatmapDataForMonth = useMemo(() => {
     const data: Record<string, { completedCount: number; totalTrackedHabits: number }> = {};
-    if (!user || !showHeatmap) return data;
+    if (!user) return data; // Only calculate if user is present
 
     const monthStart = startOfMonth(heatmapDisplayMonth);
     const monthEnd = endOfMonth(heatmapDisplayMonth);
@@ -200,7 +200,7 @@ export default function MyHabitsPage() {
         }
     }
     return data;
-  }, [user, habits, habitLogs, heatmapDisplayMonth, showHeatmap]);
+  }, [user, habits, habitLogs, heatmapDisplayMonth]);
 
 
   if (authLoading || (!user && !authLoading)) {
@@ -223,75 +223,63 @@ export default function MyHabitsPage() {
         </Button>
       </div>
 
-      {!showHeatmap && (
-        <Card className="shadow-xl border-primary/20 rounded-xl overflow-hidden">
-          <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-6 bg-primary/5">
-              <div>
-                  <CardTitle className="text-3xl font-bold text-primary flex items-center">
-                      <CheckSquare className="mr-3 h-7 w-7" />
-                      My Habits
-                  </CardTitle>
-                  <ShadcnCardDescription className="text-primary/80">
-                      Track your daily habits and build consistency. Today is {format(new Date(currentDate), "PPP")}.
-                  </ShadcnCardDescription>
-              </div>
-              <Button onClick={() => handleOpenHabitForm()} className="bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg shadow-md transform hover:scale-105 transition-transform w-full sm:w-auto">
-                  <PlusCircle className="w-5 h-5 mr-2" /> Add New Habit
-              </Button>
-          </CardHeader>
-          <CardContent className="p-6">
-            <RenderHabitsListComponent
-              habitsLoading={habitsLoading}
-              habits={habits}
-              currentDate={currentDate}
-              handleOpenHabitForm={handleOpenHabitForm}
-            />
-          </CardContent>
-        </Card>
-      )}
-
-      {showHeatmap && (
-        <Card className="shadow-xl border-primary/20 rounded-xl overflow-hidden">
-            <CardHeader className="p-6 bg-primary/5">
+      <Card className="shadow-xl border-primary/20 rounded-xl overflow-hidden">
+        <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-6 bg-primary/5">
+            <div>
                 <CardTitle className="text-3xl font-bold text-primary flex items-center">
-                    <CalendarDays className="mr-3 h-7 w-7" />
-                    Habit Completion Heatmap
+                    <CheckSquare className="mr-3 h-7 w-7" />
+                    My Habits for Today
                 </CardTitle>
                 <ShadcnCardDescription className="text-primary/80">
-                    Visualize your habit consistency over the month. Darker means more habits completed.
+                    Track your daily habits and build consistency. Today is {format(new Date(currentDate), "PPP")}.
                 </ShadcnCardDescription>
-            </CardHeader>
-            <CardContent className="p-6 flex flex-col items-center">
-                <Calendar
-                    mode="single"
-                    month={heatmapDisplayMonth}
-                    onMonthChange={setHeatmapDisplayMonth}
-                    components={{
-                        Day: (props) => <MemoizedCustomDay {...props} heatmapData={heatmapDataForMonth} />,
-                    }}
-                    className="rounded-md border p-0 sm:p-3 self-center w-full max-w-md"
-                    selected={undefined} // Disable date selection behavior
-                    onSelect={() => {}} // Disable date selection behavior
-                    showOutsideDays
-                    fixedWeeks
-                />
-                <div className="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
-                    <div className="flex items-center"><span className="w-3 h-3 rounded-sm mr-1.5 bg-primary"></span>All Done</div>
-                    <div className="flex items-center"><span className="w-3 h-3 rounded-sm mr-1.5 bg-primary/60"></span>Some Done</div>
-                    <div className="flex items-center"><span className="w-3 h-3 rounded-sm mr-1.5 bg-muted/50"></span>None Done (Tracked)</div>
-                </div>
-            </CardContent>
-        </Card>
-      )}
-      
-      <CardFooter className="p-6 bg-card border-t border-border justify-center rounded-b-xl">
-            <Button variant="outline" onClick={() => setShowHeatmap(prev => !prev)} className="w-full sm:w-auto">
-                {showHeatmap ? <X className="mr-2 h-4 w-4" /> : <Eye className="mr-2 h-4 w-4" />}
-                {showHeatmap ? 'Hide Calendar Heatmap' : 'Show Calendar Heatmap & Stats'}
+            </div>
+            <Button onClick={() => handleOpenHabitForm()} className="bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg shadow-md transform hover:scale-105 transition-transform w-full sm:w-auto">
+                <PlusCircle className="w-5 h-5 mr-2" /> Add New Habit
             </Button>
-      </CardFooter>
+        </CardHeader>
+        <CardContent className="p-6">
+          <RenderHabitsListComponent
+            habitsLoading={habitsLoading}
+            habits={habits}
+            currentDate={currentDate}
+            handleOpenHabitForm={handleOpenHabitForm}
+          />
+        </CardContent>
+      </Card>
 
-
+      <Card className="shadow-xl border-primary/20 rounded-xl overflow-hidden mt-8">
+          <CardHeader className="p-6 bg-primary/5">
+              <CardTitle className="text-2xl font-bold text-primary flex items-center">
+                  <CalendarDays className="mr-3 h-6 w-6" />
+                  Habit Completion Heatmap
+              </CardTitle>
+              <ShadcnCardDescription className="text-primary/80">
+                  Visualize your habit consistency over the month. Darker means more habits completed.
+              </ShadcnCardDescription>
+          </CardHeader>
+          <CardContent className="p-6 flex flex-col items-center">
+              <Calendar
+                  mode="single"
+                  month={heatmapDisplayMonth}
+                  onMonthChange={setHeatmapDisplayMonth}
+                  components={{
+                      Day: (props) => <MemoizedCustomDay {...props} heatmapData={heatmapDataForMonth} />,
+                  }}
+                  className="rounded-md border p-0 sm:p-3 self-center w-full max-w-md"
+                  selected={undefined} // Disable date selection behavior
+                  onSelect={() => {}} // Disable date selection behavior
+                  showOutsideDays
+                  fixedWeeks
+              />
+              <div className="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
+                  <div className="flex items-center"><span className="w-3 h-3 rounded-sm mr-1.5 bg-primary"></span>All Done</div>
+                  <div className="flex items-center"><span className="w-3 h-3 rounded-sm mr-1.5 bg-primary/60"></span>Some Done</div>
+                  <div className="flex items-center"><span className="w-3 h-3 rounded-sm mr-1.5 bg-muted/50"></span>None Done (Tracked)</div>
+              </div>
+          </CardContent>
+      </Card>
+      
       {isHabitFormOpen && (
          <Dialog open={isHabitFormOpen} onOpenChange={(open) => { if(!open) handleCloseHabitForm(); else setIsHabitFormOpen(true);}}>
             <DialogContent className="sm:max-w-lg w-[90vw]">
@@ -314,4 +302,3 @@ export default function MyHabitsPage() {
     </div>
   );
 }
-
