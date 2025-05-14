@@ -75,7 +75,7 @@ export default function GoalSetupForm() {
     const newGoal: Goal = {
       id: crypto.randomUUID(),
       originalGoal: goalDescription,
-      title: goalDescription.substring(0, 70) + (goalDescription.length > 70 ? '...' : ''), // Title generation updated here
+      title: goalDescription.substring(0, 70) + (goalDescription.length > 70 ? '...' : ''),
       category: generatedPlan.category,
       timeline: generatedPlan.timeline,
       overallDeadline: generatedPlan.overallDeadline, 
@@ -162,7 +162,7 @@ export default function GoalSetupForm() {
         </Form>
 
         {isGeneratingPlan && (
-          <div className="mt-6 text-center py-10">
+          <div className="mt-6 flex flex-col items-center justify-center py-10">
             <LoadingSpinner size={48} />
             <p className="mt-4 text-lg text-muted-foreground animate-pulse">Our AI is crafting your personalized plan...</p>
             <p className="text-sm text-muted-foreground/70">This might take a moment.</p>
@@ -243,7 +243,7 @@ export default function GoalSetupForm() {
               disabled={isSavingGoal}
             >
              {isSavingGoal ? <LoadingSpinner className="mr-2" /> :  <CheckCircle className="mr-2 h-5 w-5" />}
-              {isSavingGoal ? 'Saving Your Goal...' : 'Save & Start Achieving'}
+              Save & Start Achieving
             </Button>
         </CardFooter>
       )}
