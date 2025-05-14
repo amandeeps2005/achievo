@@ -7,7 +7,7 @@ import LoadingSpinner from '@/components/loading-spinner';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth-context';
 import Link from 'next/link';
-import { PlusCircle, BarChartBig, Lightbulb, Brain, LayoutGrid, ArrowRight, NotebookPen, CheckSquare } from 'lucide-react';
+import { PlusCircle, BarChartBig, Lightbulb, Brain, LayoutGrid, ArrowRight, NotebookPen, CheckSquare, UserCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import {
   Card,
@@ -17,6 +17,8 @@ import {
   CardDescription as ShadcnCardDescription,
   CardFooter
 } from '@/components/ui/card';
+import { useHabits } from '@/context/habit-context';
+import { format } from 'date-fns';
 
 
 const motivationalQuotes = [
@@ -34,7 +36,9 @@ const motivationalQuotes = [
 
 export default function DashboardPage() {
   const { goals, isLoading: goalsLoading } = useGoals();
+  const { habits, habitLogs, isLoading: habitsLoading } = useHabits();
   const [currentQuote, setCurrentQuote] = useState("");
+  const [greeting, setGreeting] = useState("Hello");
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
 
@@ -45,13 +49,24 @@ export default function DashboardPage() {
   }, [user, authLoading, router]);
 
   useEffect(() => {
-    // Ensure this runs only on the client after mount
-    if (typeof window !== 'undefined' && motivationalQuotes.length > 0) {
-      const randomIndex = Math.floor(Math.random() * motivationalQuotes.length);
-      setCurrentQuote(motivationalQuotes[randomIndex]);
+    if (typeof window !== 'undefined') {
+      // Set motivational quote
+      if (motivationalQuotes.length > 0) {
+        const randomIndex = Math.floor(Math.random() * motivationalQuotes.length);
+        setCurrentQuote(motivationalQuotes[randomIndex]);
+      }
+
+      // Set dynamic greeting
+      const hours = new Date().getHours();
+      if (hours < 12) {
+        setGreeting("Good Morning");
+      } else if (hours < 18) {
+        setGreeting("Good Afternoon");
+      } else {
+        setGreeting("Good Evening");
+      }
     }
   }, []);
-
 
   if (authLoading || (!authLoading && user === null)) {
      return (
@@ -68,7 +83,9 @@ export default function DashboardPage() {
     return null;
   }
 
-  if (goalsLoading && typeof window !== 'undefined' && !localStorage.getItem('achievoGoals')) {
+  const isDataLoading = (goalsLoading || habitsLoading) && typeof window !== 'undefined' && (!localStorage.getItem('achievoGoals') || !localStorage.getItem('achievoHabits'));
+
+  if (isDataLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
         <LoadingSpinner size={48} />
@@ -77,39 +94,60 @@ export default function DashboardPage() {
     );
   }
 
+  const todayStr = format(new Date(), 'yyyy-MM-dd');
+  const activeHabits = habits.filter(h => !h.archived && h.userId === user.uid);
+  const activeHabitsCount = activeHabits.length;
+  const habitsCompletedToday = activeHabits.filter(habit => {
+      const log = habitLogs.find(l => l.habitId === habit.id && l.date === todayStr && l.userId === user.uid);
+      return log?.completed;
+  }).length;
 
   return (
-    <div className="space-y-8">
-      <div className="p-4 sm:p-6">
-        <h1 className="text-3xl md:text-4xl font-bold text-primary">My Goals Dashboard</h1>
-        <p className="text-lg text-muted-foreground mt-1">
-          Your central hub for goal management, progress tracking, and smart insights.
-        </p>
+    <div className="space-y-8 py-4">
+      <div className="p-4 sm:p-6 rounded-xl bg-card shadow-lg border border-primary/10">
+        <div className="flex items-center gap-3 mb-1">
+            {user.photoURL ? (
+                <img src={user.photoURL} alt="User" className="w-12 h-12 rounded-full object-cover border-2 border-primary" />
+            ) : (
+                <UserCircle className="w-12 h-12 text-primary" />
+            )}
+            <div>
+                <h1 className="text-3xl md:text-4xl font-bold text-primary">
+                    {greeting}, {user.displayName?.split(' ')[0] || 'Achiever'}!
+                </h1>
+                <p className="text-md text-muted-foreground">
+                    Ready to make progress today?
+                </p>
+            </div>
+        </div>
       </div>
 
       {currentQuote && (
-        <Card className="bg-gradient-to-r from-primary/10 via-card to-card/50 shadow-lg rounded-xl border-primary/20">
-          <CardHeader className="flex flex-row items-center gap-3 pb-3">
-            <Lightbulb className="w-10 h-10 text-accent animate-pulse" />
-            <div>
-                <CardTitle className="text-2xl font-bold text-primary">Motivational Corner</CardTitle>
-                <ShadcnCardDescription className="text-sm text-muted-foreground">A spark to ignite your ambition.</ShadcnCardDescription>
+        <Card className="bg-gradient-to-br from-primary/10 via-card to-accent/5 shadow-lg rounded-xl border-primary/20 overflow-hidden group">
+            <div className="relative">
+                 <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-accent/5 opacity-70 group-hover:opacity-100 transition-opacity duration-500"></div>
+                 <CardHeader className="flex flex-row items-center gap-4 pb-4 relative z-10">
+                    <Lightbulb className="w-12 h-12 text-accent animate-pulse drop-shadow-lg" />
+                    <div>
+                        <CardTitle className="text-2xl font-bold text-primary drop-shadow-sm">Motivational Corner</CardTitle>
+                        <ShadcnCardDescription className="text-sm text-muted-foreground">A spark to ignite your ambition.</ShadcnCardDescription>
+                    </div>
+                 </CardHeader>
+                 <CardContent className="relative z-10">
+                    <blockquote className="text-xl italic text-foreground pl-6 border-l-4 border-accent relative group-hover:scale-[1.01] transition-transform duration-300">
+                    <span className="absolute left-[-0.3rem] top-[-0.5rem] text-6xl text-accent opacity-30 font-serif">&ldquo;</span>
+                    {currentQuote.split(" - ")[0]}
+                    {currentQuote.includes(" - ") && (
+                        <footer className="text-base text-muted-foreground mt-3 not-italic tracking-wide">- {currentQuote.split(" - ")[1]}</footer>
+                    )}
+                    </blockquote>
+                </CardContent>
             </div>
-          </CardHeader>
-          <CardContent>
-            <blockquote className="text-xl italic text-foreground pl-6 border-l-4 border-accent relative">
-              <span className="absolute left-1 top-0 text-4xl text-accent opacity-50">&ldquo;</span>
-              {currentQuote.split(" - ")[0]}
-              {currentQuote.includes(" - ") && (
-                 <footer className="text-base text-muted-foreground mt-3 not-italic tracking-wide">- {currentQuote.split(" - ")[1]}</footer>
-              )}
-            </blockquote>
-          </CardContent>
         </Card>
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4 sm:p-0">
-        <Card className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl">
+        <Card className="flex flex-col shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl transform hover:-translate-y-1">
           <CardHeader>
             <div className="flex items-center gap-3 mb-2">
               <LayoutGrid className="w-8 h-8 text-primary" />
@@ -118,7 +156,9 @@ export default function DashboardPage() {
             <ShadcnCardDescription>View, manage, and track all your active and completed goals.</ShadcnCardDescription>
           </CardHeader>
           <CardContent className="flex-grow">
-             <p className="text-sm text-muted-foreground">You have {goals.length} goal(s) currently.</p>
+             <p className="text-sm text-muted-foreground">
+                You currently have <span className="font-semibold text-primary">{goals.length}</span> active goal(s).
+             </p>
           </CardContent>
           <CardFooter>
             <Button asChild size="lg" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg">
@@ -129,7 +169,7 @@ export default function DashboardPage() {
           </CardFooter>
         </Card>
 
-        <Card className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl">
+        <Card className="flex flex-col shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl transform hover:-translate-y-1">
             <CardHeader>
               <div className="flex items-center gap-3 mb-2">
                 <BarChartBig className="w-8 h-8 text-primary" />
@@ -149,16 +189,16 @@ export default function DashboardPage() {
             </CardFooter>
         </Card>
 
-         <Card className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl">
+         <Card className="flex flex-col shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl transform hover:-translate-y-1">
             <CardHeader>
               <div className="flex items-center gap-3 mb-2">
                 <Brain className="w-8 h-8 text-accent" />
-                <CardTitle className="text-2xl text-accent">Smart Goal Suggestions</CardTitle>
+                <CardTitle className="text-2xl text-accent">Smart Goal Tips</CardTitle>
               </div>
-              <ShadcnCardDescription>Get AI-powered tips and ideas to boost your progress.</ShadcnCardDescription>
+              <ShadcnCardDescription>Get AI-powered ideas to boost your progress on existing or new goals.</ShadcnCardDescription>
             </CardHeader>
             <CardContent className="flex-grow">
-              <p className="text-sm text-muted-foreground">Receive tailored advice for existing or custom goals.</p>
+              <p className="text-sm text-muted-foreground">Receive tailored advice to help you strategize and achieve more effectively.</p>
             </CardContent>
             <CardFooter>
               <Button asChild size="lg" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg">
@@ -170,7 +210,7 @@ export default function DashboardPage() {
           </Card>
 
 
-        <Card className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl">
+        <Card className="flex flex-col shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl transform hover:-translate-y-1">
           <CardHeader>
             <div className="flex items-center gap-3 mb-2">
               <NotebookPen className="w-8 h-8 text-primary" />
@@ -179,7 +219,7 @@ export default function DashboardPage() {
             <ShadcnCardDescription>Record your thoughts, ideas, and reflections.</ShadcnCardDescription>
           </CardHeader>
           <CardContent className="flex-grow">
-            <p className="text-sm text-muted-foreground">Organize your journal entries and link them to specific goals if needed.</p>
+            <p className="text-sm text-muted-foreground">Organize entries and link them to goals if needed.</p>
           </CardContent>
           <CardFooter>
              <Button asChild size="lg" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg">
@@ -190,16 +230,20 @@ export default function DashboardPage() {
           </CardFooter>
         </Card>
 
-        <Card className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl">
+        <Card className="flex flex-col shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl transform hover:-translate-y-1">
           <CardHeader>
             <div className="flex items-center gap-3 mb-2">
               <CheckSquare className="w-8 h-8 text-primary" />
               <CardTitle className="text-2xl">Habit Tracking</CardTitle>
             </div>
-            <ShadcnCardDescription>Build and maintain your daily habits.</ShadcnCardDescription>
+            <ShadcnCardDescription>Build and maintain your daily habits for consistent growth.</ShadcnCardDescription>
           </CardHeader>
           <CardContent className="flex-grow">
-            <p className="text-sm text-muted-foreground">Define habits, track your progress, and build consistency.</p>
+             <p className="text-sm text-muted-foreground">
+                Tracking <span className="font-semibold text-primary">{activeHabitsCount}</span> active habit(s).
+                <br/>
+                <span className="font-semibold text-accent">{habitsCompletedToday}</span> completed today!
+             </p>
           </CardContent>
           <CardFooter>
              <Button asChild size="lg" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg">
@@ -229,3 +273,4 @@ export default function DashboardPage() {
     </div>
   );
 }
+
