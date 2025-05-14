@@ -110,7 +110,7 @@ export default function LandingPage() {
                   <p>{feature.description}</p>
                 </CardContent>
                 <CardFooter>
-                  <Button asChild size="sm" variant="outline" className="w-full border-primary text-primary hover:bg-primary/10">
+                  <Button asChild size="sm" variant="outline" className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground">
                     <Link href={feature.href}>
                       Learn More <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
