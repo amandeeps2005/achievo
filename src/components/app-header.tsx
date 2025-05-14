@@ -3,11 +3,10 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { LayoutDashboard, LogIn, UserPlus, LogOut, ShieldCheck, User } from 'lucide-react'; 
+import { LayoutDashboard, LogIn, UserPlus, LogOut, ShieldCheck, User } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
-import { Target } from 'lucide-react'; 
-import { useAuth } from '@/context/auth-context'; 
-// useTheme and Moon/Sun icons are removed
+import { Target } from 'lucide-react';
+import { useAuth } from '@/context/auth-context';
 import LoadingSpinner from './loading-spinner';
 import { useEffect, useState } from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -23,8 +22,7 @@ import {
 export default function AppHeader() {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, logout, loading: authLoading } = useAuth(); 
-  // const { theme, toggleTheme } = useTheme(); // Removed
+  const { user, logout, loading: authLoading } = useAuth();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -33,21 +31,23 @@ export default function AppHeader() {
 
   const handleLogout = async () => {
     await logout();
-    router.push('/login'); 
+    router.push('/login');
   };
 
-  const getInitials = (name?: string | null, email?: string | null) => {
+  const getInitials = (name?: string | null, email?: string | null): string | JSX.Element => {
     if (name && name.trim()) {
-      const parts = name.trim().split(' ');
-      if (parts.length > 1) {
-        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+      const nameParts = name.trim().split(' ').filter(part => part.length > 0);
+      if (nameParts.length > 1) {
+        return (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase();
       }
-      return parts[0].substring(0, 2).toUpperCase();
+      if (nameParts.length === 1 && nameParts[0].length > 0) {
+        return nameParts[0].substring(0, Math.min(2, nameParts[0].length)).toUpperCase();
+      }
     }
-    if (email) {
+    if (email && email.trim()) {
       return email[0].toUpperCase();
     }
-    return <User className="h-5 w-5" />;
+    return <User className="h-5 w-5 text-muted-foreground" />;
   };
 
   const logoHref = user ? '/dashboard' : '/';
@@ -67,10 +67,10 @@ export default function AppHeader() {
           ) : user ? (
             <>
               {pathname !== '/dashboard' && (
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="text-sm" 
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-sm"
                   onClick={() => router.push('/dashboard')}
                 >
                   <LayoutDashboard className="mr-1.5 h-4 w-4" />
@@ -142,7 +142,7 @@ export default function AppHeader() {
               )}
             </>
           )}
-          {/* Theme toggle button is removed */}
+          {/* Theme toggle button has been completely removed */}
         </nav>
       </div>
     </header>
