@@ -105,7 +105,7 @@ export default function SmartSuggestionsPage() {
            form.reset({
              customTitle: existingGoal.title || existingGoal.originalGoal,
              customCategory: existingGoal.category,
-             customTimeframe: existingGoal.timeline,
+             customTimeframe: existingGoal.overallDeadline || existingGoal.timeline, // Use overallDeadline, fallback to timeline
            });
            setLoadedFromGoalId(goalId);
         }
@@ -232,7 +232,7 @@ export default function SmartSuggestionsPage() {
                       <FormItem>
                         <FormLabel>Timeframe / Deadline</FormLabel>
                         <FormControl>
-                          <Input placeholder="e.g., 3 months, By end of year" {...field} disabled={isLoadingSuggestions} />
+                          <Input placeholder="e.g., 3 months, By end of year, YYYY-MM-DD" {...field} disabled={isLoadingSuggestions} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
