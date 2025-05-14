@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
@@ -8,6 +9,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   logout: () => Promise<void>;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>; // Added setUser for manual updates
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -31,10 +33,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = async () => {
     await signOut(auth);
+    setUser(null); // Explicitly set user to null on logout
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, logout }}>
+    <AuthContext.Provider value={{ user, loading, logout, setUser }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,13 +1,14 @@
+
 // src/app/profile/page.tsx
 "use client";
 
 import { useAuth } from '@/context/auth-context';
 import { redirect } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react'; // Added React import
 import LoadingSpinner from '@/components/loading-spinner';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User, Mail, ShieldCheck, CalendarClock, Briefcase, Edit3, Save, XCircle, Send } from 'lucide-react';
+import { User, Mail, ShieldCheck, CalendarClock, Briefcase, Edit3, Save, XCircle, Send, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
@@ -18,7 +19,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { updateProfile, sendEmailVerification } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { auth, storage } from '@/lib/firebase'; // Import storage
+import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage'; // Storage functions
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -37,17 +39,22 @@ const titleOptions = [
 
 const profileFormSchema = z.object({
   displayName: z.string().min(3, "Display name must be at least 3 characters.").max(50, "Display name can be at most 50 characters."),
-  title: z.string().optional(), // Title is optional
+  title: z.string().optional(),
 });
 type ProfileFormData = z.infer<typeof profileFormSchema>;
 
 export default function ProfilePage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, setUser: setAuthUser } = useAuth(); // Assuming useAuth exposes setUser or similar for force update
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isResendingVerification, setIsResendingVerification] = useState(false);
   const [profileTitle, setProfileTitle] = useState<string>("N/A");
+
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileFormSchema),
@@ -62,7 +69,6 @@ export default function ProfilePage() {
       redirect('/');
     }
     if (user) {
-      // Load title from localStorage for demo persistence
       const storedTitle = localStorage.getItem(`user_${user.uid}_title`);
       const currentTitle = storedTitle || "N/A";
       setProfileTitle(currentTitle);
@@ -70,8 +76,24 @@ export default function ProfilePage() {
         displayName: user.displayName || "",
         title: currentTitle,
       });
+      if (user.photoURL) {
+        setPreviewUrl(user.photoURL);
+      }
     }
   }, [user, authLoading, form]);
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      setSelectedFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+    }
+  };
+
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
+  };
+
 
   if (authLoading || !user) {
     return (
@@ -104,17 +126,18 @@ export default function ProfilePage() {
 
   const handleEditToggle = () => {
     if (isEditing) {
-      // Reset form to current profile values when canceling edit
       form.reset({ 
         displayName: user.displayName || "",
         title: profileTitle,
        });
+       setSelectedFile(null);
+       setPreviewUrl(user.photoURL || null); // Reset preview to current photoURL or null
     } else {
-      // Ensure form is populated with current values when starting edit
        form.reset({ 
         displayName: user.displayName || "",
         title: profileTitle,
        });
+       setPreviewUrl(user.photoURL || null); // Ensure preview is set when entering edit mode
     }
     setIsEditing(!isEditing);
   };
@@ -125,17 +148,39 @@ export default function ProfilePage() {
       return;
     }
     setIsSaving(true);
+    let photoURL = user.photoURL; // Start with current photoURL
+
     try {
+      if (selectedFile) {
+        const imageRef = storageRef(storage, `profilePictures/${auth.currentUser.uid}/${selectedFile.name}`);
+        await uploadBytes(imageRef, selectedFile);
+        photoURL = await getDownloadURL(imageRef);
+        toast({ title: "Image Uploaded", description: "Profile picture updated successfully." });
+      }
+
       await updateProfile(auth.currentUser, {
         displayName: data.displayName,
+        photoURL: photoURL, // This will be the new URL if uploaded, or existing if not
       });
+      
       const newTitle = data.title || "N/A";
       setProfileTitle(newTitle);
-      // Save title to localStorage for demo persistence
       localStorage.setItem(`user_${auth.currentUser.uid}_title`, newTitle);
       
+      // Force a refresh of the user object in the AuthContext if possible
+      // This depends on how AuthContext is implemented. A common way is to re-fetch or re-set the user.
+      // For simplicity, we rely on onAuthStateChanged, but for immediate UI update, manual update might be needed.
+      // Example: if useAuth exposes a way to update the user object:
+      if (setAuthUser) { // Check if setAuthUser exists from useAuth()
+          const updatedUser = { ...auth.currentUser, displayName: data.displayName, photoURL: photoURL };
+          setAuthUser(updatedUser as any); // Type assertion might be needed depending on User type
+      }
+
+
       toast({ title: "Success", description: "Profile updated successfully." });
       setIsEditing(false);
+      setSelectedFile(null); // Clear selected file after saving
+      // previewUrl will be updated by useEffect if user.photoURL changes from onAuthStateChanged
     } catch (error: any) {
       toast({ title: "Error", description: error.message || "Failed to update profile.", variant: "destructive" });
     } finally {
@@ -175,14 +220,37 @@ export default function ProfilePage() {
     <div className="container mx-auto py-8 md:py-12">
       <Card className="max-w-2xl mx-auto shadow-xl border-primary/20 rounded-xl overflow-hidden">
         <CardHeader className="items-center text-center bg-gradient-to-br from-primary/10 via-card to-card p-8">
-          <Avatar className="w-28 h-28 text-5xl mb-4 border-4 border-primary bg-primary/20 shadow-lg">
-            {user.photoURL ? (
-              <AvatarImage src={user.photoURL} alt={user.displayName || user.email || 'User Avatar'} />
-            ) : null}
-            <AvatarFallback className="bg-primary text-primary-foreground text-4xl">
-              {getInitials(user.displayName, user.email)}
-            </AvatarFallback>
-          </Avatar>
+          <div className="relative">
+            <Avatar className="w-28 h-28 text-5xl mb-4 border-4 border-primary bg-primary/20 shadow-lg">
+              {previewUrl ? (
+                <AvatarImage src={previewUrl} alt={user.displayName || user.email || 'User Avatar'} />
+              ) : (
+                <AvatarImage src={user.photoURL || undefined} alt={user.displayName || user.email || 'User Avatar'} />
+              )}
+              <AvatarFallback className="bg-primary text-primary-foreground text-4xl">
+                {getInitials(user.displayName, user.email)}
+              </AvatarFallback>
+            </Avatar>
+            {isEditing && (
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="absolute bottom-4 right-0 rounded-full h-8 w-8 bg-background hover:bg-muted border-primary/50"
+                onClick={triggerFileInput}
+                aria-label="Change profile picture"
+              >
+                <Camera className="h-4 w-4 text-primary" />
+              </Button>
+            )}
+          </div>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            ref={fileInputRef}
+            className="hidden"
+            disabled={!isEditing || isSaving}
+          />
           <CardTitle className="text-3xl font-bold text-primary">{user.displayName || "Achievo User"}</CardTitle>
           <CardDescription className="text-muted-foreground text-base">Your personal account details and journey with Achievo.</CardDescription>
            <Button onClick={handleEditToggle} variant={isEditing ? "secondary" : "outline"} size="sm" className="mt-4">
@@ -309,7 +377,6 @@ export default function ProfilePage() {
                   <div>
                     <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Title</p>
                     <p className="text-md font-semibold text-foreground">{profileTitle}</p>
-                    {profileTitle === "N/A" && <p className="text-xs text-muted-foreground">(Title information is not stored in user profile)</p>}
                   </div>
                 </div>
               </div>
@@ -341,3 +408,4 @@ export default function ProfilePage() {
     </div>
   );
 }
+
