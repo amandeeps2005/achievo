@@ -7,7 +7,7 @@ import { Toaster } from '@/components/ui/toaster';
 import AppHeader from '@/components/app-header';
 import { AuthProvider } from '@/context/auth-context';
 import { JournalProvider } from '@/context/journal-context';
-import { HabitProvider } from '@/context/habit-context'; 
+import { HabitProvider } from '@/context/habit-context';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -30,13 +30,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning> {/* suppressHydrationWarning can be removed if not causing issues */}
+    <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans`}>
         {/* ThemeProvider is removed */}
           <AuthProvider>
             <GoalProvider>
               <JournalProvider>
-                <HabitProvider> 
+                <HabitProvider>
                   <AppHeader />
                   <main className="container mx-auto px-4 py-8">
                     {children}
