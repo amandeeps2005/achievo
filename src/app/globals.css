@@ -9,8 +9,8 @@ body {
 
 @layer base {
   :root {
-    /* Light Theme - Based on user input */
-    --background: 204 17% 93%; /* from #ecf0f1 - Light Gray */
+    /* Light Theme - Updated for a more appealing background */
+    --background: 208 60% 97%; /* Very Light Soft Blue Tint */
     --foreground: 220 13% 20%; /* Darker cool gray for contrast */
 
     --card: 0 0% 100%; /* White */
@@ -25,8 +25,8 @@ body {
     --secondary: 130 30% 66%; /* Seafoam Green - from #a7d1ab */
     --secondary-foreground: 130 40% 20%; /* Darker Seafoam for text */
 
-    --muted: 204 17% 88%; /* Lighter version of background */
-    --muted-foreground: 204 10% 45%; /* Medium cool gray */
+    --muted: 208 40% 94%; /* Lighter version of the new background */
+    --muted-foreground: 208 10% 45%; /* Medium cool gray */
 
     --accent: 28 80% 52%; /* Orange - from #e67e22 */
     --accent-foreground: 0 0% 100%; /* White */
@@ -34,8 +34,8 @@ body {
     --destructive: 0 72% 51%; /* Vivid Red */
     --destructive-foreground: 0 0% 100%; /* White */
 
-    --border: 204 17% 85%; /* Slightly darker than secondary for borders */
-    --input: 204 17% 90%; /* Slightly lighter than background for inputs */
+    --border: 208 30% 90%; /* Slightly darker than new muted for borders */
+    --input: 208 50% 95%;  /* Based on new background for inputs */
     --ring: 180 60% 40%; /* Primary color (Teal) for rings */
 
     --chart-1: 180 60% 40%; /* Primary (Teal) */
