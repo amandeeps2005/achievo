@@ -5,7 +5,7 @@
 import type { JournalEntry, Goal } from '@/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Edit3, Trash2, Link as LinkIcon, CalendarDays } from 'lucide-react';
+import { Edit3, Trash2, Link as LinkIcon, CalendarDays, Eye } from 'lucide-react';
 import { useJournal } from '@/context/journal-context';
 import { useGoals } from '@/context/goal-context';
 import {
@@ -24,10 +24,11 @@ import { formatDistanceToNow } from 'date-fns';
 
 interface JournalEntryItemProps {
   entry: JournalEntry;
-  onEdit: (entry: JournalEntry) => void;
+  onEdit: () => void;
+  onViewRequest: (entry: JournalEntry) => void;
 }
 
-export default function JournalEntryItem({ entry, onEdit }: JournalEntryItemProps) {
+export default function JournalEntryItem({ entry, onEdit, onViewRequest }: JournalEntryItemProps) {
   const { deleteJournalEntry } = useJournal();
   const { getGoalById } = useGoals();
 
@@ -40,10 +41,10 @@ export default function JournalEntryItem({ entry, onEdit }: JournalEntryItemProp
   const formattedUpdatedAt = formatDistanceToNow(new Date(entry.updatedAt), { addSuffix: true });
 
   return (
-    <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
-      <CardHeader>
+    <Card className="shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col">
+      <CardHeader className="pb-3">
         <div className="flex justify-between items-start">
-          <CardTitle className="text-lg text-primary">{entry.title}</CardTitle>
+          <CardTitle className="text-lg text-primary cursor-pointer hover:underline" onClick={() => onViewRequest(entry)}>{entry.title}</CardTitle>
           {linkedGoal && (
             <Badge variant="secondary" className="ml-2 whitespace-nowrap text-xs">
               <LinkIcon className="w-3 h-3 mr-1" />
@@ -56,17 +57,27 @@ export default function JournalEntryItem({ entry, onEdit }: JournalEntryItemProp
             </Badge>
           )}
         </div>
-        <CardDescription className="text-xs text-muted-foreground flex items-center">
+        <CardDescription className="text-xs text-muted-foreground flex items-center pt-1">
             <CalendarDays className="w-3 h-3 mr-1" /> Last updated: {formattedUpdatedAt}
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <p className="text-sm text-foreground whitespace-pre-wrap line-clamp-4">
+      <CardContent 
+        className="flex-grow cursor-pointer hover:bg-muted/20 transition-colors duration-150 py-2"
+        onClick={() => onViewRequest(entry)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onViewRequest(entry);}}
+        aria-label={`View details for journal entry: ${entry.title}`}
+      >
+        <p className="text-sm text-foreground whitespace-pre-wrap line-clamp-3">
           {entry.content}
         </p>
       </CardContent>
-      <CardFooter className="flex justify-end space-x-2">
-        <Button variant="outline" size="sm" onClick={() => onEdit(entry)}>
+      <CardFooter className="flex justify-end space-x-2 pt-3">
+        <Button variant="ghost" size="sm" onClick={() => onViewRequest(entry)} className="text-primary hover:text-primary">
+          <Eye className="w-4 h-4 mr-2" /> View
+        </Button>
+        <Button variant="outline" size="sm" onClick={onEdit}>
           <Edit3 className="w-4 h-4 mr-2" /> Edit
         </Button>
         <AlertDialog>
@@ -94,3 +105,4 @@ export default function JournalEntryItem({ entry, onEdit }: JournalEntryItemProp
     </Card>
   );
 }
+

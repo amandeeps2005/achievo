@@ -11,6 +11,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from '@/components/ui/button';
 import JournalEntryForm from '@/components/journal/journal-entry-form';
@@ -19,18 +20,20 @@ import type { Goal, JournalEntry } from '@/types';
 import { useGoals } from '@/context/goal-context';
 import { useJournal } from '@/context/journal-context';
 import { useAuth } from '@/context/auth-context';
-import { PlusCircle, FileText, NotebookPen, ArrowLeft } from 'lucide-react';
+import { PlusCircle, FileText, NotebookPen, ArrowLeft, Eye } from 'lucide-react';
 import LoadingSpinner from '@/components/loading-spinner';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription as ShadcnCardDescription } from '@/components/ui/card';
+import { format } from 'date-fns';
 
 export default function MyJournalPage() {
   const { user, loading: authLoading } = useAuth();
-  const { goals, isLoading: goalsLoading } = useGoals(); // Keep goals for the form
+  const { goals, isLoading: goalsLoading } = useGoals();
   const { journalEntries, isLoading: journalLoading } = useJournal();
   const router = useRouter();
 
   const [isJournalFormOpen, setIsJournalFormOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState<JournalEntry | undefined>(undefined);
+  const [viewingEntry, setViewingEntry] = useState<JournalEntry | null>(null);
 
   useEffect(() => {
     if (typeof document !== 'undefined') {
@@ -44,13 +47,20 @@ export default function MyJournalPage() {
 
   const handleOpenJournalEntryForm = (entry?: JournalEntry) => {
     setEditingEntry(entry);
-    // defaultGoalId for new entry is handled by the form itself if no entry is passed
     setIsJournalFormOpen(true);
   };
 
   const handleCloseJournalEntryForm = () => {
     setIsJournalFormOpen(false);
     setEditingEntry(undefined);
+  };
+
+  const handleViewEntry = (entry: JournalEntry) => {
+    setViewingEntry(entry);
+  };
+
+  const handleCloseViewEntryDialog = () => {
+    setViewingEntry(null);
   };
   
   if (authLoading || (!user && !authLoading)) {
@@ -84,7 +94,12 @@ export default function MyJournalPage() {
     return (
       <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2 pt-2 pb-4 custom-scrollbar">
         {entriesToList.map(entry => (
-          <JournalEntryItem key={entry.id} entry={entry} onEdit={() => handleOpenJournalEntryForm(entry)} />
+          <JournalEntryItem 
+            key={entry.id} 
+            entry={entry} 
+            onEdit={() => handleOpenJournalEntryForm(entry)}
+            onViewRequest={() => handleViewEntry(entry)}
+          />
         ))}
       </div>
     );
@@ -108,9 +123,9 @@ export default function MyJournalPage() {
                     <NotebookPen className="mr-3 h-7 w-7" />
                     My Journal
                 </CardTitle>
-                <CardDescription className="text-primary/80">
+                <ShadcnCardDescription className="text-primary/80">
                     Record your thoughts, ideas, and reflections. Link them to goals or keep them general.
-                </CardDescription>
+                </ShadcnCardDescription>
             </div>
             <Button onClick={() => handleOpenJournalEntryForm()} className="bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg shadow-md transform hover:scale-105 transition-transform w-full sm:w-auto">
                 <PlusCircle className="w-5 h-5 mr-2" /> Add New Entry
@@ -134,14 +149,42 @@ export default function MyJournalPage() {
                     </DialogDescription>
                 </DialogHeader>
                 <JournalEntryForm
-                    goals={goals} // Pass goals for the dropdown in the form
+                    goals={goals} 
                     existingEntry={editingEntry}
                     onSave={handleCloseJournalEntryForm}
-                    defaultGoalId={editingEntry?.goalId} // Pass existing entry's goalId or undefined
+                    defaultGoalId={editingEntry?.goalId}
                 />
             </DialogContent>
          </Dialog>
       )}
+
+      {viewingEntry && (
+        <Dialog open={!!viewingEntry} onOpenChange={(open) => { if(!open) handleCloseViewEntryDialog(); }}>
+          <DialogContent className="sm:max-w-xl w-[90vw] max-h-[80vh] flex flex-col">
+            <DialogHeader>
+              <DialogTitle className="text-2xl text-primary flex items-center">
+                <Eye className="w-6 h-6 mr-2" /> 
+                {viewingEntry.title}
+              </DialogTitle>
+              <DialogDescription>
+                Last updated: {format(new Date(viewingEntry.updatedAt), "PPP p")}
+                {viewingEntry.goalId && goals.find(g => g.id === viewingEntry.goalId) && (
+                    <span className="block mt-1 text-xs">
+                        Linked to Goal: <span className="font-medium">{goals.find(g => g.id === viewingEntry.goalId)?.title || 'Unknown Goal'}</span>
+                    </span>
+                )}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4 overflow-y-auto flex-grow custom-scrollbar">
+              <p className="text-foreground whitespace-pre-wrap break-words">{viewingEntry.content}</p>
+            </div>
+            <DialogFooter className="pt-4">
+              <Button variant="outline" onClick={handleCloseViewEntryDialog}>Close</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
+

@@ -8,7 +8,6 @@ import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label'; // Unused, but often kept for ShadCN consistency
 import { Form, FormControl, FormField, FormItem, FormMessage, FormDescription, FormLabel } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel as RadixSelectLabel } from "@/components/ui/select";
 import type { Goal, JournalEntry } from '@/types';
@@ -16,10 +15,11 @@ import { useJournal } from '@/context/journal-context';
 import { useEffect } from 'react';
 
 const GENERAL_JOURNAL_ENTRY_VALUE = "__GENERAL_JOURNAL_ENTRY__";
+const MAX_CONTENT_LENGTH = 5000;
 
 const journalEntryFormSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters.").max(100, "Title too long."),
-  content: z.string().min(5, "Content must be at least 5 characters.").max(5000, "Content too long."),
+  content: z.string().min(5, "Content must be at least 5 characters.").max(MAX_CONTENT_LENGTH, `Content cannot exceed ${MAX_CONTENT_LENGTH} characters.`),
   goalId: z.string().optional(), 
 });
 
@@ -43,6 +43,8 @@ export default function JournalEntryForm({ goals, existingEntry, onSave, default
       goalId: existingEntry?.goalId || defaultGoalId || undefined,
     },
   });
+
+  const watchedContent = form.watch('content');
 
   useEffect(() => {
     if (!existingEntry && defaultGoalId !== form.getValues('goalId')) {
@@ -89,9 +91,14 @@ export default function JournalEntryForm({ goals, existingEntry, onSave, default
             <FormItem>
               <FormLabel>Journal Entry Content</FormLabel>
               <FormControl>
-                <Textarea placeholder="Type your journal entry here..." {...field} rows={6} />
+                <Textarea placeholder="Type your journal entry here..." {...field} rows={8} />
               </FormControl>
-              <FormMessage />
+              <div className="flex justify-between items-center">
+                <FormMessage />
+                <p className="text-xs text-muted-foreground">
+                  {watchedContent?.length || 0} / {MAX_CONTENT_LENGTH} characters
+                </p>
+              </div>
             </FormItem>
           )}
         />
@@ -141,3 +148,4 @@ export default function JournalEntryForm({ goals, existingEntry, onSave, default
     </Form>
   );
 }
+
