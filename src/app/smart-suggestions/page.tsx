@@ -41,10 +41,11 @@ export default function SmartSuggestionsPage() {
   const router = useRouter();
   const { toast } = useToast();
 
-  const [selectedExistingGoalId, setSelectedExistingGoalId] = useState<string | undefined>(undefined);
   const [smartSuggestions, setSmartSuggestions] = useState<SmartSuggestionsOutput | null>(null);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   const [suggestionsError, setSuggestionsError] = useState<string | null>(null);
+  const [loadedFromGoalId, setLoadedFromGoalId] = useState<string | undefined>(undefined);
+
 
   const form = useForm<CustomGoalFormData>({
     resolver: zodResolver(customGoalSchema),
@@ -64,37 +65,16 @@ export default function SmartSuggestionsPage() {
     }
   }, [user, authLoading]);
 
-  const handleFetchSuggestions = async (data?: CustomGoalFormData) => {
+  const handleFetchSuggestions = async (data: CustomGoalFormData) => {
     setIsLoadingSuggestions(true);
     setSuggestionsError(null);
     setSmartSuggestions(null);
 
-    let inputForAI;
-
-    if (selectedExistingGoalId && !data) { // Fetching for existing goal
-      const existingGoal = goals.find(g => g.id === selectedExistingGoalId);
-      if (!existingGoal) {
-        setSuggestionsError("Selected existing goal not found.");
-        setIsLoadingSuggestions(false);
-        return;
-      }
-      inputForAI = {
-        goalTitle: existingGoal.title || existingGoal.originalGoal,
-        category: existingGoal.category,
-        timeframe: existingGoal.timeline,
-      };
-    } else if (data) { // Fetching for custom goal
-      inputForAI = {
-        goalTitle: data.customTitle,
-        category: data.customCategory,
-        timeframe: data.customTimeframe,
-      };
-      setSelectedExistingGoalId(undefined); // Clear existing goal selection
-    } else {
-      setSuggestionsError("Please select an existing goal or provide custom goal details.");
-      setIsLoadingSuggestions(false);
-      return;
-    }
+    const inputForAI = {
+      goalTitle: data.customTitle,
+      category: data.customCategory,
+      timeframe: data.customTimeframe,
+    };
 
     const result: GenerateSmartSuggestionsResult = await getSmartSuggestions(inputForAI);
 
@@ -111,21 +91,23 @@ export default function SmartSuggestionsPage() {
     setIsLoadingSuggestions(false);
   };
   
-  const onCustomGoalSubmit: SubmitHandler<CustomGoalFormData> = (data) => {
+  const onFormSubmit: SubmitHandler<CustomGoalFormData> = (data) => {
     handleFetchSuggestions(data);
   };
 
-  const handleExistingGoalSelect = (goalId: string) => {
+  const handleLoadFromExistingGoal = (goalId: string) => {
     if (goalId === "none") {
-        setSelectedExistingGoalId(undefined);
-        form.reset(); // Clear custom form if "none" is selected
+        form.reset({ customTitle: "", customCategory: "", customTimeframe: "" });
+        setLoadedFromGoalId(undefined);
     } else {
-        setSelectedExistingGoalId(goalId);
-        form.reset(); // Clear custom form if an existing goal is selected
-        // Trigger suggestion fetch for the selected existing goal
         const existingGoal = goals.find(g => g.id === goalId);
         if (existingGoal) {
-           handleFetchSuggestions(); // No data means use selectedExistingGoalId
+           form.reset({
+             customTitle: existingGoal.title || existingGoal.originalGoal,
+             customCategory: existingGoal.category,
+             customTimeframe: existingGoal.timeline,
+           });
+           setLoadedFromGoalId(goalId);
         }
     }
   };
@@ -169,59 +151,45 @@ export default function SmartSuggestionsPage() {
             Smart Goal Suggestions
           </CardTitle>
           <ShadcnCardDescription className="text-primary/80">
-            Get AI-powered tips for your existing goals or define a new one below.
+            Get AI-powered tips for your goals. You can load details from an existing goal or enter them manually.
           </ShadcnCardDescription>
         </CardHeader>
         <CardContent className="p-6 space-y-6">
-          {/* Section for Existing Goals */}
-          <Card className="bg-card border-border">
-            <CardHeader>
-              <CardTitle className="text-xl">For an Existing Goal</CardTitle>
-              <ShadcnCardDescription>Select one of your saved goals to get suggestions.</ShadcnCardDescription>
-            </CardHeader>
-            <CardContent>
-              <Select
-                onValueChange={handleExistingGoalSelect}
-                value={selectedExistingGoalId || "none"}
-                disabled={goalsLoading || isLoadingSuggestions || goals.length === 0}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder={goals.length > 0 ? "Select from your goals..." : "No existing goals found."} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <RadixSelectLabel>Your Goals</RadixSelectLabel>
-                    <SelectItem value="none">-- Select a Goal --</SelectItem>
-                    {goals.map((goal: Goal) => (
-                      <SelectItem key={goal.id} value={goal.id}>
-                        {goal.title || goal.originalGoal}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-               {goals.length === 0 && !goalsLoading && <p className="text-xs text-muted-foreground mt-2">You don't have any saved goals yet. Try adding a custom goal below or create one from "My Goals".</p>}
-            </CardContent>
-          </Card>
-
-          {/* Section for Custom Goal */}
-          <div className="relative my-4">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-border" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="bg-card px-2 text-muted-foreground">OR</span>
-            </div>
-          </div>
           
           <Card className="bg-card border-border">
             <CardHeader>
-              <CardTitle className="text-xl">For a Custom Goal</CardTitle>
-              <ShadcnCardDescription>Describe a new goal to get suggestions.</ShadcnCardDescription>
+              <CardTitle className="text-xl">Define Your Goal</CardTitle>
+              <ShadcnCardDescription>Describe your goal to get suggestions. You can load details from an existing goal.</ShadcnCardDescription>
             </CardHeader>
             <CardContent>
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(onCustomGoalSubmit)} className="space-y-4">
+                <form onSubmit={form.handleSubmit(onFormSubmit)} className="space-y-4">
+                  
+                  <FormItem>
+                    <FormLabel>Load from Existing Goal (Optional)</FormLabel>
+                    <Select
+                      onValueChange={handleLoadFromExistingGoal}
+                      value={loadedFromGoalId || "none"}
+                      disabled={goalsLoading || isLoadingSuggestions || goals.length === 0}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder={goals.length > 0 ? "Select from your goals to pre-fill..." : "No existing goals to load from."} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <RadixSelectLabel>Your Goals</RadixSelectLabel>
+                          <SelectItem value="none">-- Select a Goal to Pre-fill --</SelectItem>
+                          {goals.map((goal: Goal) => (
+                            <SelectItem key={goal.id} value={goal.id}>
+                              {goal.title || goal.originalGoal}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                    {goals.length === 0 && !goalsLoading && <p className="text-xs text-muted-foreground mt-2">You don't have any saved goals yet. Please enter goal details manually below.</p>}
+                  </FormItem>
+
                   <FormField
                     control={form.control}
                     name="customTitle"
@@ -229,7 +197,7 @@ export default function SmartSuggestionsPage() {
                       <FormItem>
                         <FormLabel>Goal Title / Objective</FormLabel>
                         <FormControl>
-                          <Input placeholder="e.g., Learn Spanish for travel" {...field} disabled={isLoadingSuggestions || !!selectedExistingGoalId} />
+                          <Input placeholder="e.g., Learn Spanish for travel" {...field} disabled={isLoadingSuggestions} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -241,7 +209,7 @@ export default function SmartSuggestionsPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Category</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value} disabled={isLoadingSuggestions || !!selectedExistingGoalId}>
+                        <Select onValueChange={field.onChange} value={field.value} disabled={isLoadingSuggestions}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select a category" />
@@ -264,15 +232,15 @@ export default function SmartSuggestionsPage() {
                       <FormItem>
                         <FormLabel>Timeframe / Deadline</FormLabel>
                         <FormControl>
-                          <Input placeholder="e.g., 3 months, By end of year" {...field} disabled={isLoadingSuggestions || !!selectedExistingGoalId} />
+                          <Input placeholder="e.g., 3 months, By end of year" {...field} disabled={isLoadingSuggestions} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  <Button type="submit" className="w-full sm:w-auto" disabled={isLoadingSuggestions || !!selectedExistingGoalId}>
-                    {isLoadingSuggestions && form.formState.isSubmitting ? <LoadingSpinner className="mr-2" /> : <Lightbulb className="mr-2 h-4 w-4" />}
-                    Get Suggestions for Custom Goal
+                  <Button type="submit" className="w-full sm:w-auto" disabled={isLoadingSuggestions}>
+                    {isLoadingSuggestions ? <LoadingSpinner className="mr-2" /> : <Lightbulb className="mr-2 h-4 w-4" />}
+                    Get Suggestions
                   </Button>
                 </form>
               </Form>
@@ -296,11 +264,7 @@ export default function SmartSuggestionsPage() {
             <Card className="mt-6 bg-muted/30">
               <CardHeader>
                 <CardTitle className="text-xl text-primary">
-                  Suggestions for: {
-                    selectedExistingGoalId 
-                    ? (goals.find(g=>g.id === selectedExistingGoalId)?.title || goals.find(g=>g.id === selectedExistingGoalId)?.originalGoal)
-                    : form.getValues().customTitle
-                  }
+                  Suggestions for: {form.getValues().customTitle}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm">
@@ -324,7 +288,7 @@ export default function SmartSuggestionsPage() {
            {!isLoadingSuggestions && !smartSuggestions && !suggestionsError && (
                 <div className="text-center py-8 text-muted-foreground">
                     <Lightbulb className="w-12 h-12 mx-auto mb-3 opacity-30"/>
-                    <p>Select an existing goal or fill out the custom goal form above to get AI-powered suggestions.</p>
+                    <p>Fill out the goal form above and click "Get Suggestions" to receive AI-powered advice.</p>
                 </div>
             )}
         </CardContent>
