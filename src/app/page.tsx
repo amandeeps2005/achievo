@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Target, Brain, Map, CalendarDays, BarChartBig, Wand2, ArrowRight, Zap } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import AppFooter from '@/components/app-footer'; // Import the new AppFooter
+// import AppFooter from '@/components/app-footer'; // Import the new AppFooter - Removed
 
 const features = [
   {
@@ -168,8 +168,9 @@ export default function LandingPage() {
         </section>
       )}
 
-      {/* Footer - Replaced with AppFooter */}
-      <AppFooter />
+      {/* Footer - Replaced with AppFooter in RootLayout
+      <AppFooter /> 
+      */}
     </div>
   );
 }
