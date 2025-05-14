@@ -186,7 +186,7 @@ export default function GoalSetupForm() {
               </div>
               {generatedPlan.tools.length > 0 && (
                 <div>
-                  <p className="flex items-center"><Wrench className="inline mr-2 h-4 w-4 text-primary flex-shrink-0" /> <strong className="text-foreground">Tools & Resources:</strong></p>
+                  <p className="flex items-center"><Wrench className="inline mr-2 h-4 w-4 text-primary flex-shrink-0" /> <strong className="text-foreground">Tools &amp; Resources:</strong></p>
                   <ul className="list-disc list-inside ml-6 text-sm text-muted-foreground space-y-1 mt-1">
                     {generatedPlan.tools.map((tool, idx) => <li key={idx}>{tool}</li>)}
                   </ul>
@@ -224,10 +224,10 @@ export default function GoalSetupForm() {
             <Button 
               variant="outline" 
               onClick={() => { setGeneratedPlan(null); form.reset(); setApiError(null); }} 
-              className="w-full sm:w-auto border-primary text-primary hover:bg-primary/10 py-3 text-base rounded-lg shadow-sm hover:shadow-md transition-all duration-300" 
+              className="w-full sm:w-auto border-primary text-primary hover:bg-primary/20 py-3 text-base rounded-lg shadow-sm hover:shadow-md transition-all duration-300" 
               disabled={isSavingGoal}
             >
-              Edit Goal & Regenerate
+              Edit Goal &amp; Regenerate
             </Button>
             <Button 
               onClick={handleSaveGoal} 
@@ -235,7 +235,7 @@ export default function GoalSetupForm() {
               disabled={isSavingGoal}
             >
              {isSavingGoal ? <LoadingSpinner className="mr-2" /> :  <CheckCircle className="mr-2 h-5 w-5" />}
-              {isSavingGoal ? 'Saving Your Goal...' : 'Save & Start Achieving'}
+              {isSavingGoal ? 'Saving Your Goal...' : 'Save &amp; Start Achieving'}
             </Button>
         </CardFooter>
       )}
