@@ -28,8 +28,8 @@ export default function GoalCard({ goal }: GoalCardProps) {
   };
 
   return (
-    <Card className="flex flex-col h-full shadow-lg hover:shadow-xl transition-shadow duration-300">
-      <CardHeader>
+    <Card className="flex flex-col h-full shadow-xl hover:shadow-2xl transition-shadow duration-300 rounded-xl border border-border hover:border-primary/30">
+      <CardHeader className="bg-muted/20">
         <Link href={`/goal/${goal.id}`} passHref legacyBehavior>
           <a className="cursor-pointer hover:underline" aria-label={`View goal: ${goal.title || goal.originalGoal}`}>
             <CardTitle className="text-xl font-semibold text-primary truncate">
@@ -63,7 +63,7 @@ export default function GoalCard({ goal }: GoalCardProps) {
           )}
         </div>
       </CardContent>
-      <CardFooter className="flex justify-end items-center pt-4"> {/* Changed to justify-end */}
+      <CardFooter className="flex justify-end items-center pt-4">
         <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
           <AlertDialogTrigger asChild>
             <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive hover:text-destructive-foreground shrink-0">

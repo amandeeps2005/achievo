@@ -104,7 +104,7 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-8 py-4">
-      <div className="p-4 sm:p-6 rounded-xl bg-card shadow-lg border border-primary/10">
+      <div className="p-4 sm:p-6 rounded-xl bg-card shadow-lg border border-border">
         <div className="flex items-center gap-3 mb-1">
             {user.photoURL ? (
                 <img src={user.photoURL} alt="User" className="w-12 h-12 rounded-full object-cover border-2 border-primary" />
@@ -123,7 +123,7 @@ export default function DashboardPage() {
       </div>
 
       {currentQuote && (
-        <Card className="bg-gradient-to-br from-primary/10 via-card to-accent/5 shadow-lg rounded-xl border-primary/20 overflow-hidden group">
+        <Card className="bg-gradient-to-br from-primary/10 via-card to-accent/5 shadow-xl rounded-xl border border-border group">
             <div className="relative">
                  <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-accent/5 opacity-70 group-hover:opacity-100 transition-opacity duration-500"></div>
                  <CardHeader className="flex flex-row items-center gap-4 pb-4 relative z-10">
@@ -147,8 +147,8 @@ export default function DashboardPage() {
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4 sm:p-0">
-        <Card className="flex flex-col shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl transform hover:-translate-y-1">
-          <CardHeader>
+        <Card className="flex flex-col shadow-xl hover:shadow-2xl transition-all duration-300 rounded-xl transform hover:-translate-y-1 border border-border hover:border-primary/30">
+          <CardHeader className="bg-muted/20">
             <div className="flex items-center gap-3 mb-2">
               <LayoutGrid className="w-8 h-8 text-primary" />
               <CardTitle className="text-2xl">My Goals</CardTitle>
@@ -169,8 +169,8 @@ export default function DashboardPage() {
           </CardFooter>
         </Card>
 
-        <Card className="flex flex-col shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl transform hover:-translate-y-1">
-            <CardHeader>
+        <Card className="flex flex-col shadow-xl hover:shadow-2xl transition-all duration-300 rounded-xl transform hover:-translate-y-1 border border-border hover:border-primary/30">
+            <CardHeader className="bg-muted/20">
               <div className="flex items-center gap-3 mb-2">
                 <BarChartBig className="w-8 h-8 text-primary" />
                 <CardTitle className="text-2xl">Progress Overview</CardTitle>
@@ -189,8 +189,8 @@ export default function DashboardPage() {
             </CardFooter>
         </Card>
 
-         <Card className="flex flex-col shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl transform hover:-translate-y-1">
-            <CardHeader>
+         <Card className="flex flex-col shadow-xl hover:shadow-2xl transition-all duration-300 rounded-xl transform hover:-translate-y-1 border border-border hover:border-accent/30">
+            <CardHeader className="bg-muted/20">
               <div className="flex items-center gap-3 mb-2">
                 <Brain className="w-8 h-8 text-accent" />
                 <CardTitle className="text-2xl text-accent">Smart Goal Tips</CardTitle>
@@ -210,8 +210,8 @@ export default function DashboardPage() {
           </Card>
 
 
-        <Card className="flex flex-col shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl transform hover:-translate-y-1">
-          <CardHeader>
+        <Card className="flex flex-col shadow-xl hover:shadow-2xl transition-all duration-300 rounded-xl transform hover:-translate-y-1 border border-border hover:border-primary/30">
+          <CardHeader className="bg-muted/20">
             <div className="flex items-center gap-3 mb-2">
               <NotebookPen className="w-8 h-8 text-primary" />
               <CardTitle className="text-2xl">My Journal</CardTitle>
@@ -230,8 +230,8 @@ export default function DashboardPage() {
           </CardFooter>
         </Card>
 
-        <Card className="flex flex-col shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl transform hover:-translate-y-1">
-          <CardHeader>
+        <Card className="flex flex-col shadow-xl hover:shadow-2xl transition-all duration-300 rounded-xl transform hover:-translate-y-1 border border-border hover:border-primary/30">
+          <CardHeader className="bg-muted/20">
             <div className="flex items-center gap-3 mb-2">
               <CheckSquare className="w-8 h-8 text-primary" />
               <CardTitle className="text-2xl">Habit Tracking</CardTitle>
@@ -257,7 +257,7 @@ export default function DashboardPage() {
       </div>
 
       {goals.length === 0 && !goalsLoading && (
-        <Card className="mt-8 text-center py-12 bg-card shadow-md rounded-xl">
+        <Card className="mt-8 text-center py-12 bg-card shadow-md rounded-xl border border-border">
           <CardHeader>
             <CardTitle className="text-2xl font-semibold text-primary">Ready to Start Achieving?</CardTitle>
           </CardHeader>

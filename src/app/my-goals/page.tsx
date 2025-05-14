@@ -54,8 +54,8 @@ export default function MyGoalsPage() {
             </Button>
         </div>
 
-      <Card className="shadow-xl border-primary/20 rounded-xl overflow-hidden">
-        <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-6 bg-primary/5">
+      <Card className="shadow-xl border-border rounded-xl overflow-hidden">
+        <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-6 bg-muted/20">
             <div>
                 <CardTitle className="text-3xl font-bold text-primary flex items-center">
                     <LayoutGrid className="mr-3 h-7 w-7" />

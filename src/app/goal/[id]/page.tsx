@@ -22,13 +22,11 @@ export default function GoalDetailPage() {
 
   useEffect(() => {
     if (!authLoading && !user) {
-      redirect('/'); // Redirect to landing page if not authenticated
+      redirect('/'); 
     }
   }, [user, authLoading]);
 
   useEffect(() => {
-    // This effect handles the case where the goal is not found AFTER auth check has passed
-    // or if the user was already logged in but the goal doesn't exist.
     if (user && !isContextLoading && goalId && !goal) {
       router.replace('/dashboard'); 
     }
@@ -44,7 +42,6 @@ export default function GoalDetailPage() {
    );
   }
   
-  // This loading state is for the goal context itself, after auth is confirmed
   if (user && isContextLoading && !goal) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
@@ -54,7 +51,7 @@ export default function GoalDetailPage() {
     );
   }
 
-  if (!goal && user) { // If user is authenticated but goal is not found
+  if (!goal && user) { 
     return (
       <div className="text-center py-12">
         <h1 className="text-2xl font-semibold mb-4">Goal Not Found</h1>
@@ -69,9 +66,6 @@ export default function GoalDetailPage() {
     );
   }
   
-  // If goal is still undefined here, it means auth hasn't redirected yet, or some other edge case.
-  // The primary "goal not found" for authenticated users is handled above.
-  // If !user, the auth redirect should handle it. If still here without a goal, show generic not found.
   if (!goal) {
      return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
@@ -105,4 +99,3 @@ export default function GoalDetailPage() {
     </div>
   );
 }
-

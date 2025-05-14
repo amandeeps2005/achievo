@@ -59,8 +59,8 @@ export default function GoalDetailView({ goal }: GoalDetailViewProps) {
 
   return (
     <div className="space-y-8">
-      <Card className="shadow-lg">
-        <CardHeader>
+      <Card className="shadow-xl border-border rounded-xl overflow-hidden">
+        <CardHeader className="bg-muted/20">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
             <CardTitle className="text-3xl font-bold text-primary flex items-center">
               <Target className="w-8 h-8 mr-3 shrink-0" /> {goal.title || goal.originalGoal}
@@ -150,8 +150,8 @@ export default function GoalDetailView({ goal }: GoalDetailViewProps) {
         </CardFooter>
       </Card>
       
-      <Card className="shadow-md">
-        <CardHeader>
+      <Card className="shadow-xl border-border rounded-xl overflow-hidden">
+        <CardHeader className="bg-muted/20">
           <CardTitle className="text-2xl font-semibold text-foreground flex items-center">
             <BarChartHorizontalBig className="w-6 h-6 mr-3 text-primary" />
             Action Roadmap
@@ -175,4 +175,3 @@ export default function GoalDetailView({ goal }: GoalDetailViewProps) {
     </div>
   );
 }
-

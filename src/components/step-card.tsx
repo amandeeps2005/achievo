@@ -30,20 +30,17 @@ export default function StepCard({ step, goalId, stepNumber }: StepCardProps) {
   const formatDate = (dateString?: string) => {
     if (!dateString) return '';
     try {
-      // Attempt to create a date object. If the dateString is already in a good format (like YYYY-MM-DD),
-      // this will work. If it's something else, it might be problematic, so ensure AI provides consistent format.
       const date = new Date(dateString);
-      // Adjust for timezone to avoid off-by-one day errors
       const userTimezoneOffset = date.getTimezoneOffset() * 60000;
       return new Date(date.getTime() + userTimezoneOffset).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
     } catch (e) {
       console.warn("Invalid date string for formatting:", dateString, e);
-      return dateString; // fallback to original string if date is invalid
+      return dateString;
     }
   };
 
   return (
-    <Card className={`transition-all duration-300 ${step.completed ? 'bg-green-800/40 border-green-600' : 'bg-card shadow-sm hover:shadow-md'}`}>
+    <Card className={`transition-all duration-300 rounded-xl border ${step.completed ? 'bg-green-800/40 border-green-600' : 'bg-card shadow-lg hover:shadow-xl border-border hover:border-primary/20'}`}>
       <CardHeader className="flex flex-row items-start space-x-4 p-4">
         <Checkbox
           id={`step-${step.id}`}
@@ -74,7 +71,7 @@ export default function StepCard({ step, goalId, stepNumber }: StepCardProps) {
                 Start: {formatDate(step.startDate)}
               </CardDescription>
             )}
-            {step.endDate && step.repeatInterval && ( // Only show end date if it's a repeating task, otherwise deadline implies end
+            {step.endDate && step.repeatInterval && ( 
               <CardDescription className="text-xs flex items-center text-muted-foreground">
                 <CalendarDays className="w-3.5 h-3.5 mr-1.5 text-primary/70" />
                 End: {formatDate(step.endDate)}
@@ -133,4 +130,3 @@ export default function StepCard({ step, goalId, stepNumber }: StepCardProps) {
     </Card>
   );
 }
-
