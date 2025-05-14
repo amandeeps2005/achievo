@@ -74,7 +74,7 @@ export default function JournalEntryItem({ entry, onEdit, onViewRequest }: Journ
         </p>
       </CardContent>
       <CardFooter className="flex justify-end space-x-2 pt-3">
-        <Button variant="ghost" size="sm" onClick={() => onViewRequest(entry)} className="text-primary hover:text-primary">
+        <Button variant="ghost" size="sm" onClick={() => onViewRequest(entry)} className="text-primary hover:text-primary hover:bg-primary/10">
           <Eye className="w-4 h-4 mr-2" /> View
         </Button>
         <Button variant="outline" size="sm" onClick={onEdit}>
