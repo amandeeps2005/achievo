@@ -1,3 +1,4 @@
+
 import type { GoalDecompositionOutput } from '@/ai/flows/goal-decomposition';
 
 export interface StepUi extends GoalDecompositionOutput['steps'][0] {
@@ -21,16 +22,16 @@ export interface Goal {
   progress: number; // Calculated: (completed steps / total steps) * 100
 }
 
-// Note type
-export interface Note {
+// JournalEntry type (formerly Note)
+export interface JournalEntry {
   id: string;
   userId: string;
   title: string;
   content: string;
-  goalId?: string; // Optional: if the note is linked to a specific goal
+  goalId?: string; // Optional: if the entry is linked to a specific goal
   createdAt: string; // ISO date string
   updatedAt: string; // ISO date string
 }
 
-// Represents an item that can have notes (either a Goal or a "General" category)
-export type Noteable = Goal | { id: 'general'; title: string; originalGoal: string };
+// Represents an item that can have journal entries (either a Goal or a "General" category)
+export type Journalable = Goal | { id: 'general'; title: string; originalGoal: string };

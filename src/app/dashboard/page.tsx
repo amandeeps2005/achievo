@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth-context';
 import Link from 'next/link';
 import { PlusCircle, BarChartBig, Lightbulb, Brain, LayoutGrid, ArrowRight, NotebookPen } from 'lucide-react';
-import { useRouter } from 'next/navigation'; // Changed from next/navigation redirect
+import { useRouter } from 'next/navigation'; 
 import GoalProgressChart from '@/components/goal-progress-chart';
 import {
   Dialog,
@@ -123,7 +123,6 @@ export default function DashboardPage() {
     );
   }
   
-  // This loading state is specifically for goals, after user is confirmed.
   if (goalsLoading && typeof window !== 'undefined' && !localStorage.getItem('achievoGoals')) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
@@ -165,7 +164,6 @@ export default function DashboardPage() {
       )}
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4 sm:p-0">
-        {/* Card for My Goals */}
         <Card className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl">
           <CardHeader>
             <div className="flex items-center gap-3 mb-2">
@@ -186,7 +184,6 @@ export default function DashboardPage() {
           </CardFooter>
         </Card>
 
-        {/* Card for Progress Overview */}
         <Dialog open={isOverviewModalOpen} onOpenChange={setIsOverviewModalOpen}>
           <Card className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl">
             <CardHeader>
@@ -228,7 +225,6 @@ export default function DashboardPage() {
           </DialogContent>
         </Dialog>
 
-        {/* Card for Get Smart Tips */}
         <Dialog open={isSuggestionsModalOpen} onOpenChange={(isOpen) => {
             setIsSuggestionsModalOpen(isOpen);
             if (!isOpen) { 
@@ -338,7 +334,6 @@ export default function DashboardPage() {
           </DialogContent>
         </Dialog>
 
-        {/* Card for Add New Goal */}
         <Card className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl">
           <CardHeader>
             <div className="flex items-center gap-3 mb-2">
@@ -359,22 +354,21 @@ export default function DashboardPage() {
           </CardFooter>
         </Card>
 
-        {/* Card for My Notes */}
         <Card className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl">
           <CardHeader>
             <div className="flex items-center gap-3 mb-2">
               <NotebookPen className="w-8 h-8 text-primary" />
-              <CardTitle className="text-2xl">My Notes</CardTitle>
+              <CardTitle className="text-2xl">My Journal</CardTitle>
             </div>
-            <ShadcnCardDescription>Jot down thoughts, ideas, and reminders.</ShadcnCardDescription>
+            <ShadcnCardDescription>Record your thoughts, ideas, and reflections.</ShadcnCardDescription>
           </CardHeader>
           <CardContent className="flex-grow">
-            <p className="text-sm text-muted-foreground">Organize your notes and link them to specific goals if needed.</p>
+            <p className="text-sm text-muted-foreground">Organize your journal entries and link them to specific goals if needed.</p>
           </CardContent>
           <CardFooter>
              <Button asChild size="lg" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg">
-              <Link href="/my-notes">
-                Manage Notes <ArrowRight className="ml-2 h-5 w-5" />
+              <Link href="/my-journal">
+                Open Journal <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
           </CardFooter>
@@ -399,4 +393,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-

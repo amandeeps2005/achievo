@@ -1,3 +1,4 @@
+
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
@@ -5,8 +6,8 @@ import { GoalProvider } from '@/context/goal-context';
 import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/context/theme-context';
 import AppHeader from '@/components/app-header';
-import { AuthProvider } from '@/context/auth-context'; // Import AuthProvider
-import { NotesProvider } from '@/context/notes-context'; // Import NotesProvider
+import { AuthProvider } from '@/context/auth-context';
+import { JournalProvider } from '@/context/journal-context'; // Changed from NotesProvider
 
 
 const geistSans = Geist({
@@ -34,7 +35,7 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans`}>
         <ThemeProvider storageKey="achievo-ui-theme">
           <AuthProvider>
-            <NotesProvider>
+            <JournalProvider> {/* Changed from NotesProvider */}
               <GoalProvider>
                 <AppHeader />
                 <main className="container mx-auto px-4 py-8">
@@ -42,7 +43,7 @@ export default function RootLayout({
                 </main>
                 <Toaster />
               </GoalProvider>
-            </NotesProvider>
+            </JournalProvider> {/* Changed from NotesProvider */}
           </AuthProvider>
         </ThemeProvider>
       </body>
