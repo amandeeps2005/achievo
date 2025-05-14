@@ -258,7 +258,7 @@ export default function MyHabitsPage() {
                   Visualize your habit consistency over the month. Darker means more habits completed.
               </ShadcnCardDescription>
           </CardHeader>
-          <CardContent className="p-6 flex flex-col items-center"> {/* items-center might still center it if w-full below is not fully effective */}
+          <CardContent className="p-0"> {/* Removed padding from CardContent */}
               <Calendar
                   mode="single"
                   month={heatmapDisplayMonth}
@@ -266,13 +266,16 @@ export default function MyHabitsPage() {
                   components={{
                       Day: (props) => <MemoizedCustomDay {...props} heatmapData={heatmapDataForMonth} />,
                   }}
-                  className="rounded-md border p-0 sm:p-3 w-full" // Removed max-w-md and self-center
-                  selected={undefined} // Disable date selection behavior
-                  onSelect={() => {}} // Disable date selection behavior
+                  // Calendar component should take full width, have NO internal padding (p-0 overrides default p-3), 
+                  // and no border/top-rounding of its own. Card provides overall border & top rounding.
+                  // Bottom rounding applied to match card.
+                  className="w-full p-0 rounded-b-xl" 
+                  selected={undefined} 
+                  onSelect={() => {}} 
                   showOutsideDays
                   fixedWeeks
               />
-              <div className="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
+              <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs text-muted-foreground p-3 border-t">
                   <div className="flex items-center"><span className="w-3 h-3 rounded-sm mr-1.5 bg-primary"></span>All Done</div>
                   <div className="flex items-center"><span className="w-3 h-3 rounded-sm mr-1.5 bg-primary/60"></span>Some Done</div>
                   <div className="flex items-center"><span className="w-3 h-3 rounded-sm mr-1.5 bg-muted/50"></span>None Done (Tracked)</div>
