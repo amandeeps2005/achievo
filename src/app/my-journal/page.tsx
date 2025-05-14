@@ -13,8 +13,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel as RadixSelectLabel } from "@/components/ui/select";
 import JournalEntryForm from '@/components/journal/journal-entry-form';
 import JournalEntryItem from '@/components/journal/journal-entry-item';
 import type { Goal, JournalEntry } from '@/types';
@@ -27,15 +25,12 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 
 export default function MyJournalPage() {
   const { user, loading: authLoading } = useAuth();
-  const { goals, isLoading: goalsLoading } = useGoals();
-  const { journalEntries, getJournalEntriesByGoalId, getGeneralJournalEntries, isLoading: journalLoading } = useJournal();
+  const { goals, isLoading: goalsLoading } = useGoals(); // Keep goals for the form
+  const { journalEntries, isLoading: journalLoading } = useJournal();
   const router = useRouter();
 
-  const [selectedGoalIdForList, setSelectedGoalIdForList] = useState<string>('');
   const [isJournalFormOpen, setIsJournalFormOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState<JournalEntry | undefined>(undefined);
-  const [defaultGoalIdForNewEntry, setDefaultGoalIdForNewEntry] = useState<string | undefined>(undefined);
-  const [currentTab, setCurrentTab] = useState<'goal' | 'general'>('goal');
 
   useEffect(() => {
     if (typeof document !== 'undefined') {
@@ -46,18 +41,10 @@ export default function MyJournalPage() {
     }
   }, [user, authLoading]);
   
-  useEffect(() => {
-    if (currentTab === 'general') {
-      setSelectedGoalIdForList('');
-    }
-  }, [currentTab]);
 
-  const entriesForSelectedGoal = selectedGoalIdForList ? getJournalEntriesByGoalId(selectedGoalIdForList) : [];
-  const generalEntries = getGeneralJournalEntries();
-
-  const handleOpenJournalEntryForm = (entry?: JournalEntry, goalId?: string) => {
+  const handleOpenJournalEntryForm = (entry?: JournalEntry) => {
     setEditingEntry(entry);
-    setDefaultGoalIdForNewEntry(entry ? entry.goalId : goalId);
+    // defaultGoalId for new entry is handled by the form itself if no entry is passed
     setIsJournalFormOpen(true);
   };
 
@@ -75,7 +62,7 @@ export default function MyJournalPage() {
     );
   }
 
-  const renderJournalEntriesList = (entriesToList: JournalEntry[], type: 'goal' | 'general') => {
+  const renderJournalEntriesList = (entriesToList: JournalEntry[]) => {
     if (journalLoading) {
       return (
         <div className="flex flex-col justify-center items-center py-12 min-h-[200px]">
@@ -83,24 +70,19 @@ export default function MyJournalPage() {
         </div>
       );
     }
-    if (type === 'goal' && !selectedGoalIdForList && goals.length > 0) {
-      return <p className="text-center text-muted-foreground py-12 min-h-[200px]">Please select a goal to view its journal entries.</p>;
-    }
-     if (type === 'goal' && goals.length === 0 && !goalsLoading) {
-         return <p className="text-center text-muted-foreground py-12 min-h-[200px]">Create a goal first to add goal-specific journal entries.</p>;
-    }
+    
     if (entriesToList.length === 0) {
       return (
         <div className="text-center py-12 min-h-[200px] flex flex-col items-center justify-center">
             <FileText className="w-16 h-16 text-primary opacity-30 mb-4" />
             <p className="text-muted-foreground">
-            No journal entries found. {type === 'goal' && selectedGoalIdForList ? 'Add one for this goal!' : type === 'goal' ? '' : 'Add a general entry!'}
+            No journal entries found. Click "Add New Entry" to create your first one!
             </p>
         </div>
         );
     }
     return (
-      <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 pt-2 pb-4 custom-scrollbar">
+      <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2 pt-2 pb-4 custom-scrollbar">
         {entriesToList.map(entry => (
           <JournalEntryItem key={entry.id} entry={entry} onEdit={() => handleOpenJournalEntryForm(entry)} />
         ))}
@@ -127,51 +109,15 @@ export default function MyJournalPage() {
                     My Journal
                 </CardTitle>
                 <CardDescription className="text-primary/80">
-                    Record your thoughts, ideas, and important information.
+                    Record your thoughts, ideas, and reflections. Link them to goals or keep them general.
                 </CardDescription>
             </div>
-            <Button onClick={() => handleOpenJournalEntryForm(undefined, currentTab === 'goal' ? selectedGoalIdForList : undefined)} className="bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg shadow-md transform hover:scale-105 transition-transform w-full sm:w-auto">
+            <Button onClick={() => handleOpenJournalEntryForm()} className="bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg shadow-md transform hover:scale-105 transition-transform w-full sm:w-auto">
                 <PlusCircle className="w-5 h-5 mr-2" /> Add New Entry
             </Button>
         </CardHeader>
         <CardContent className="p-6">
-          <Tabs value={currentTab} onValueChange={(value) => setCurrentTab(value as 'goal' | 'general')} className="w-full">
-            <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 max-w-md mx-auto">
-              <TabsTrigger value="goal">Goal-Specific Entries</TabsTrigger>
-              <TabsTrigger value="general">General Entries</TabsTrigger>
-            </TabsList>
-            <TabsContent value="goal" className="mt-6 space-y-4">
-              <Select
-                onValueChange={setSelectedGoalIdForList}
-                value={selectedGoalIdForList}
-                disabled={goalsLoading || goals.length === 0}
-              >
-                <SelectTrigger className="w-full sm:w-[350px] text-sm">
-                  <SelectValue placeholder={goals.length > 0 ? "Select a goal to see its journal entries..." : "No goals available"} />
-                </SelectTrigger>
-                <SelectContent>
-                  {goalsLoading ? (
-                    <SelectItem value="loading" disabled>Loading goals...</SelectItem>
-                  ) : goals.length > 0 ? (
-                    <SelectGroup>
-                      <RadixSelectLabel>Your Goals</RadixSelectLabel>
-                      {goals.map((goal) => (
-                        <SelectItem key={goal.id} value={goal.id}>
-                          {goal.title || goal.originalGoal}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  ) : (
-                    <SelectItem value="no-goals" disabled>No goals created yet. Add a goal to link journal entries.</SelectItem>
-                  )}
-                </SelectContent>
-              </Select>
-              {renderJournalEntriesList(entriesForSelectedGoal, 'goal')}
-            </TabsContent>
-            <TabsContent value="general" className="mt-6">
-              {renderJournalEntriesList(generalEntries, 'general')}
-            </TabsContent>
-          </Tabs>
+          {renderJournalEntriesList(journalEntries)}
         </CardContent>
       </Card>
 
@@ -188,10 +134,10 @@ export default function MyJournalPage() {
                     </DialogDescription>
                 </DialogHeader>
                 <JournalEntryForm
-                    goals={goals}
+                    goals={goals} // Pass goals for the dropdown in the form
                     existingEntry={editingEntry}
                     onSave={handleCloseJournalEntryForm}
-                    defaultGoalId={editingEntry?.goalId || defaultGoalIdForNewEntry}
+                    defaultGoalId={editingEntry?.goalId} // Pass existing entry's goalId or undefined
                 />
             </DialogContent>
          </Dialog>
