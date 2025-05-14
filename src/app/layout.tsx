@@ -45,18 +45,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans flex flex-col min-h-screen`}>
           <AuthProvider>
             <GoalProvider>
               <JournalProvider>
                 <HabitProvider>
-                  <SidebarProvider defaultOpen={false} > {/* Sidebar collapsed by default, can be changed */}
-                    <Sidebar collapsible="icon" className="border-r border-sidebar-border">
+                  <SidebarProvider defaultOpen={false} >
+                    <Sidebar collapsible="offcanvas" className="border-r border-sidebar-border">
                       <SidebarHeader className="p-4">
                         <Link href="/" className="flex items-center gap-2 text-xl font-bold text-primary hover:opacity-80 transition-opacity">
                           <Target className="w-7 h-7" />
-                          {/* Text span is hidden when sidebar is icon-only */}
-                          <span className="group-data-[state=collapsed]:hidden group-data-[collapsible=icon]:hidden">Achievo</span>
+                          {/* Text span is hidden when sidebar is icon-only, but offcanvas will show it when open */}
+                          <span>Achievo</span>
                         </Link>
                       </SidebarHeader>
                       <SidebarContent>
@@ -67,7 +67,7 @@ export default function RootLayout({
                       </SidebarFooter>
                     </Sidebar>
 
-                    <SidebarInset className="flex flex-col min-h-screen bg-background">
+                    <SidebarInset className="flex flex-col flex-grow bg-background">
                       <AppHeader />
                       <main className="container mx-auto px-4 py-8 flex-grow">
                         {children}
