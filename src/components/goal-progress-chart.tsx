@@ -63,8 +63,8 @@ function IndividualGoalPieChart({ goal }: IndividualGoalPieChartProps) {
               nameKey="name"
               cx="50%"
               cy="50%"
-              outerRadius={Math.min(window.innerWidth < 640 ? 70 : 80, 80)} // Adjusted for sm breakpoint
-              innerRadius={Math.min(window.innerWidth < 640 ? 45 : 55, 55)} // This makes it a donut
+              outerRadius={Math.min(window.innerWidth < 640 ? 70 : 80, 80)} 
+              innerRadius={Math.min(window.innerWidth < 640 ? 45 : 55, 55)} 
               strokeWidth={2}
               stroke="hsl(var(--background))"
               style={{ filter: 'url(#shadow)' }}
@@ -73,7 +73,6 @@ function IndividualGoalPieChart({ goal }: IndividualGoalPieChartProps) {
                 <Cell key={`cell-${index}`} fill={entry.fill} />
               ))}
             </Pie>
-            {/* Text in the middle of the donut */}
             <text
               x="50%"
               y="50%"
@@ -95,22 +94,16 @@ function IndividualGoalPieChart({ goal }: IndividualGoalPieChartProps) {
 
 
 export default function GoalProgressChart({ goals }: GoalProgressChartProps) {
-  // Show max 12 goals to prevent clutter and ensure decent sizing
-  const chartData = goals.slice(0, 12);
-
+  // Display all goals, not just a slice
   return (
-    <Card className="shadow-lg rounded-xl w-full">
-      <CardHeader>
-        <CardTitle className="text-2xl font-semibold text-primary flex items-center">
-          <BarChartBig className="w-6 h-6 mr-3" />
-          Goals Progress Overview
-        </CardTitle>
-        <CardDescription>Visual summary of your progress for up to 12 active goals.</CardDescription>
-      </CardHeader>
-      <CardContent className="pt-2 pb-4">
-        {chartData.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-2 gap-y-4 sm:gap-x-4 sm:gap-y-6 items-start justify-center">
-            {chartData.map(goal => (
+    // Card wrapper is removed from here as the page will provide its own Card structure.
+    // Adding border-none to avoid double borders if parent Card still exists.
+    <div className="w-full"> 
+      {/* CardHeader is removed as the parent page will have its own title and description for the overview */}
+      <div className="pt-2 pb-4">
+        {goals.length > 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-2 gap-y-4 sm:gap-x-4 sm:gap-y-6 items-start justify-center">
+            {goals.map(goal => (
               <IndividualGoalPieChart key={goal.id} goal={goal} />
             ))}
           </div>
@@ -123,9 +116,9 @@ export default function GoalProgressChart({ goals }: GoalProgressChartProps) {
             </p>
           </div>
         )}
-      </CardContent>
-       {chartData.length > 0 && (
-        <CardContent className="text-xs text-muted-foreground pt-2 pb-4">
+      </div>
+       {goals.length > 0 && (
+        <div className="text-xs text-muted-foreground pt-2 pb-4">
           <div className="flex items-center justify-center space-x-4">
             <div className="flex items-center">
               <span className="w-3 h-3 rounded-sm mr-1.5" style={{ backgroundColor: chartColors.completed }} />
@@ -136,8 +129,8 @@ export default function GoalProgressChart({ goals }: GoalProgressChartProps) {
               Remaining
             </div>
           </div>
-        </CardContent>
+        </div>
       )}
-    </Card>
+    </div>
   );
 }

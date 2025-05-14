@@ -9,15 +9,24 @@ import { useAuth } from '@/context/auth-context';
 import Link from 'next/link';
 import { PlusCircle, BarChartBig, Lightbulb, Brain, LayoutGrid, ArrowRight, NotebookPen, CheckSquare } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import GoalProgressChart from '@/components/goal-progress-chart';
+// Removed GoalProgressChart import as it's on a separate page now
+// import GoalProgressChart from '@/components/goal-progress-chart';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
+  // Removed Dialog imports for Progress Overview
+  // Dialog,
+  // DialogContent,
+  // DialogDescription,
+  // DialogHeader,
+  // DialogTitle,
+  // DialogTrigger,
+  // DialogFooter,
+  Dialog, // Keep Dialog for Smart Suggestions
+  DialogContent as SuggestionsDialogContent, // Alias to avoid conflict if other dialogs are added
+  DialogDescription as SuggestionsDialogDescription,
+  DialogHeader as SuggestionsDialogHeader,
+  DialogTitle as SuggestionsDialogTitle,
+  DialogTrigger as SuggestionsDialogTrigger,
+  DialogFooter as SuggestionsDialogFooter,
 } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription as ShadcnCardDescription, CardFooter } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from "@/components/ui/select";
@@ -48,7 +57,8 @@ export default function DashboardPage() {
   const router = useRouter();
   const { toast } = useToast();
 
-  const [isOverviewModalOpen, setIsOverviewModalOpen] = useState(false);
+  // Removed state for Progress Overview modal
+  // const [isOverviewModalOpen, setIsOverviewModalOpen] = useState(false);
   const [isSuggestionsModalOpen, setIsSuggestionsModalOpen] = useState(false);
   const [selectedGoalForSuggestions, setSelectedGoalForSuggestions] = useState<Goal | null>(null);
   const [smartSuggestions, setSmartSuggestions] = useState<SmartSuggestionsOutput | null>(null);
@@ -112,7 +122,7 @@ export default function DashboardPage() {
     );
   };
 
-  if (authLoading || (!authLoading && user === null)) { // Show loading if auth is pending or user is null but auth finished
+  if (authLoading || (!authLoading && user === null)) { 
      return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
         <LoadingSpinner size={64} />
@@ -123,8 +133,8 @@ export default function DashboardPage() {
     );
   }
   
-  if (!user) { // Should be caught by above or useEffect redirect, but as a failsafe
-    return null; // Or a more explicit "Redirecting..." message
+  if (!user) { 
+    return null; 
   }
   
   if (goalsLoading && typeof window !== 'undefined' && !localStorage.getItem('achievoGoals')) {
@@ -188,8 +198,8 @@ export default function DashboardPage() {
           </CardFooter>
         </Card>
 
-        <Dialog open={isOverviewModalOpen} onOpenChange={setIsOverviewModalOpen}>
-          <Card className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl">
+        {/* Updated Progress Overview Card to link to a new page */}
+        <Card className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl">
             <CardHeader>
               <div className="flex items-center gap-3 mb-2">
                 <BarChartBig className="w-8 h-8 text-primary" />
@@ -198,36 +208,16 @@ export default function DashboardPage() {
               <ShadcnCardDescription>A visual summary of your current goal progress.</ShadcnCardDescription>
             </CardHeader>
             <CardContent className="flex-grow">
-              <p className="text-sm text-muted-foreground">See charts and summaries of how you're doing.</p>
+              <p className="text-sm text-muted-foreground">See charts and summaries of how you're doing across all goals.</p>
             </CardContent>
             <CardFooter>
-              <DialogTrigger asChild>
-                <Button size="lg" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg">
-                  View Overview <ArrowRight className="ml-2 h-5 w-5" />
+                <Button asChild size="lg" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg">
+                <Link href="/progress-overview">
+                    View Overview <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
                 </Button>
-              </DialogTrigger>
             </CardFooter>
-          </Card>
-          <DialogContent className="sm:max-w-3xl w-[90vw] max-h-[90vh] overflow-y-auto rounded-lg">
-            <DialogHeader>
-              <DialogTitle className="text-2xl font-bold text-primary flex items-center">
-                  <BarChartBig className="mr-3 w-7 h-7" />
-                  Goal Progress Overview
-              </DialogTitle>
-              <DialogDescription>
-                A visual summary of your current goal progress. Add more goals to see them reflected here!
-              </DialogDescription>
-            </DialogHeader>
-            <div className="py-4">
-              <GoalProgressChart goals={goals} />
-            </div>
-            <DialogFooter className="sm:justify-start pt-4">
-                <Button type="button" variant="outline" onClick={() => setIsOverviewModalOpen(false)} className="w-full sm:w-auto">
-                  Close
-                </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        </Card>
 
         <Dialog open={isSuggestionsModalOpen} onOpenChange={(isOpen) => {
             setIsSuggestionsModalOpen(isOpen);
@@ -249,23 +239,23 @@ export default function DashboardPage() {
               <p className="text-sm text-muted-foreground">Select a goal to receive tailored advice.</p>
             </CardContent>
             <CardFooter>
-              <DialogTrigger asChild>
+              <SuggestionsDialogTrigger asChild>
                 <Button size="lg" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg">
                   Get Tips <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
-              </DialogTrigger>
+              </SuggestionsDialogTrigger>
             </CardFooter>
           </Card>
-          <DialogContent className="sm:max-w-lg w-[90vw] max-h-[90vh] overflow-y-auto rounded-lg">
-            <DialogHeader>
-              <DialogTitle className="text-2xl font-bold text-accent flex items-center">
+          <SuggestionsDialogContent className="sm:max-w-lg w-[90vw] max-h-[90vh] overflow-y-auto rounded-lg">
+            <SuggestionsDialogHeader>
+              <SuggestionsDialogTitle className="text-2xl font-bold text-accent flex items-center">
                   <Brain className="mr-3 w-7 h-7" />
                   Smart Goal Suggestions
-              </DialogTitle>
-              <DialogDescription>
+              </SuggestionsDialogTitle>
+              <SuggestionsDialogDescription>
                 Select one of your goals to get AI-powered tips and ideas to boost your progress.
-              </DialogDescription>
-            </DialogHeader>
+              </SuggestionsDialogDescription>
+            </SuggestionsDialogHeader>
             <div className="py-4 space-y-4">
               <Select
                 onValueChange={(goalId) => {
@@ -330,15 +320,14 @@ export default function DashboardPage() {
                   <p className="text-sm text-center text-muted-foreground pt-4">Please select a goal from the dropdown to see suggestions.</p>
               )}
             </div>
-            <DialogFooter className="sm:justify-start pt-4">
+            <SuggestionsDialogFooter className="sm:justify-start pt-4">
                 <Button type="button" variant="outline" onClick={() => setIsSuggestionsModalOpen(false)} className="w-full sm:w-auto">
                   Close
                 </Button>
-            </DialogFooter>
-          </DialogContent>
+            </SuggestionsDialogFooter>
+          </SuggestionsDialogContent>
         </Dialog>
 
-        {/* Removed Add New Goal card from here */}
 
         <Card className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl">
           <CardHeader>
