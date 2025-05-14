@@ -57,7 +57,9 @@ const smartSuggestionsPrompt = ai.definePrompt({
       - Offer 'generalTips': Other useful advice, such as tracking methods, motivation strategies, or resource types. For example, for a fitness goal, 'Weekly weigh-in to track progress' is a good general tip.
 
   Be specific and actionable. Ensure the suggestions are appropriate for the given timeframe and commitment level.
-  IMPORTANT: If a suggestion category (e.g., 'dietAndNutritionTips' for a 'Learning' goal, or 'topicsToCover' for a 'Fitness' goal) is NOT RELEVANT to the goal's category and nature, COMPLETELY OMIT the field from the JSON output or provide an EMPTY ARRAY for array fields (e.g., "workoutRoutineIdeas": []). DO NOT include placeholder text like "No workout routines are necessary" or "Not applicable" within the arrays for these irrelevant fields. Only provide content for fields that directly apply to the given goal.
+  VERY IMPORTANT: If a suggestion category (e.g., 'dietAndNutritionTips' for a 'Learning' goal, or 'topicsToCover' for a 'Fitness' goal) is NOT RELEVANT to the goal's category and nature, you MUST either COMPLETELY OMIT the field from the JSON output, OR provide an EMPTY ARRAY for that field (e.g., "workoutRoutineIdeas": []).
+  ABSOLUTELY DO NOT include placeholder text like "No workout routines are necessary", "Not applicable", or any similar explanatory text within the arrays for these irrelevant fields. Only provide content for fields that directly apply to the given goal.
+  For example, if the goal is 'Learn Python', the 'workoutRoutineIdeas' field should either be absent from the JSON or be \`[]\`. It MUST NOT be \`["No workout routines are necessary."]\`.
 
   Example for "Learn Python in 1 month" (Category: Learning, Timeframe: 1 month, Commitment: high):
   {
