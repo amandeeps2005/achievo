@@ -71,10 +71,11 @@ export default function GoalSetupForm() {
     }
     setIsSavingGoal(true);
     
+    const goalDescription = form.getValues().goalDescription;
     const newGoal: Goal = {
       id: crypto.randomUUID(),
-      originalGoal: form.getValues().goalDescription,
-      title: generatedPlan.category ? `${generatedPlan.category}: ${form.getValues().goalDescription.substring(0, 40)}...` : form.getValues().goalDescription.substring(0, 50) + (form.getValues().goalDescription.length > 50 ? '...' : ''),
+      originalGoal: goalDescription,
+      title: goalDescription.substring(0, 70) + (goalDescription.length > 70 ? '...' : ''), // Title without category
       category: generatedPlan.category,
       timeline: generatedPlan.timeline,
       overallDeadline: generatedPlan.overallDeadline, // Save overall deadline
