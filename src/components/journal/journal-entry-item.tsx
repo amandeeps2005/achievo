@@ -2,10 +2,11 @@
 // src/components/journal/journal-entry-item.tsx
 "use client";
 
-import type { JournalEntry, Goal } from '@/types';
+import type { JournalEntry } from '@/types';
+import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Edit3, Trash2, Link as LinkIcon, CalendarDays, Eye, MoreVertical } from 'lucide-react';
+import { Edit3, Trash2, Link as LinkIconLucide, CalendarDays, Eye, MoreVertical } from 'lucide-react'; // Renamed Link to LinkIconLucide
 import { useJournal } from '@/context/journal-context';
 import { useGoals } from '@/context/goal-context';
 import {
@@ -17,7 +18,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  // AlertDialogTrigger, // No longer needed here for the dropdown item
 } from "@/components/ui/alert-dialog";
 import {
   DropdownMenu,
@@ -33,10 +33,9 @@ import { useState } from 'react';
 interface JournalEntryItemProps {
   entry: JournalEntry;
   onEdit: () => void;
-  onViewRequest: (entry: JournalEntry) => void;
 }
 
-export default function JournalEntryItem({ entry, onEdit, onViewRequest }: JournalEntryItemProps) {
+export default function JournalEntryItem({ entry, onEdit }: JournalEntryItemProps) {
   const { deleteJournalEntry } = useJournal();
   const { getGoalById } = useGoals();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -45,7 +44,7 @@ export default function JournalEntryItem({ entry, onEdit, onViewRequest }: Journ
 
   const handleDelete = () => {
     deleteJournalEntry(entry.id);
-    setIsDeleteDialogOpen(false); // Close the dialog after deletion
+    setIsDeleteDialogOpen(false); 
   };
   
   const formattedUpdatedAt = formatDistanceToNow(new Date(entry.updatedAt), { addSuffix: true });
@@ -54,16 +53,15 @@ export default function JournalEntryItem({ entry, onEdit, onViewRequest }: Journ
     <Card className="shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col">
       <CardHeader className="pb-3">
         <div className="flex justify-between items-start">
-          <CardTitle 
-            className="text-lg text-primary cursor-pointer hover:underline flex-grow" 
-            onClick={() => onViewRequest(entry)}
-            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onViewRequest(entry);}}
-            tabIndex={0}
-            role="button"
-            aria-label={`View journal entry: ${entry.title}`}
-          >
-            {entry.title}
-          </CardTitle>
+          <Link href={`/my-journal/${entry.id}`} passHref legacyBehavior>
+            <a className="flex-grow cursor-pointer hover:underline" aria-label={`View journal entry: ${entry.title}`}>
+              <CardTitle 
+                className="text-lg text-primary"
+              >
+                {entry.title}
+              </CardTitle>
+            </a>
+          </Link>
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -73,16 +71,17 @@ export default function JournalEntryItem({ entry, onEdit, onViewRequest }: Journ
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => onViewRequest(entry)}>
-                <Eye className="w-4 h-4 mr-2" />
-                View
+              <DropdownMenuItem asChild>
+                <Link href={`/my-journal/${entry.id}`} className="flex items-center w-full">
+                  <Eye className="w-4 h-4 mr-2" />
+                  View
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={onEdit}>
                 <Edit3 className="w-4 h-4 mr-2" />
                 Edit
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              {/* Removed AlertDialogTrigger wrapper here */}
               <DropdownMenuItem 
                 className="text-destructive focus:bg-destructive/10 focus:text-destructive"
                 onSelect={(e) => { e.preventDefault(); setIsDeleteDialogOpen(true); }}
@@ -100,7 +99,7 @@ export default function JournalEntryItem({ entry, onEdit, onViewRequest }: Journ
             </CardDescription>
             {linkedGoal && (
                 <Badge variant="secondary" className="whitespace-nowrap text-xs py-0.5 px-1.5">
-                <LinkIcon className="w-3 h-3 mr-1" />
+                <LinkIconLucide className="w-3 h-3 mr-1" /> {/* Updated to LinkIconLucide */}
                 {linkedGoal.title?.substring(0, 20) || linkedGoal.originalGoal.substring(0, 20)}...
                 </Badge>
             )}
@@ -111,23 +110,18 @@ export default function JournalEntryItem({ entry, onEdit, onViewRequest }: Journ
             )}
         </div>
       </CardHeader>
-      <CardContent 
-        className="flex-grow cursor-pointer hover:bg-muted/20 transition-colors duration-150 py-2"
-        onClick={() => onViewRequest(entry)}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onViewRequest(entry);}}
-        aria-label={`View content of journal entry: ${entry.title}`}
-      >
-        <p className="text-sm text-foreground whitespace-pre-wrap line-clamp-3">
-          {entry.content}
-        </p>
-      </CardContent>
+      <Link href={`/my-journal/${entry.id}`} passHref legacyBehavior>
+        <a className="flex-grow cursor-pointer hover:bg-muted/20 transition-colors duration-150" aria-label={`View content of journal entry: ${entry.title}`}>
+          <CardContent className="py-2">
+            <p className="text-sm text-foreground whitespace-pre-wrap line-clamp-3">
+              {entry.content}
+            </p>
+          </CardContent>
+        </a>
+      </Link>
       <CardFooter className="flex justify-end space-x-2 pt-3">
-        {/* Footer can be empty or used for other info if actions are in dropdown */}
       </CardFooter>
 
-      {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
