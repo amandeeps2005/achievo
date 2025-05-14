@@ -30,28 +30,28 @@ export default function MyJournalPage() {
   const router = useRouter();
 
   const [isJournalFormOpen, setIsJournalFormOpen] = useState(false);
-  const [editingEntry, setEditingEntry] = useState<JournalEntry | undefined>(undefined);
+  // editingEntry state is no longer needed here as editing is handled by a new page.
 
   useEffect(() => {
     if (typeof document !== 'undefined') {
-        document.title = "My Journal - Achievo";
+      document.title = "My Journal - Achievo";
     }
     if (!authLoading && !user) {
       redirect('/');
     }
   }, [user, authLoading]);
-  
 
-  const handleOpenJournalEntryForm = (entry?: JournalEntry) => {
-    setEditingEntry(entry);
+
+  const handleOpenJournalEntryFormForNew = () => {
+    // setEditingEntry(undefined); // Ensure no existing entry is pre-filled
     setIsJournalFormOpen(true);
   };
 
   const handleCloseJournalEntryForm = () => {
     setIsJournalFormOpen(false);
-    setEditingEntry(undefined);
+    // setEditingEntry(undefined);
   };
-  
+
   if (authLoading || (!user && !authLoading)) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
@@ -69,24 +69,24 @@ export default function MyJournalPage() {
         </div>
       );
     }
-    
+
     if (entriesToList.length === 0) {
       return (
         <div className="text-center py-12 min-h-[200px] flex flex-col items-center justify-center">
-            <FileText className="w-16 h-16 text-primary opacity-30 mb-4" />
-            <p className="text-muted-foreground">
+          <FileText className="w-16 h-16 text-primary opacity-30 mb-4" />
+          <p className="text-muted-foreground">
             No journal entries found. Click "Add New Entry" to create your first one!
-            </p>
+          </p>
         </div>
-        );
+      );
     }
     return (
       <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2 pt-2 pb-4 custom-scrollbar">
         {entriesToList.map(entry => (
-          <JournalEntryItem 
-            key={entry.id} 
-            entry={entry} 
-            onEdit={() => handleOpenJournalEntryForm(entry)}
+          <JournalEntryItem
+            key={entry.id}
+            entry={entry}
+            // onEdit prop is removed
           />
         ))}
       </div>
@@ -105,19 +105,19 @@ export default function MyJournalPage() {
       </div>
 
       <Card className="shadow-xl border-primary/20 rounded-xl overflow-hidden">
-         <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-6 bg-primary/5">
-            <div>
-                <CardTitle className="text-3xl font-bold text-primary flex items-center">
-                    <NotebookPen className="mr-3 h-7 w-7" />
-                    My Journal
-                </CardTitle>
-                <ShadcnCardDescription className="text-primary/80">
-                    Record your thoughts, ideas, and reflections. Link them to goals or keep them general.
-                </ShadcnCardDescription>
-            </div>
-            <Button onClick={() => handleOpenJournalEntryForm()} className="bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg shadow-md transform hover:scale-105 transition-transform w-full sm:w-auto">
-                <PlusCircle className="w-5 h-5 mr-2" /> Add New Entry
-            </Button>
+        <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-6 bg-primary/5">
+          <div>
+            <CardTitle className="text-3xl font-bold text-primary flex items-center">
+              <NotebookPen className="mr-3 h-7 w-7" />
+              My Journal
+            </CardTitle>
+            <ShadcnCardDescription className="text-primary/80">
+              Record your thoughts, ideas, and reflections. Link them to goals or keep them general.
+            </ShadcnCardDescription>
+          </div>
+          <Button onClick={handleOpenJournalEntryFormForNew} className="bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg shadow-md transform hover:scale-105 transition-transform w-full sm:w-auto">
+            <PlusCircle className="w-5 h-5 mr-2" /> Add New Entry
+          </Button>
         </CardHeader>
         <CardContent className="p-6">
           {renderJournalEntriesList(journalEntries)}
@@ -125,25 +125,25 @@ export default function MyJournalPage() {
       </Card>
 
       {isJournalFormOpen && (
-         <Dialog open={isJournalFormOpen} onOpenChange={(open) => { if(!open) handleCloseJournalEntryForm(); else setIsJournalFormOpen(true);}}>
-            <DialogContent className="sm:max-w-lg w-[90vw]">
-                <DialogHeader>
-                    <DialogTitle className="flex items-center">
-                    <NotebookPen className="w-6 h-6 mr-2 text-primary" />
-                    {editingEntry ? 'Edit Journal Entry' : 'Add New Journal Entry'}
-                    </DialogTitle>
-                    <DialogDescription>
-                    {editingEntry ? 'Update the details of your journal entry.' : 'Create a new journal entry. You can link it to a goal or keep it general.'}
-                    </DialogDescription>
-                </DialogHeader>
-                <JournalEntryForm
-                    goals={goals} 
-                    existingEntry={editingEntry}
-                    onSave={handleCloseJournalEntryForm}
-                    defaultGoalId={editingEntry?.goalId}
-                />
-            </DialogContent>
-         </Dialog>
+        <Dialog open={isJournalFormOpen} onOpenChange={(open) => { if (!open) handleCloseJournalEntryForm(); else setIsJournalFormOpen(true); }}>
+          <DialogContent className="sm:max-w-lg w-[90vw]">
+            <DialogHeader>
+              <DialogTitle className="flex items-center">
+                <NotebookPen className="w-6 h-6 mr-2 text-primary" />
+                Add New Journal Entry
+              </DialogTitle>
+              <DialogDescription>
+                Create a new journal entry. You can link it to a goal or keep it general.
+              </DialogDescription>
+            </DialogHeader>
+            <JournalEntryForm
+              goals={goals}
+              // existingEntry is undefined for new entries
+              onSave={handleCloseJournalEntryForm}
+              // defaultGoalId can be undefined or a specific default if needed
+            />
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );

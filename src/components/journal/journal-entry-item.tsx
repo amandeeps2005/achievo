@@ -6,7 +6,7 @@ import type { JournalEntry } from '@/types';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Edit3, Trash2, Link as LinkIconLucide, CalendarDays, Eye, MoreVertical } from 'lucide-react'; // Renamed Link to LinkIconLucide
+import { Edit3, Trash2, Link as LinkIconLucide, CalendarDays, Eye, MoreVertical } from 'lucide-react';
 import { useJournal } from '@/context/journal-context';
 import { useGoals } from '@/context/goal-context';
 import {
@@ -32,10 +32,10 @@ import { useState } from 'react';
 
 interface JournalEntryItemProps {
   entry: JournalEntry;
-  onEdit: () => void;
+  // onEdit is no longer needed as navigation handles it
 }
 
-export default function JournalEntryItem({ entry, onEdit }: JournalEntryItemProps) {
+export default function JournalEntryItem({ entry }: JournalEntryItemProps) {
   const { deleteJournalEntry } = useJournal();
   const { getGoalById } = useGoals();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -44,9 +44,9 @@ export default function JournalEntryItem({ entry, onEdit }: JournalEntryItemProp
 
   const handleDelete = () => {
     deleteJournalEntry(entry.id);
-    setIsDeleteDialogOpen(false); 
+    setIsDeleteDialogOpen(false);
   };
-  
+
   const formattedUpdatedAt = formatDistanceToNow(new Date(entry.updatedAt), { addSuffix: true });
 
   return (
@@ -55,14 +55,14 @@ export default function JournalEntryItem({ entry, onEdit }: JournalEntryItemProp
         <div className="flex justify-between items-start">
           <Link href={`/my-journal/${entry.id}`} passHref legacyBehavior>
             <a className="flex-grow cursor-pointer hover:underline" aria-label={`View journal entry: ${entry.title}`}>
-              <CardTitle 
+              <CardTitle
                 className="text-lg text-primary"
               >
                 {entry.title}
               </CardTitle>
             </a>
           </Link>
-          
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
@@ -72,18 +72,20 @@ export default function JournalEntryItem({ entry, onEdit }: JournalEntryItemProp
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem asChild>
-                <Link href={`/my-journal/${entry.id}`} className="flex items-center w-full">
+                <Link href={`/my-journal/${entry.id}`} className="flex items-center w-full cursor-pointer">
                   <Eye className="w-4 h-4 mr-2" />
                   View
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={onEdit}>
-                <Edit3 className="w-4 h-4 mr-2" />
-                Edit
+              <DropdownMenuItem asChild>
+                <Link href={`/my-journal/${entry.id}/edit`} className="flex items-center w-full cursor-pointer">
+                  <Edit3 className="w-4 h-4 mr-2" />
+                  Edit
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem 
-                className="text-destructive focus:bg-destructive/10 focus:text-destructive"
+              <DropdownMenuItem
+                className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer"
                 onSelect={(e) => { e.preventDefault(); setIsDeleteDialogOpen(true); }}
               >
                 <Trash2 className="w-4 h-4 mr-2" />
@@ -94,20 +96,20 @@ export default function JournalEntryItem({ entry, onEdit }: JournalEntryItemProp
         </div>
 
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1">
-            <CardDescription className="text-xs text-muted-foreground flex items-center">
-                <CalendarDays className="w-3 h-3 mr-1" /> Last updated: {formattedUpdatedAt}
-            </CardDescription>
-            {linkedGoal && (
-                <Badge variant="secondary" className="whitespace-nowrap text-xs py-0.5 px-1.5">
-                <LinkIconLucide className="w-3 h-3 mr-1" /> {/* Updated to LinkIconLucide */}
-                {linkedGoal.title?.substring(0, 20) || linkedGoal.originalGoal.substring(0, 20)}...
-                </Badge>
-            )}
-            {!linkedGoal && entry.goalId && ( 
-                <Badge variant="outline" className="whitespace-nowrap text-xs py-0.5 px-1.5">
-                Linked Goal (Not Found)
-                </Badge>
-            )}
+          <CardDescription className="text-xs text-muted-foreground flex items-center">
+            <CalendarDays className="w-3 h-3 mr-1" /> Last updated: {formattedUpdatedAt}
+          </CardDescription>
+          {linkedGoal && (
+            <Badge variant="secondary" className="whitespace-nowrap text-xs py-0.5 px-1.5">
+              <LinkIconLucide className="w-3 h-3 mr-1" />
+              {linkedGoal.title?.substring(0, 20) || linkedGoal.originalGoal.substring(0, 20)}...
+            </Badge>
+          )}
+          {!linkedGoal && entry.goalId && (
+            <Badge variant="outline" className="whitespace-nowrap text-xs py-0.5 px-1.5">
+              Linked Goal (Not Found)
+            </Badge>
+          )}
         </div>
       </CardHeader>
       <Link href={`/my-journal/${entry.id}`} passHref legacyBehavior>
