@@ -10,7 +10,7 @@ body {
 @layer base {
   :root {
     /* Light Theme - Based on user input */
-    --background: 204 17% 93%; /* from #ecf0f1 - Clouds */
+    --background: 204 17% 93%; /* from #ecf0f1 - Light Gray */
     --foreground: 220 13% 20%; /* Darker cool gray for contrast */
 
     --card: 0 0% 100%; /* White */
@@ -22,10 +22,10 @@ body {
     --primary: 180 60% 40%; /* Teal - from #008080 */
     --primary-foreground: 0 0% 100%; /* White */
 
-    --secondary: 204 17% 88%; /* Lighter version of background */
-    --secondary-foreground: 220 13% 20%;
+    --secondary: 130 30% 66%; /* Seafoam Green - from #a7d1ab */
+    --secondary-foreground: 130 40% 20%; /* Darker Seafoam for text */
 
-    --muted: 204 17% 88%; /* Light cool gray */
+    --muted: 204 17% 88%; /* Lighter version of background */
     --muted-foreground: 204 10% 45%; /* Medium cool gray */
 
     --accent: 28 80% 52%; /* Orange - from #e67e22 */
@@ -40,8 +40,8 @@ body {
 
     --chart-1: 180 60% 40%; /* Primary (Teal) */
     --chart-2: 28 80% 52%;  /* Accent (Orange) */
-    --chart-3: 140 60% 45%; /* Green */
-    --chart-4: 280 70% 60%; /* Purple */
+    --chart-3: 130 40% 50%; /* Seafoam Green variation */
+    --chart-4: 220 50% 60%; /* Complementary Blue/Purple */
     --chart-5: 50 80% 55%;  /* Yellow-Orange */
 
     --radius: 0.5rem;
@@ -59,16 +59,16 @@ body {
     --popover-foreground: 210 20% 90%;
 
     --primary: 180 60% 50%; /* Lighter Teal for dark mode */
-    --primary-foreground: 220 13% 5%; /* Very dark for contrast on primary */
+    --primary-foreground: 180 100% 10%; /* Very dark Teal for contrast */
 
-    --secondary: 220 13% 20%; /* Medium dark cool gray/blue */
-    --secondary-foreground: 210 20% 90%;
+    --secondary: 130 30% 45%; /* Darker Seafoam Green for dark mode */
+    --secondary-foreground: 130 25% 85%; /* Lighter Seafoam Green text */
 
     --muted: 220 13% 20%;
     --muted-foreground: 210 15% 65%; /* Medium cool gray */
 
     --accent: 28 80% 60%; /* Lighter orange for dark mode */
-    --accent-foreground: 28 90% 5%; /* Very dark for contrast on accent */
+    --accent-foreground: 28 90% 10%; /* Very dark Orange for contrast */
 
     --destructive: 0 62% 50%; /* Slightly desaturated red for dark mode */
     --destructive-foreground: 0 0% 95%; /* Light foreground for destructive */
@@ -79,8 +79,8 @@ body {
 
     --chart-1: 180 60% 50%; /* Primary (Teal - dark mode) */
     --chart-2: 28 80% 60%;  /* Accent (Orange - dark mode) */
-    --chart-3: 140 60% 55%; /* Green (dark mode) */
-    --chart-4: 280 70% 70%; /* Purple (dark mode) */
+    --chart-3: 130 40% 60%; /* Seafoam Green variation (dark mode) */
+    --chart-4: 220 50% 70%; /* Complementary Blue/Purple (dark mode) */
     --chart-5: 50 80% 65%;  /* Yellow-Orange (dark mode) */
   }
 }
