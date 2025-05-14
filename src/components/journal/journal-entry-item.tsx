@@ -17,7 +17,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
+  // AlertDialogTrigger, // No longer needed here for the dropdown item
 } from "@/components/ui/alert-dialog";
 import {
   DropdownMenu,
@@ -82,16 +82,14 @@ export default function JournalEntryItem({ entry, onEdit, onViewRequest }: Journ
                 Edit
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <AlertDialogTrigger asChild>
-                 {/* We need to trigger the state change for AlertDialog from DropdownMenuItem's onSelect */}
-                <DropdownMenuItem 
-                  className="text-destructive focus:bg-destructive/10 focus:text-destructive"
-                  onSelect={(e) => { e.preventDefault(); setIsDeleteDialogOpen(true); }}
-                >
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Delete
-                </DropdownMenuItem>
-              </AlertDialogTrigger>
+              {/* Removed AlertDialogTrigger wrapper here */}
+              <DropdownMenuItem 
+                className="text-destructive focus:bg-destructive/10 focus:text-destructive"
+                onSelect={(e) => { e.preventDefault(); setIsDeleteDialogOpen(true); }}
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
