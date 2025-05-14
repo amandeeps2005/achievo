@@ -22,23 +22,9 @@ import { format } from 'date-fns';
 import GoalProgressChart from '@/components/goal-progress-chart'; // Import GoalProgressChart
 
 
-const motivationalQuotes = [
-  "The secret of getting ahead is getting started. - Mark Twain",
-  "Don't watch the clock; do what it does. Keep going. - Sam Levenson",
-  "The will to win, the desire to succeed, the urge to reach your full potential... these are the keys that will unlock the door to personal excellence. - Confucius",
-  "Believe you can and you're halfway there. - Theodore Roosevelt",
-  "It does not matter how slowly you go as long as you do not stop. - Confucius",
-  "Our greatest glory is not in never failing, but in rising up every time we fail. - Ralph Waldo Emerson",
-  "The journey of a thousand miles begins with a single step. - Lao Tzu",
-  "Success is not final, failure is not fatal: It is the courage to continue that counts. - Winston Churchill",
-  "What you get by achieving your goals is not as important as what you become by achieving your goals. - Zig Ziglar",
-  "Act as if what you do makes a difference. It does. - William James"
-];
-
 export default function DashboardPage() {
   const { goals, isLoading: goalsLoading } = useGoals();
   const { habits, habitLogs, isLoading: habitsLoading } = useHabits();
-  const [currentQuote, setCurrentQuote] = useState("");
   const [greeting, setGreeting] = useState("Hello");
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
@@ -51,12 +37,6 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      // Set motivational quote
-      if (motivationalQuotes.length > 0) {
-        const randomIndex = Math.floor(Math.random() * motivationalQuotes.length);
-        setCurrentQuote(motivationalQuotes[randomIndex]);
-      }
-
       // Set dynamic greeting
       const hours = new Date().getHours();
       if (hours < 12) {
@@ -122,30 +102,6 @@ export default function DashboardPage() {
             </div>
         </div>
       </div>
-
-      {currentQuote && (
-        <Card className="bg-gradient-to-br from-primary/10 via-card to-accent/5 shadow-xl rounded-xl border border-border group">
-            <div className="relative">
-                 <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-accent/5 opacity-70 group-hover:opacity-100 transition-opacity duration-500"></div>
-                 <CardHeader className="flex flex-row items-center gap-4 pb-4 relative z-10">
-                    <Lightbulb className="w-12 h-12 text-accent animate-pulse drop-shadow-lg" />
-                    <div>
-                        <CardTitle className="text-2xl font-bold text-primary drop-shadow-sm">Motivational Corner</CardTitle>
-                        <ShadcnCardDescription className="text-sm text-muted-foreground">A spark to ignite your ambition.</ShadcnCardDescription>
-                    </div>
-                 </CardHeader>
-                 <CardContent className="relative z-10">
-                    <blockquote className="text-xl italic text-foreground pl-6 border-l-4 border-accent relative group-hover:scale-[1.01] transition-transform duration-300">
-                    <span className="absolute left-[-0.3rem] top-[-0.5rem] text-6xl text-accent opacity-30 font-serif">&ldquo;</span>
-                    {currentQuote.split(" - ")[0]}
-                    {currentQuote.includes(" - ") && (
-                        <footer className="text-base text-muted-foreground mt-3 not-italic tracking-wide">- {currentQuote.split(" - ")[1]}</footer>
-                    )}
-                    </blockquote>
-                </CardContent>
-            </div>
-        </Card>
-      )}
 
       {/* Integrated Goal Progress Chart */}
       <Card className="shadow-xl border-primary/20 rounded-xl overflow-hidden">
