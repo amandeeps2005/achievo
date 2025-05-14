@@ -12,7 +12,7 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const AchievoChatbotInputSchema = z.object({
-  question: z.string().describe('The user's question about the Achievo application.'),
+  question: z.string().describe("The user's question about the Achievo application."),
 });
 export type AchievoChatbotInput = z.infer<typeof AchievoChatbotInputSchema>;
 
@@ -67,3 +67,4 @@ const achievoChatbotFlow = ai.defineFlow(
     return output!;
   }
 );
+
