@@ -50,7 +50,7 @@ export default function AppHeader() {
     return <User className="h-5 w-5 text-muted-foreground" />;
   };
 
-  const logoHref = user ? '/dashboard' : '/';
+  const logoHref = '/'; // Always link to landing page
 
   return (
     <header className="bg-card border-b border-border shadow-sm sticky top-0 z-50">
@@ -142,7 +142,6 @@ export default function AppHeader() {
               )}
             </>
           )}
-          {/* Theme toggle button has been completely removed */}
         </nav>
       </div>
     </header>
