@@ -75,7 +75,7 @@ export default function GoalSetupForm() {
     const newGoal: Goal = {
       id: crypto.randomUUID(),
       originalGoal: goalDescription,
-      title: goalDescription.substring(0, 70) + (goalDescription.length > 70 ? '...' : ''),
+      title: goalDescription.substring(0, 70) + (goalDescription.length > 70 ? '...' : ''), // Title generation updated here
       category: generatedPlan.category,
       timeline: generatedPlan.timeline,
       overallDeadline: generatedPlan.overallDeadline, 
@@ -235,7 +235,7 @@ export default function GoalSetupForm() {
               className="w-full sm:w-auto border-primary text-primary hover:bg-primary/20 py-3 text-base rounded-lg shadow-sm hover:shadow-md transition-all duration-300" 
               disabled={isSavingGoal}
             >
-              Edit Goal &amp; Regenerate
+              Edit Goal & Regenerate
             </Button>
             <Button 
               onClick={handleSaveGoal} 
@@ -243,7 +243,7 @@ export default function GoalSetupForm() {
               disabled={isSavingGoal}
             >
              {isSavingGoal ? <LoadingSpinner className="mr-2" /> :  <CheckCircle className="mr-2 h-5 w-5" />}
-              {isSavingGoal ? 'Saving Your Goal...' : 'Save &amp; Start Achieving'}
+              {isSavingGoal ? 'Saving Your Goal...' : 'Save & Start Achieving'}
             </Button>
         </CardFooter>
       )}
