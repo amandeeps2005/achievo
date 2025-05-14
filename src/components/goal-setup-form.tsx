@@ -75,10 +75,10 @@ export default function GoalSetupForm() {
     const newGoal: Goal = {
       id: crypto.randomUUID(),
       originalGoal: goalDescription,
-      title: goalDescription.substring(0, 70) + (goalDescription.length > 70 ? '...' : ''), // Title without category
+      title: goalDescription.substring(0, 70) + (goalDescription.length > 70 ? '...' : ''),
       category: generatedPlan.category,
       timeline: generatedPlan.timeline,
-      overallDeadline: generatedPlan.overallDeadline, // Save overall deadline
+      overallDeadline: generatedPlan.overallDeadline, 
       tools: generatedPlan.tools,
       steps: generatedPlan.steps.map((step): StepUi => ({
         ...step,
@@ -151,7 +151,7 @@ export default function GoalSetupForm() {
             {!generatedPlan && (
               <Button 
                 type="submit" 
-                className="w-full bg-gradient-to-r from-primary to-teal-600 hover:from-primary/90 hover:to-teal-600/90 text-primary-foreground py-3 text-base font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-[1.02] transition-all duration-300" 
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-3 text-base font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-[1.02] transition-all duration-300" 
                 disabled={isGeneratingPlan || isSavingGoal}
               >
                 {isGeneratingPlan ? <LoadingSpinner className="mr-2" /> : <Lightbulb className="mr-2 h-5 w-5" />}
@@ -239,7 +239,7 @@ export default function GoalSetupForm() {
             </Button>
             <Button 
               onClick={handleSaveGoal} 
-              className="w-full sm:w-auto bg-gradient-to-r from-accent to-orange-500 hover:from-accent/90 hover:to-orange-500/90 text-accent-foreground py-3 text-base font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-[1.02] transition-all duration-300" 
+              className="w-full sm:w-auto bg-accent hover:bg-accent/90 text-accent-foreground py-3 text-base font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-[1.02] transition-all duration-300" 
               disabled={isSavingGoal}
             >
              {isSavingGoal ? <LoadingSpinner className="mr-2" /> :  <CheckCircle className="mr-2 h-5 w-5" />}
