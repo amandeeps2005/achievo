@@ -4,11 +4,10 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { GoalProvider } from '@/context/goal-context';
 import { Toaster } from '@/components/ui/toaster';
-import { ThemeProvider } from '@/context/theme-context';
 import AppHeader from '@/components/app-header';
 import { AuthProvider } from '@/context/auth-context';
 import { JournalProvider } from '@/context/journal-context';
-import { HabitProvider } from '@/context/habit-context'; // Added HabitProvider
+import { HabitProvider } from '@/context/habit-context'; 
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -31,13 +30,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning> {/* suppressHydrationWarning can be removed if not causing issues */}
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans`}>
-        <ThemeProvider storageKey="achievo-ui-theme">
+        {/* ThemeProvider is removed */}
           <AuthProvider>
             <GoalProvider>
               <JournalProvider>
-                <HabitProvider> {/* Added HabitProvider */}
+                <HabitProvider> 
                   <AppHeader />
                   <main className="container mx-auto px-4 py-8">
                     {children}
@@ -47,7 +46,6 @@ export default function RootLayout({
               </JournalProvider>
             </GoalProvider>
           </AuthProvider>
-        </ThemeProvider>
       </body>
     </html>
   );

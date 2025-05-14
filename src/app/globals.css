@@ -9,46 +9,7 @@ body {
 
 @layer base {
   :root {
-    /* Light Theme - Updated for a more appealing background */
-    --background: 208 60% 97%; /* Very Light Soft Blue Tint */
-    --foreground: 220 13% 20%; /* Darker cool gray for contrast */
-
-    --card: 0 0% 100%; /* White */
-    --card-foreground: 220 13% 20%;
-
-    --popover: 0 0% 100%; /* White */
-    --popover-foreground: 220 13% 20%;
-
-    --primary: 180 60% 40%; /* Teal - from #008080 */
-    --primary-foreground: 0 0% 100%; /* White */
-
-    --secondary: 130 30% 66%; /* Seafoam Green - from #a7d1ab */
-    --secondary-foreground: 130 40% 20%; /* Darker Seafoam for text */
-
-    --muted: 208 40% 94%; /* Lighter version of the new background */
-    --muted-foreground: 208 10% 45%; /* Medium cool gray */
-
-    --accent: 28 80% 52%; /* Orange - from #e67e22 */
-    --accent-foreground: 0 0% 100%; /* White */
-
-    --destructive: 0 72% 51%; /* Vivid Red */
-    --destructive-foreground: 0 0% 100%; /* White */
-
-    --border: 208 30% 90%; /* Slightly darker than new muted for borders */
-    --input: 208 50% 95%;  /* Based on new background for inputs */
-    --ring: 180 60% 40%; /* Primary color (Teal) for rings */
-
-    --chart-1: 180 60% 40%; /* Primary (Teal) */
-    --chart-2: 28 80% 52%;  /* Accent (Orange) */
-    --chart-3: 130 40% 50%; /* Seafoam Green variation */
-    --chart-4: 220 50% 60%; /* Complementary Blue/Purple */
-    --chart-5: 50 80% 55%;  /* Yellow-Orange */
-
-    --radius: 0.5rem;
-  }
-
-  .dark {
-    /* Dark Theme - Complementary to user input */
+    /* Dark Theme - Now the default and only theme */
     --background: 220 13% 12%; /* Very dark cool gray/blue */
     --foreground: 210 20% 90%; /* Light cool gray (off-white) */
 
@@ -82,7 +43,11 @@ body {
     --chart-3: 130 40% 60%; /* Seafoam Green variation (dark mode) */
     --chart-4: 220 50% 70%; /* Complementary Blue/Purple (dark mode) */
     --chart-5: 50 80% 65%;  /* Yellow-Orange (dark mode) */
+
+    --radius: 0.5rem;
   }
+
+  /* .dark class is no longer needed as dark theme is default */
 }
 
 @layer base {

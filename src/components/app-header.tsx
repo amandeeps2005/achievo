@@ -1,12 +1,13 @@
+
 "use client";
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { LayoutDashboard, Moon, Sun, LogIn, UserPlus, LogOut, ShieldCheck, User } from 'lucide-react'; 
+import { LayoutDashboard, LogIn, UserPlus, LogOut, ShieldCheck, User } from 'lucide-react'; 
 import { usePathname, useRouter } from 'next/navigation';
 import { Target } from 'lucide-react'; 
 import { useAuth } from '@/context/auth-context'; 
-import { useTheme } from '@/context/theme-context'; 
+// useTheme and Moon/Sun icons are removed
 import LoadingSpinner from './loading-spinner';
 import { useEffect, useState } from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -23,7 +24,7 @@ export default function AppHeader() {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout, loading: authLoading } = useAuth(); 
-  const { theme, toggleTheme } = useTheme(); 
+  // const { theme, toggleTheme } = useTheme(); // Removed
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -105,12 +106,6 @@ export default function AppHeader() {
                     <User className="mr-2 h-4 w-4" />
                     <span>Profile</span>
                   </DropdownMenuItem>
-                  {/* Placeholder for future Settings link
-                  <DropdownMenuItem onClick={() => router.push('/settings')}>
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
-                  </DropdownMenuItem> 
-                  */}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" />
@@ -147,12 +142,9 @@ export default function AppHeader() {
               )}
             </>
           )}
-          <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme" className="h-9 w-9 sm:h-10 sm:w-10">
-            {mounted ? (theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />) : <Sun className="h-5 w-5" /> }
-          </Button>
+          {/* Theme toggle button is removed */}
         </nav>
       </div>
     </header>
   );
 }
-
