@@ -2,7 +2,7 @@
 // src/app/my-habits/page.tsx
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter, redirect } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -30,7 +30,7 @@ export default function MyHabitsPage() {
 
   const [isHabitFormOpen, setIsHabitFormOpen] = useState(false);
   const [editingHabit, setEditingHabit] = useState<Habit | undefined>(undefined);
-  const [currentDate, setCurrentDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const [currentDate, setCurrentDate] = useState(() => format(new Date(), 'yyyy-MM-dd'));
 
   useEffect(() => {
     if (typeof document !== 'undefined') {
@@ -41,15 +41,15 @@ export default function MyHabitsPage() {
     }
   }, [user, authLoading]);
 
-  const handleOpenHabitForm = (habit?: Habit) => {
+  const handleOpenHabitForm = useCallback((habit?: Habit) => {
     setEditingHabit(habit);
     setIsHabitFormOpen(true);
-  };
+  }, []);
 
-  const handleCloseHabitForm = () => {
+  const handleCloseHabitForm = useCallback(() => {
     setIsHabitFormOpen(false);
     setEditingHabit(undefined);
-  };
+  }, []);
 
   if (authLoading || (!user && !authLoading)) {
     return (
@@ -60,7 +60,7 @@ export default function MyHabitsPage() {
     );
   }
 
-  const renderHabitsList = () => {
+  const RenderHabitsListComponent = () => {
     if (habitsLoading) {
       return (
         <div className="flex flex-col justify-center items-center py-12 min-h-[200px]">
@@ -92,7 +92,7 @@ export default function MyHabitsPage() {
         ))}
       </div>
     );
-  };
+  }; // Explicit semicolon added here
 
   return (
     <div className="space-y-8">
@@ -127,7 +127,7 @@ export default function MyHabitsPage() {
             <span className="mx-4 font-semibold text-lg">{format(new Date(currentDate), "PPP")}</span>
             <Button variant="outline" size="icon" onClick={() => {/* Increment date */}}><ChevronRight /></Button>
           </div> */}
-          {renderHabitsList()}
+          <RenderHabitsListComponent />
         </CardContent>
         <CardFooter className="p-6 bg-muted/20 border-t border-border justify-center">
              <Button variant="outline" className="w-full sm:w-auto">
