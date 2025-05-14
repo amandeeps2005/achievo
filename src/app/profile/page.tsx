@@ -4,7 +4,7 @@
 
 import { useAuth } from '@/context/auth-context';
 import { redirect } from 'next/navigation';
-import React, { useEffect, useState, useRef } from 'react'; // Added React import
+import React, { useEffect, useState, useRef } from 'react';
 import LoadingSpinner from '@/components/loading-spinner';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -19,8 +19,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { updateProfile, sendEmailVerification } from 'firebase/auth';
-import { auth, storage } from '@/lib/firebase'; // Import storage
-import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage'; // Storage functions
+import { auth, storage } from '@/lib/firebase';
+import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -43,8 +43,14 @@ const profileFormSchema = z.object({
 });
 type ProfileFormData = z.infer<typeof profileFormSchema>;
 
+const MAX_IMAGE_WIDTH = 512;
+const MAX_IMAGE_HEIGHT = 512;
+const IMAGE_QUALITY = 0.8; // JPEG quality (0.0 to 1.0)
+const IMAGE_TYPE = 'image/jpeg';
+
+
 export default function ProfilePage() {
-  const { user, loading: authLoading, setUser: setAuthUser } = useAuth(); // Assuming useAuth exposes setUser or similar for force update
+  const { user, loading: authLoading, setUser: setAuthUser } = useAuth();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -76,17 +82,97 @@ export default function ProfilePage() {
         displayName: user.displayName || "",
         title: currentTitle,
       });
-      if (user.photoURL) {
+      // Set initial preview URL from user's photoURL if editing is not active
+      // or if no new file has been selected for preview.
+      if (!previewUrl && user.photoURL) {
         setPreviewUrl(user.photoURL);
       }
     }
-  }, [user, authLoading, form]);
+  }, [user, authLoading, form, previewUrl]); // Added previewUrl to dependency array
+
+  // Cleanup object URLs
+  useEffect(() => {
+    return () => {
+      if (previewUrl && previewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
-      setSelectedFile(file);
-      setPreviewUrl(URL.createObjectURL(file));
+
+      // Revoke previous object URL if it exists and is a blob URL
+      if (previewUrl && previewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(previewUrl);
+      }
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let { width, height } = img;
+
+          if (width > height) {
+            if (width > MAX_IMAGE_WIDTH) {
+              height = Math.round((height * MAX_IMAGE_WIDTH) / width);
+              width = MAX_IMAGE_WIDTH;
+            }
+          } else {
+            if (height > MAX_IMAGE_HEIGHT) {
+              width = Math.round((width * MAX_IMAGE_HEIGHT) / height);
+              height = MAX_IMAGE_HEIGHT;
+            }
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            toast({ title: "Error", description: "Could not process image. Canvas context not available.", variant: "destructive" });
+            setSelectedFile(file); // Fallback to original file
+            setPreviewUrl(URL.createObjectURL(file));
+            return;
+          }
+          ctx.drawImage(img, 0, 0, width, height);
+          canvas.toBlob(
+            (blob) => {
+              if (blob) {
+                const resizedFile = new File([blob], file.name, {
+                  type: IMAGE_TYPE,
+                  lastModified: Date.now(),
+                });
+                setSelectedFile(resizedFile);
+                setPreviewUrl(URL.createObjectURL(resizedFile));
+              } else {
+                toast({ title: "Error", description: "Failed to resize image.", variant: "destructive" });
+                setSelectedFile(file); // Fallback to original file
+                setPreviewUrl(URL.createObjectURL(file));
+              }
+            },
+            IMAGE_TYPE,
+            IMAGE_QUALITY
+          );
+        };
+        img.onerror = () => {
+          toast({ title: "Error", description: "Failed to load image for resizing.", variant: "destructive" });
+          setSelectedFile(file); // Fallback to original file
+          setPreviewUrl(URL.createObjectURL(file));
+        };
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = () => {
+        toast({ title: "Error", description: "Failed to read file.", variant: "destructive" });
+        setSelectedFile(file); // Fallback to original file
+        setPreviewUrl(URL.createObjectURL(file));
+      };
+      reader.readAsDataURL(file);
+    }
+    // Reset the file input value so the same file can be selected again if needed
+    if (event.target) {
+        event.target.value = '';
     }
   };
 
@@ -125,19 +211,24 @@ export default function ProfilePage() {
     : 'N/A';
 
   const handleEditToggle = () => {
-    if (isEditing) {
+    if (isEditing) { // When cancelling edit
       form.reset({ 
         displayName: user.displayName || "",
-        title: profileTitle,
+        title: profileTitle, // Use state for profile title
        });
        setSelectedFile(null);
-       setPreviewUrl(user.photoURL || null); // Reset preview to current photoURL or null
-    } else {
+       // Revoke blob URL if it exists, then reset preview to actual user photoURL or null
+       if (previewUrl && previewUrl.startsWith('blob:')) {
+         URL.revokeObjectURL(previewUrl);
+       }
+       setPreviewUrl(user.photoURL || null); 
+    } else { // When entering edit mode
        form.reset({ 
         displayName: user.displayName || "",
-        title: profileTitle,
+        title: profileTitle, // Use state for profile title
        });
-       setPreviewUrl(user.photoURL || null); // Ensure preview is set when entering edit mode
+       // Set previewUrl to user's current photoURL if no new file is selected yet
+       setPreviewUrl(user.photoURL || null);
     }
     setIsEditing(!isEditing);
   };
@@ -152,6 +243,8 @@ export default function ProfilePage() {
 
     try {
       if (selectedFile) {
+        // Ensure a unique name or handle potential overwrites if necessary, though UID folder helps.
+        // For simplicity, using selectedFile.name. Could be `${auth.currentUser.uid}_profile.${selectedFile.name.split('.').pop()}`
         const imageRef = storageRef(storage, `profilePictures/${auth.currentUser.uid}/${selectedFile.name}`);
         await uploadBytes(imageRef, selectedFile);
         photoURL = await getDownloadURL(imageRef);
@@ -164,21 +257,36 @@ export default function ProfilePage() {
       });
       
       const newTitle = data.title || "N/A";
-      setProfileTitle(newTitle);
+      setProfileTitle(newTitle); // Update local state for title
       localStorage.setItem(`user_${auth.currentUser.uid}_title`, newTitle);
       
-      if (setAuthUser) { 
-          const updatedUser = { ...auth.currentUser, displayName: data.displayName, photoURL: photoURL };
-          setAuthUser(updatedUser as any); 
+      // Attempt to update auth context user for immediate UI reflection
+      if (setAuthUser && auth.currentUser) { 
+          // Create a new user object for the context with all known properties
+          const updatedUserFromAuth = auth.currentUser; // Get the latest from Firebase Auth
+          const updatedUserForContext: User = {
+            ...updatedUserFromAuth,
+            displayName: data.displayName, // from form
+            photoURL: photoURL, // from upload or existing
+            // Ensure all other User properties are spread if needed,
+            // but Firebase User type is complex. Rely on onAuthStateChanged for full sync.
+          };
+          setAuthUser(updatedUserForContext); 
       }
 
       toast({ title: "Success", description: "Profile updated successfully." });
       setIsEditing(false);
       setSelectedFile(null); 
+      // previewUrl is already set to the new photoURL (or remains old if no new image) by the auth update.
+      // If we set `selectedFile` to null, we might want to also explicitly set `previewUrl` to the `photoURL`
+      // from the update operation to ensure consistency.
+      if (photoURL) {
+        setPreviewUrl(photoURL);
+      }
     } catch (error: any) {
       toast({ title: "Error", description: error.message || "Failed to update profile.", variant: "destructive" });
     } finally {
-      setIsSaving(false); // Ensure isSaving is reset in all cases
+      setIsSaving(false); 
     }
   };
 
@@ -218,8 +326,8 @@ export default function ProfilePage() {
             <Avatar className="w-28 h-28 text-5xl mb-4 border-4 border-primary bg-primary/20 shadow-lg">
               {previewUrl ? (
                 <AvatarImage src={previewUrl} alt={user.displayName || user.email || 'User Avatar'} />
-              ) : (
-                <AvatarImage src={user.photoURL || undefined} alt={user.displayName || user.email || 'User Avatar'} />
+              ) : (user.photoURL &&  // Check user.photoURL explicitly here as previewUrl might be null if no blob was created yet
+                <AvatarImage src={user.photoURL} alt={user.displayName || user.email || 'User Avatar'} />
               )}
               <AvatarFallback className="bg-primary text-primary-foreground text-4xl">
                 {getInitials(user.displayName, user.email)}
@@ -232,6 +340,7 @@ export default function ProfilePage() {
                 className="absolute bottom-4 right-0 rounded-full h-8 w-8 bg-background hover:bg-muted border-primary/50"
                 onClick={triggerFileInput}
                 aria-label="Change profile picture"
+                disabled={isSaving}
               >
                 <Camera className="h-4 w-4 text-primary" />
               </Button>
@@ -247,7 +356,7 @@ export default function ProfilePage() {
           />
           <CardTitle className="text-3xl font-bold text-primary">{user.displayName || "Achievo User"}</CardTitle>
           <CardDescription className="text-muted-foreground text-base">Your personal account details and journey with Achievo.</CardDescription>
-           <Button onClick={handleEditToggle} variant={isEditing ? "secondary" : "outline"} size="sm" className="mt-4">
+           <Button onClick={handleEditToggle} variant={isEditing ? "secondary" : "outline"} size="sm" className="mt-4" disabled={isSaving}>
             {isEditing ? <XCircle className="mr-2 h-4 w-4" /> : <Edit3 className="mr-2 h-4 w-4" />}
             {isEditing ? "Cancel Edit" : "Edit Profile"}
           </Button>
@@ -402,3 +511,4 @@ export default function ProfilePage() {
     </div>
   );
 }
+
