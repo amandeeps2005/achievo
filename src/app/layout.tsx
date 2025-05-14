@@ -29,21 +29,23 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (<html lang="en">
+  return (
+    <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans`}>
-          <AuthProvider>
-            <GoalProvider>
-              <JournalProvider>
-                <HabitProvider>
-                  <AppHeader />
-                  <main className="container mx-auto px-4 py-8">
-                    {children}
-                  </main>
-                  <Toaster />
-                </HabitProvider>
-              </JournalProvider>
-            </GoalProvider>
-          </AuthProvider>
+        <AuthProvider>
+          <GoalProvider>
+            <JournalProvider>
+              <HabitProvider>
+                <AppHeader />
+                <main className="container mx-auto px-4 py-8">
+                  {children}
+                </main>
+                <Toaster />
+              </HabitProvider>
+            </JournalProvider>
+          </GoalProvider>
+        </AuthProvider>
       </body>
-    </html>);
+    </html>
+  );
 }
