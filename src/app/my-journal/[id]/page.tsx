@@ -231,7 +231,7 @@ export default function JournalEntryDetailPage() {
                             value={field.value === undefined ? GENERAL_JOURNAL_ENTRY_VALUE : field.value}
                             >
                             <FormControl>
-                                <SelectTrigger className="h-9 focus:ring-primary focus:border-primary">
+                                <SelectTrigger className="h-9 border-primary/30 focus:border-primary focus-visible:ring-0 focus-visible:ring-offset-0">
                                 <SelectValue placeholder="Select a goal or leave for general entry" />
                                 </SelectTrigger>
                             </FormControl>
