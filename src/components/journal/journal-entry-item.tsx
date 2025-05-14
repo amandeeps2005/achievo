@@ -29,18 +29,19 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation'; // Import useRouter
 
 interface JournalEntryItemProps {
   entry: JournalEntry;
-  // onEdit is no longer needed as navigation handles it
 }
 
 export default function JournalEntryItem({ entry }: JournalEntryItemProps) {
   const { deleteJournalEntry } = useJournal();
   const { getGoalById } = useGoals();
+  const router = useRouter(); // Initialize useRouter
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  const linkedGoal = entry.goalId ? getGoalById(entry.goalId) : null;
+  const linkedGoal = entry.goalId ? getGoalById(entry.id) : null;
 
   const handleDelete = () => {
     deleteJournalEntry(entry.id);
@@ -78,7 +79,8 @@ export default function JournalEntryItem({ entry }: JournalEntryItemProps) {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href={`/my-journal/${entry.id}/edit`} className="flex items-center w-full cursor-pointer">
+                {/* Update this Link to point to the view page; editing is handled there */}
+                <Link href={`/my-journal/${entry.id}`} className="flex items-center w-full cursor-pointer">
                   <Edit3 className="w-4 h-4 mr-2" />
                   Edit
                 </Link>
