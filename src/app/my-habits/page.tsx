@@ -258,7 +258,7 @@ export default function MyHabitsPage() {
                   Visualize your habit consistency over the month. Darker means more habits completed.
               </ShadcnCardDescription>
           </CardHeader>
-          <CardContent className="p-6 flex flex-col items-center">
+          <CardContent className="p-6 flex flex-col items-center"> {/* items-center might still center it if w-full below is not fully effective */}
               <Calendar
                   mode="single"
                   month={heatmapDisplayMonth}
@@ -266,7 +266,7 @@ export default function MyHabitsPage() {
                   components={{
                       Day: (props) => <MemoizedCustomDay {...props} heatmapData={heatmapDataForMonth} />,
                   }}
-                  className="rounded-md border p-0 sm:p-3 self-center w-full max-w-md"
+                  className="rounded-md border p-0 sm:p-3 w-full" // Removed max-w-md and self-center
                   selected={undefined} // Disable date selection behavior
                   onSelect={() => {}} // Disable date selection behavior
                   showOutsideDays
@@ -302,3 +302,4 @@ export default function MyHabitsPage() {
     </div>
   );
 }
+
