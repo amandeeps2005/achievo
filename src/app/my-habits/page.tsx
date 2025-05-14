@@ -258,7 +258,7 @@ export default function MyHabitsPage() {
                   Visualize your habit consistency over the month. Darker means more habits completed.
               </ShadcnCardDescription>
           </CardHeader>
-          <CardContent className="p-0"> {/* Removed padding from CardContent */}
+          <CardContent className="p-3 flex flex-col items-center">
               <Calendar
                   mode="single"
                   month={heatmapDisplayMonth}
@@ -266,16 +266,13 @@ export default function MyHabitsPage() {
                   components={{
                       Day: (props) => <MemoizedCustomDay {...props} heatmapData={heatmapDataForMonth} />,
                   }}
-                  // Calendar component should take full width, have NO internal padding (p-0 overrides default p-3), 
-                  // and no border/top-rounding of its own. Card provides overall border & top rounding.
-                  // Bottom rounding applied to match card.
-                  className="w-full p-0 rounded-b-xl" 
+                  className="rounded-md border" 
                   selected={undefined} 
                   onSelect={() => {}} 
                   showOutsideDays
                   fixedWeeks
               />
-              <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs text-muted-foreground p-3 border-t">
+              <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs text-muted-foreground mt-3">
                   <div className="flex items-center"><span className="w-3 h-3 rounded-sm mr-1.5 bg-primary"></span>All Done</div>
                   <div className="flex items-center"><span className="w-3 h-3 rounded-sm mr-1.5 bg-primary/60"></span>Some Done</div>
                   <div className="flex items-center"><span className="w-3 h-3 rounded-sm mr-1.5 bg-muted/50"></span>None Done (Tracked)</div>
