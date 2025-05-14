@@ -148,7 +148,7 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4 sm:p-0">
         <Card className="flex flex-col shadow-xl hover:shadow-2xl transition-all duration-300 rounded-xl transform hover:-translate-y-1 border border-border hover:border-primary/30">
-          <CardHeader className="bg-muted/20">
+          <CardHeader className="bg-card">
             <div className="flex items-center gap-3 mb-2">
               <LayoutGrid className="w-8 h-8 text-primary" />
               <CardTitle className="text-2xl">My Goals</CardTitle>
@@ -170,7 +170,7 @@ export default function DashboardPage() {
         </Card>
 
         <Card className="flex flex-col shadow-xl hover:shadow-2xl transition-all duration-300 rounded-xl transform hover:-translate-y-1 border border-border hover:border-primary/30">
-            <CardHeader className="bg-muted/20">
+            <CardHeader className="bg-card">
               <div className="flex items-center gap-3 mb-2">
                 <BarChartBig className="w-8 h-8 text-primary" />
                 <CardTitle className="text-2xl">Progress Overview</CardTitle>
@@ -189,11 +189,11 @@ export default function DashboardPage() {
             </CardFooter>
         </Card>
 
-         <Card className="flex flex-col shadow-xl hover:shadow-2xl transition-all duration-300 rounded-xl transform hover:-translate-y-1 border border-border hover:border-accent/30">
-            <CardHeader className="bg-muted/20">
+         <Card className="flex flex-col shadow-xl hover:shadow-2xl transition-all duration-300 rounded-xl transform hover:-translate-y-1 border border-border hover:border-primary/30">
+            <CardHeader className="bg-card">
               <div className="flex items-center gap-3 mb-2">
-                <Brain className="w-8 h-8 text-accent" />
-                <CardTitle className="text-2xl text-accent">Smart Goal Tips</CardTitle>
+                <Brain className="w-8 h-8 text-primary" />
+                <CardTitle className="text-2xl text-primary">Smart Goal Tips</CardTitle>
               </div>
               <ShadcnCardDescription>Get AI-powered ideas to boost your progress on existing or new goals.</ShadcnCardDescription>
             </CardHeader>
@@ -201,7 +201,7 @@ export default function DashboardPage() {
               <p className="text-sm text-muted-foreground">Receive tailored advice to help you strategize and achieve more effectively.</p>
             </CardContent>
             <CardFooter>
-              <Button asChild size="lg" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg">
+              <Button asChild size="lg" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg">
                 <Link href="/smart-suggestions">
                   Get Tips <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
@@ -211,7 +211,7 @@ export default function DashboardPage() {
 
 
         <Card className="flex flex-col shadow-xl hover:shadow-2xl transition-all duration-300 rounded-xl transform hover:-translate-y-1 border border-border hover:border-primary/30">
-          <CardHeader className="bg-muted/20">
+          <CardHeader className="bg-card">
             <div className="flex items-center gap-3 mb-2">
               <NotebookPen className="w-8 h-8 text-primary" />
               <CardTitle className="text-2xl">My Journal</CardTitle>
@@ -231,7 +231,7 @@ export default function DashboardPage() {
         </Card>
 
         <Card className="flex flex-col shadow-xl hover:shadow-2xl transition-all duration-300 rounded-xl transform hover:-translate-y-1 border border-border hover:border-primary/30">
-          <CardHeader className="bg-muted/20">
+          <CardHeader className="bg-card">
             <div className="flex items-center gap-3 mb-2">
               <CheckSquare className="w-8 h-8 text-primary" />
               <CardTitle className="text-2xl">Habit Tracking</CardTitle>
