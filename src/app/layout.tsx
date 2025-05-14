@@ -29,10 +29,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en" suppressHydrationWarning>
+  return (<html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans`}>
-        {/* ThemeProvider is removed */}
           <AuthProvider>
             <GoalProvider>
               <JournalProvider>
@@ -47,6 +45,5 @@ export default function RootLayout({
             </GoalProvider>
           </AuthProvider>
       </body>
-    </html>
-  );
+    </html>);
 }
