@@ -9,45 +9,43 @@ body {
 
 @layer base {
   :root {
-    /* Dark Theme - Now the default and only theme */
-    --background: 220 13% 12%; /* Very dark cool gray/blue */
+    /* Dark Theme - Black Background */
+    --background: 0 0% 0%; /* Black */
     --foreground: 210 20% 90%; /* Light cool gray (off-white) */
 
-    --card: 220 13% 16%; /* Slightly lighter than background */
+    --card: 0 0% 7%; /* Very dark gray, slightly off-black for cards */
     --card-foreground: 210 20% 90%;
 
-    --popover: 220 13% 16%;
+    --popover: 0 0% 7%; /* Very dark gray, for popovers */
     --popover-foreground: 210 20% 90%;
 
-    --primary: 180 60% 50%; /* Lighter Teal for dark mode */
-    --primary-foreground: 180 100% 10%; /* Very dark Teal for contrast */
+    --primary: 180 100% 35%; /* Calm Teal */
+    --primary-foreground: 180 100% 95%; /* Very light teal for contrast on primary */
 
-    --secondary: 130 30% 45%; /* Darker Seafoam Green for dark mode */
-    --secondary-foreground: 130 25% 85%; /* Lighter Seafoam Green text */
+    --secondary: 145 55% 42%; /* Seafoam Green */
+    --secondary-foreground: 145 30% 90%; /* Light Seafoam Green text */
 
-    --muted: 220 13% 20%;
+    --muted: 0 0% 10%; /* Darker gray for muted elements */
     --muted-foreground: 210 15% 65%; /* Medium cool gray */
 
-    --accent: 28 80% 60%; /* Lighter orange for dark mode */
-    --accent-foreground: 28 90% 10%; /* Very dark Orange for contrast */
+    --accent: 28 100% 55%; /* Orange */
+    --accent-foreground: 28 100% 10%; /* Very dark Orange for contrast */
 
-    --destructive: 0 62% 50%; /* Slightly desaturated red for dark mode */
-    --destructive-foreground: 0 0% 95%; /* Light foreground for destructive */
+    --destructive: 0 70% 50%; 
+    --destructive-foreground: 0 0% 95%;
 
-    --border: 220 13% 25%; /* Darker cool gray border */
-    --input: 220 13% 18%; /* Darker than card for inputs */
-    --ring: 180 60% 50%; /* Primary dark color (Teal) for rings */
+    --border: 0 0% 12%; /* Dark gray border */
+    --input: 0 0% 5%; /* Very dark gray for inputs */
+    --ring: 180 100% 35%; /* Primary color (Teal) for rings */
 
-    --chart-1: 180 60% 50%; /* Primary (Teal - dark mode) */
-    --chart-2: 28 80% 60%;  /* Accent (Orange - dark mode) */
-    --chart-3: 130 40% 60%; /* Seafoam Green variation (dark mode) */
-    --chart-4: 220 50% 70%; /* Complementary Blue/Purple (dark mode) */
-    --chart-5: 50 80% 65%;  /* Yellow-Orange (dark mode) */
+    --chart-1: 180 100% 35%; /* Primary (Teal) */
+    --chart-2: 28 100% 55%;  /* Accent (Orange) */
+    --chart-3: 145 50% 55%; /* Seafoam Green variation */
+    --chart-4: 220 50% 65%; /* Complementary Blue/Purple */
+    --chart-5: 50 70% 60%;  /* Yellow-Orange */
 
     --radius: 0.5rem;
   }
-
-  /* .dark class is no longer needed as dark theme is default */
 }
 
 @layer base {
