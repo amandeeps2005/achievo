@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -6,7 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { ArrowRight, CalendarDays, ListChecks, Tag, Trash2 } from 'lucide-react';
+import { CalendarDays, ListChecks, Tag, Trash2 } from 'lucide-react';
 import { useGoals } from '@/context/goal-context';
 import { useState } from 'react';
 
@@ -29,9 +30,13 @@ export default function GoalCard({ goal }: GoalCardProps) {
   return (
     <Card className="flex flex-col h-full shadow-lg hover:shadow-xl transition-shadow duration-300">
       <CardHeader>
-        <CardTitle className="text-xl font-semibold text-primary truncate">
-          {goal.title || goal.originalGoal}
-        </CardTitle>
+        <Link href={`/goal/${goal.id}`} passHref legacyBehavior>
+          <a className="cursor-pointer hover:underline" aria-label={`View goal: ${goal.title || goal.originalGoal}`}>
+            <CardTitle className="text-xl font-semibold text-primary truncate">
+              {goal.title || goal.originalGoal}
+            </CardTitle>
+          </a>
+        </Link>
         <CardDescription className="flex items-center text-sm text-muted-foreground">
           <Tag className="w-4 h-4 mr-2" />
           {goal.category}
@@ -58,16 +63,10 @@ export default function GoalCard({ goal }: GoalCardProps) {
           )}
         </div>
       </CardContent>
-      <CardFooter className="flex justify-between items-center pt-4">
-        <Button asChild variant="outline" size="sm" className="flex-grow group">
-          <Link href={`/goal/${goal.id}`}>
-            View Details
-            <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-          </Link>
-        </Button>
+      <CardFooter className="flex justify-end items-center pt-4"> {/* Changed to justify-end */}
         <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
           <AlertDialogTrigger asChild>
-            <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive hover:text-destructive-foreground ml-2 shrink-0">
+            <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive hover:text-destructive-foreground shrink-0">
               <Trash2 className="h-4 w-4" />
             </Button>
           </AlertDialogTrigger>
