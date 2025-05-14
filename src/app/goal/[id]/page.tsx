@@ -60,9 +60,9 @@ export default function GoalDetailPage() {
         <h1 className="text-2xl font-semibold mb-4">Goal Not Found</h1>
         <p className="text-muted-foreground mb-6">The goal you are looking for does not exist or could not be loaded.</p>
         <Button asChild variant="outline">
-          <Link href="/dashboard">
+          <Link href="/my-goals">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Dashboard
+            Back to My Goals
           </Link>
         </Button>
       </div>
@@ -77,9 +77,9 @@ export default function GoalDetailPage() {
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
         <p className="mt-4 text-lg text-muted-foreground">Goal not available.</p>
          <Button asChild variant="outline" className="mt-4">
-          <Link href={user ? "/dashboard" : "/"}>
+          <Link href={user ? "/my-goals" : "/"}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to {user ? "Dashboard" : "Home"}
+            Back to {user ? "My Goals" : "Home"}
           </Link>
         </Button>
       </div>
@@ -95,9 +95,9 @@ export default function GoalDetailPage() {
     <div className="py-8">
       <div className="mb-6">
         <Button variant="outline" size="sm" asChild>
-          <Link href="/dashboard">
+          <Link href="/my-goals">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Dashboard
+            Back to My Goals
           </Link>
         </Button>
       </div>
