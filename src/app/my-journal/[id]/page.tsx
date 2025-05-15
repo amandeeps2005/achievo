@@ -1,6 +1,5 @@
-"use client";
 
-// Removed generateMetadata function as it conflicts with "use client"
+"use client";
 
 import { useParams, useRouter, redirect } from 'next/navigation';
 import Link from 'next/link';
@@ -69,26 +68,24 @@ export default function JournalEntryDetailPage() {
   useEffect(() => {
     if (user && !journalLoading && entryId) {
       const foundEntry = journalEntries.find(e => e.id === entryId);
-      setEntry(foundEntry); // Will be undefined if not found
+      setEntry(foundEntry); 
       if (foundEntry) {
         form.reset({
           title: foundEntry.title,
           content: foundEntry.content,
           goalId: foundEntry.goalId,
         });
-        // Client-side title update is less critical if generateMetadata is used
-        // if (typeof document !== 'undefined') {
-        //   document.title = `${foundEntry.title} - My Journal - Achievo`;
-        // }
-      } else if (!journalLoading) { // Entry not found after loading
-         // if (typeof document !== 'undefined') document.title = "Entry Not Found - Achievo";
+         if (typeof document !== 'undefined') {
+           document.title = `${foundEntry.title} - My Journal - Achievo`;
+         }
+      } else if (!journalLoading) { 
+         if (typeof document !== 'undefined') document.title = "Entry Not Found - Achievo";
       }
     }
   }, [user, journalLoading, entryId, journalEntries, form]);
 
   const handleEditToggle = () => {
     if (isEditing && entry) {
-      // If canceling edit, reset form to original entry data
       form.reset({
         title: entry.title,
         content: entry.content,
@@ -133,7 +130,7 @@ export default function JournalEntryDetailPage() {
     );
   }
 
-  if (!entry && !journalLoading && user) { // After loading, if entry is still undefined and user is logged in
+  if (!entry && !journalLoading && user) { 
     return (
       <div className="text-center py-12">
         <NotebookPen className="w-16 h-16 mx-auto mb-6 text-primary opacity-30" />
@@ -149,7 +146,7 @@ export default function JournalEntryDetailPage() {
     );
   }
   
-  if (!entry) { // General fallback if entry is not available for any reason
+  if (!entry) { 
      return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
         <p className="mt-4 text-lg text-muted-foreground">Entry not available.</p>

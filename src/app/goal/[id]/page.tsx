@@ -1,6 +1,5 @@
-"use client";
 
-// Removed generateMetadata function as it conflicts with "use client"
+"use client";
 
 import { useParams, useRouter, redirect } from 'next/navigation';
 import { useGoals } from '@/context/goal-context';
@@ -87,10 +86,9 @@ export default function GoalDetailPage() {
     );
   }
   
-  // Client-side title update (optional, as metadata should handle it)
-  // if (typeof document !== 'undefined') {
-  //    document.title = `${goal.title || goal.originalGoal} - Achievo`;
-  // }
+  if (typeof document !== 'undefined' && goal) {
+     document.title = `${goal.title || goal.originalGoal} - Achievo`;
+  }
 
 
   return (
