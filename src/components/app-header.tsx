@@ -80,7 +80,7 @@ export default function AppHeader() {
                       {user.photoURL ? (
                         <AvatarImage src={user.photoURL} alt={user.displayName || user.email || 'User Avatar'} />
                       ) : null}
-                      <AvatarFallback>
+                      <AvatarFallback className="bg-muted/80"> {/* Made fallback slightly transparent */}
                         {getInitials(user.displayName, user.email)}
                       </AvatarFallback>
                     </Avatar>
