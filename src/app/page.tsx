@@ -146,7 +146,7 @@ export default function LandingPage() {
 
       {/* Call to Action Section */}
       {!user && (
-        <section className="py-20 md:py-28 bg-gradient-to-r from-[hsl(var(--primary-gradient-start))] to-[hsl(var(--primary-gradient-end))] text-white">
+        <section className="py-20 md:py-28 bg-primary text-white">
           <div className="container mx-auto px-6 text-center">
             <Zap className="w-16 h-16 mx-auto mb-6" /> {/* Will inherit text-white */}
             <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Start Achieving?</h2>
