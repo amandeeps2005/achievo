@@ -1,23 +1,6 @@
-
 "use client";
 
-// Add at the top of the file, BEFORE 'use client' if it was there.
-// However, since the main component is client-side, metadata is often co-located.
-import type { Metadata } from 'next';
-
-// This function runs on the server
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  // Directly access params.id, do not enumerate params object
-  const id = params.id;
-  // In a real app, you might fetch data here using 'id' to set a dynamic title.
-  // Since goal data is in localStorage, we'll use a generic title for server-generated metadata.
-  return {
-    title: `Goal Details - Achievo`,
-  };
-}
-
-// Ensure 'use client' is below generateMetadata if it was at the very top.
-// The 'use client' directive applies to the default export component and its imports.
+// Removed generateMetadata function as it conflicts with "use client"
 
 import { useParams, useRouter, redirect } from 'next/navigation';
 import { useGoals } from '@/context/goal-context';
