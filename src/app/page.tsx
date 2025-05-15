@@ -125,7 +125,7 @@ export default function LandingPage() {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-20 md:py-28 bg-card"> {/* Changed background */}
+      <section className="py-20 md:py-28 bg-card">
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-4xl md:text-5xl font-bold text-primary mb-16">Simple Steps to Success</h2>
           <div className="grid md:grid-cols-3 gap-10 max-w-5xl mx-auto">
@@ -134,7 +134,7 @@ export default function LandingPage() {
               { num: 2, title: "Get Your Plan", desc: "Our AI breaks it down into actionable steps, timeline, and resources." },
               { num: 3, title: "Track & Achieve", desc: "Follow your roadmap, mark progress, and celebrate success!" }
             ].map(step => (
-              <div key={step.num} className="flex flex-col items-center p-6 bg-gradient-to-br from-muted/30 to-muted/10 rounded-xl shadow-xl border border-border hover:border-primary/30 transition-all transform hover:scale-105"> {/* Changed background */}
+              <div key={step.num} className="flex flex-col items-center p-6 bg-gradient-to-br from-muted/30 to-muted/10 rounded-xl shadow-xl border border-border hover:border-primary/30 transition-all transform hover:scale-105">
                 <div className="bg-gradient-to-r from-[hsl(28,100%,50%)] to-[hsl(28,100%,40%)] text-white rounded-full w-16 h-16 flex items-center justify-center text-3xl font-bold mb-6 shadow-lg">{step.num}</div>
                 <h3 className="text-2xl font-semibold text-primary mb-3">{step.title}</h3>
                 <p className="text-muted-foreground">{step.desc}</p>
