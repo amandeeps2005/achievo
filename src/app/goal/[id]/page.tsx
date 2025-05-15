@@ -10,6 +10,9 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { useEffect } from 'react';
 import { useAuth } from '@/context/auth-context';
+// Removed: import type { Metadata } from 'next';
+
+// Removed: export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata>
 
 export default function GoalDetailPage() {
   const params = useParams();
@@ -28,11 +31,18 @@ export default function GoalDetailPage() {
 
   useEffect(() => {
     if (user && !isContextLoading && goalId && !goal) {
-      // If goalId exists but goal is not found after loading, redirect.
-      // This handles cases where user navigates to a non-existent goal ID.
       router.replace('/my-goals'); 
     }
   }, [user, isContextLoading, goalId, goal, router]);
+
+
+  useEffect(() => {
+    if (goal && typeof document !== 'undefined') {
+      document.title = `${goal.title || goal.originalGoal} - Achievo`;
+    } else if (!goal && !isContextLoading && typeof document !== 'undefined') {
+      document.title = `Goal Not Found - Achievo`;
+    }
+  }, [goal, isContextLoading]);
 
 
   if (authLoading || (!user && !authLoading)) {
@@ -44,8 +54,6 @@ export default function GoalDetailPage() {
    );
   }
   
-  // Show loading spinner for goal data if user is authenticated but goal hasn't loaded yet
-  // and we have a goalId we are trying to load.
   if (user && isContextLoading && goalId && !goal) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
@@ -55,7 +63,6 @@ export default function GoalDetailPage() {
     );
   }
 
-  // If after loading, the goal is still not found (and user is logged in)
   if (user && goalId && !goal && !isContextLoading) { 
     return (
       <div className="text-center py-12">
@@ -71,8 +78,7 @@ export default function GoalDetailPage() {
     );
   }
   
-  // Fallback if goal is not available for any other reason (e.g. no goalId in params)
-  if (!goal) {
+  if (!goal) { 
      return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
         <p className="mt-4 text-lg text-muted-foreground">Goal not available.</p>
@@ -85,11 +91,6 @@ export default function GoalDetailPage() {
       </div>
     );
   }
-  
-  if (typeof document !== 'undefined' && goal) {
-     document.title = `${goal.title || goal.originalGoal} - Achievo`;
-  }
-
 
   return (
     <div className="py-8">

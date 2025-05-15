@@ -1,5 +1,5 @@
 
-"use client";
+"use client"; // Moved to the very top
 
 import { useParams, useRouter, redirect } from 'next/navigation';
 import Link from 'next/link';
@@ -23,6 +23,9 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { ArrowLeft, CalendarDays, Link as LinkIcon, NotebookPen, Edit3, Save, Trash2, XCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
+// Removed: import type { Metadata } from 'next';
+
+// Removed: export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> 
 
 const GENERAL_JOURNAL_ENTRY_VALUE = "__GENERAL_JOURNAL_ENTRY__";
 const MAX_CONTENT_LENGTH = 5000;
@@ -44,9 +47,9 @@ export default function JournalEntryDetailPage() {
   const { toast } = useToast();
 
   const entryId = typeof params.id === 'string' ? params.id : undefined;
-  const [entry, setEntry] = useState<JournalEntry | undefined | null>(null); // null means loading, undefined means not found
+  const [entry, setEntry] = useState<JournalEntry | undefined | null>(null); 
   const [isEditing, setIsEditing] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false); // For delete dialog
+  const [isDeleting, setIsDeleting] = useState(false); 
 
   const form = useForm<JournalEntryFormData>({
     resolver: zodResolver(journalEntryFormSchema),
