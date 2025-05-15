@@ -8,7 +8,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from '@/components/ui/sidebar';
-import { Target, LayoutDashboard, CheckSquare, NotebookPen, BarChartBig, Brain, User, LogOut } from 'lucide-react';
+import { Target, LayoutDashboard, CheckSquare, NotebookPen, Brain, User, LogOut, MessageSquareHeart } from 'lucide-react'; // Added MessageSquareHeart
 import { useAuth } from '@/context/auth-context';
 
 export function SidebarNavigation() {
@@ -37,16 +37,14 @@ export function SidebarNavigation() {
           <Link href="/my-journal"><NotebookPen /> <span className="group-data-[collapsible=icon]:hidden">My Journal</span></Link>
         </SidebarMenuButton>
       </SidebarMenuItem>
-      {/* Removed Progress Overview link as it's now part of the dashboard
-      <SidebarMenuItem>
-        <SidebarMenuButton asChild isActive={pathname === '/dashboard' && pathname.includes('progress')} tooltip="Progress Overview">
-          <Link href="/dashboard"><BarChartBig /> <span className="group-data-[collapsible=icon]:hidden">Progress</span></Link>
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-      */}
       <SidebarMenuItem>
         <SidebarMenuButton asChild isActive={isActive('/smart-suggestions')} tooltip="Smart Suggestions">
           <Link href="/smart-suggestions"><Brain /> <span className="group-data-[collapsible=icon]:hidden">Suggestions</span></Link>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+      <SidebarMenuItem>
+        <SidebarMenuButton asChild isActive={isActive('/feedback')} tooltip="Feedback">
+          <Link href="/feedback"><MessageSquareHeart /> <span className="group-data-[collapsible=icon]:hidden">Feedback</span></Link>
         </SidebarMenuButton>
       </SidebarMenuItem>
     </SidebarMenu>
@@ -81,4 +79,3 @@ export function SidebarAccountMenu() {
     </SidebarMenu>
   );
 }
-

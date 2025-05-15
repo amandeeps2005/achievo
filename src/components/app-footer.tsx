@@ -14,6 +14,7 @@ export default function AppFooter() {
           <Link href="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link>
           <Link href="/terms" className="hover:text-primary transition-colors">Terms of Service</Link>
           <Link href="/faq" className="hover:text-primary transition-colors">FAQ</Link>
+          <Link href="/feedback" className="hover:text-primary transition-colors">Feedback</Link>
         </div>
         <p>&copy; {new Date().getFullYear()} Achievo. All rights reserved.</p>
         <p className="text-sm mt-1">Your Personal Goal Achievement System.</p>
