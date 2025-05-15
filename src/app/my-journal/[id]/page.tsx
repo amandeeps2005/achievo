@@ -1,5 +1,21 @@
 
-// src/app/my-journal/[id]/page.tsx
+// Add at the top of the file, BEFORE 'use client' if it was there.
+// However, since the main component is client-side, metadata is often co-located.
+import type { Metadata } from 'next';
+
+// This function runs on the server
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  // Directly access params.id, do not enumerate params object
+  const id = params.id;
+  // In a real app, you might fetch data here using 'id' to set a dynamic title.
+  // Since journal data is in localStorage, we'll use a generic title for server-generated metadata.
+  return {
+    title: `Journal Entry - Achievo`,
+  };
+}
+
+// Ensure 'use client' is below generateMetadata if it was at the very top.
+// The 'use client' directive applies to the default export component and its imports.
 "use client";
 
 import { useParams, useRouter, redirect } from 'next/navigation';
@@ -45,7 +61,7 @@ export default function JournalEntryDetailPage() {
   const { toast } = useToast();
 
   const entryId = typeof params.id === 'string' ? params.id : undefined;
-  const [entry, setEntry] = useState<JournalEntry | undefined | null>(null);
+  const [entry, setEntry] = useState<JournalEntry | undefined | null>(null); // null means loading, undefined means not found
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false); // For delete dialog
 
@@ -69,18 +85,19 @@ export default function JournalEntryDetailPage() {
   useEffect(() => {
     if (user && !journalLoading && entryId) {
       const foundEntry = journalEntries.find(e => e.id === entryId);
-      setEntry(foundEntry);
+      setEntry(foundEntry); // Will be undefined if not found
       if (foundEntry) {
         form.reset({
           title: foundEntry.title,
           content: foundEntry.content,
           goalId: foundEntry.goalId,
         });
-        if (typeof document !== 'undefined') {
-          document.title = `${foundEntry.title} - My Journal - Achievo`;
-        }
-      } else if (!journalLoading) {
-         if (typeof document !== 'undefined') document.title = "Entry Not Found - Achievo";
+        // Client-side title update is less critical if generateMetadata is used
+        // if (typeof document !== 'undefined') {
+        //   document.title = `${foundEntry.title} - My Journal - Achievo`;
+        // }
+      } else if (!journalLoading) { // Entry not found after loading
+         // if (typeof document !== 'undefined') document.title = "Entry Not Found - Achievo";
       }
     }
   }, [user, journalLoading, entryId, journalEntries, form]);
@@ -121,7 +138,7 @@ export default function JournalEntryDetailPage() {
   };
 
 
-  if (authLoading || journalLoading || goalsLoading || entry === null) {
+  if (authLoading || (journalLoading && entry === null) || (goalsLoading && entry === null) ) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
         <LoadingSpinner size={64} />
@@ -132,7 +149,7 @@ export default function JournalEntryDetailPage() {
     );
   }
 
-  if (!entry) {
+  if (!entry && !journalLoading && user) { // After loading, if entry is still undefined and user is logged in
     return (
       <div className="text-center py-12">
         <NotebookPen className="w-16 h-16 mx-auto mb-6 text-primary opacity-30" />
@@ -147,6 +164,21 @@ export default function JournalEntryDetailPage() {
       </div>
     );
   }
+  
+  if (!entry) { // General fallback if entry is not available for any reason
+     return (
+      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
+        <p className="mt-4 text-lg text-muted-foreground">Entry not available.</p>
+         <Button asChild variant="outline" className="mt-4">
+          <Link href={user ? "/my-journal" : "/"}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to {user ? "My Journal" : "Home"}
+          </Link>
+        </Button>
+      </div>
+    );
+  }
+
 
   const linkedGoalDetails = entry.goalId ? goals.find(g => g.id === entry.goalId) : null;
 
@@ -180,8 +212,8 @@ export default function JournalEntryDetailPage() {
       </div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <Card className="shadow-xl border-primary/10">
-            <CardHeader className="bg-primary/5 p-6 rounded-t-lg">
+          <Card className="shadow-xl border-primary/10 rounded-xl">
+            <CardHeader className="bg-muted/20 p-6 rounded-t-xl">
               {isEditing ? (
                 <FormField
                   control={form.control}
@@ -194,7 +226,7 @@ export default function JournalEntryDetailPage() {
                           id="entryTitle"
                           placeholder="Enter journal entry title..."
                           {...field}
-                          className="text-3xl font-bold text-primary border-2 border-primary/30 focus:border-primary p-2 h-auto focus-visible:ring-0 focus-visible:ring-offset-0"
+                          className="text-3xl font-bold text-primary border-2 border-input focus:border-primary focus-visible:ring-0 focus-visible:ring-offset-0 p-2 h-auto"
                         />
                       </FormControl>
                       <FormMessage />
@@ -231,7 +263,7 @@ export default function JournalEntryDetailPage() {
                             value={field.value === undefined ? GENERAL_JOURNAL_ENTRY_VALUE : field.value}
                             >
                             <FormControl>
-                                <SelectTrigger className="h-9 border-input focus:border-primary focus:ring-0 focus-visible:ring-0">
+                                <SelectTrigger className="h-9 border-input focus:border-primary focus-visible:ring-0 focus-visible:ring-offset-0">
                                 <SelectValue placeholder="Select a goal or leave for general entry" />
                                 </SelectTrigger>
                             </FormControl>
@@ -252,14 +284,21 @@ export default function JournalEntryDetailPage() {
                         )}
                     />
                 ) : (
-                    linkedGoalDetails && (
+                    linkedGoalDetails ? (
                         <div className="mt-2">
                         <span className="text-xs font-medium text-primary py-0.5 px-2 rounded-full bg-primary/10 flex items-center w-fit">
                             <LinkIcon className="w-3 h-3 mr-1.5" />
                             Linked to Goal: {linkedGoalDetails.title || linkedGoalDetails.originalGoal}
                         </span>
                         </div>
-                    )
+                    ) : entry.goalId ? (
+                         <div className="mt-2">
+                            <span className="text-xs font-medium text-muted-foreground py-0.5 px-2 rounded-full bg-muted/50 flex items-center w-fit">
+                                <LinkIcon className="w-3 h-3 mr-1.5" />
+                                Linked Goal (Details not found)
+                            </span>
+                        </div>
+                    ) : null
                 )}
             </CardHeader>
             <CardContent className="p-6">
@@ -276,7 +315,7 @@ export default function JournalEntryDetailPage() {
                           placeholder="Type your journal entry here..."
                           {...field}
                           rows={15}
-                          className="prose dark:prose-invert max-w-none text-foreground whitespace-pre-wrap break-words text-base leading-relaxed border-2 border-primary/30 focus:border-primary focus-visible:ring-0 focus-visible:ring-offset-0"
+                          className="prose dark:prose-invert max-w-none text-foreground whitespace-pre-wrap break-words text-base leading-relaxed border-2 border-input focus:border-primary focus-visible:ring-0 focus-visible:ring-offset-0"
                         />
                       </FormControl>
                         <div className="flex justify-end items-center mt-1">
@@ -294,7 +333,7 @@ export default function JournalEntryDetailPage() {
                 </div>
               )}
             </CardContent>
-            <CardFooter className="p-6 bg-muted/20 border-t flex justify-end">
+            <CardFooter className="p-6 bg-muted/20 border-t flex justify-end rounded-b-xl">
               {!isEditing && (
                  <AlertDialog open={isDeleting} onOpenChange={setIsDeleting}>
                     <AlertDialogTrigger asChild>
@@ -311,7 +350,7 @@ export default function JournalEntryDetailPage() {
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive hover:bg-destructive/90">
+                        <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
                             Yes, Delete
                         </AlertDialogAction>
                         </AlertDialogFooter>
@@ -325,4 +364,3 @@ export default function JournalEntryDetailPage() {
     </div>
   );
 }
-

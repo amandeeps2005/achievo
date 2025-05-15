@@ -1,6 +1,24 @@
 
 "use client";
 
+// Add at the top of the file, BEFORE 'use client' if it was there.
+// However, since the main component is client-side, metadata is often co-located.
+import type { Metadata } from 'next';
+
+// This function runs on the server
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  // Directly access params.id, do not enumerate params object
+  const id = params.id;
+  // In a real app, you might fetch data here using 'id' to set a dynamic title.
+  // Since goal data is in localStorage, we'll use a generic title for server-generated metadata.
+  return {
+    title: `Goal Details - Achievo`,
+  };
+}
+
+// Ensure 'use client' is below generateMetadata if it was at the very top.
+// The 'use client' directive applies to the default export component and its imports.
+
 import { useParams, useRouter, redirect } from 'next/navigation';
 import { useGoals } from '@/context/goal-context';
 import GoalDetailView from '@/components/goal-detail-view';
@@ -24,11 +42,13 @@ export default function GoalDetailPage() {
     if (!authLoading && !user) {
       redirect('/'); 
     }
-  }, [user, authLoading]);
+  }, [user, authLoading, router]);
 
   useEffect(() => {
     if (user && !isContextLoading && goalId && !goal) {
-      router.replace('/dashboard'); 
+      // If goalId exists but goal is not found after loading, redirect.
+      // This handles cases where user navigates to a non-existent goal ID.
+      router.replace('/my-goals'); 
     }
   }, [user, isContextLoading, goalId, goal, router]);
 
@@ -42,7 +62,9 @@ export default function GoalDetailPage() {
    );
   }
   
-  if (user && isContextLoading && !goal) {
+  // Show loading spinner for goal data if user is authenticated but goal hasn't loaded yet
+  // and we have a goalId we are trying to load.
+  if (user && isContextLoading && goalId && !goal) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
         <LoadingSpinner size={48} />
@@ -51,7 +73,8 @@ export default function GoalDetailPage() {
     );
   }
 
-  if (!goal && user) { 
+  // If after loading, the goal is still not found (and user is logged in)
+  if (user && goalId && !goal && !isContextLoading) { 
     return (
       <div className="text-center py-12">
         <h1 className="text-2xl font-semibold mb-4">Goal Not Found</h1>
@@ -66,6 +89,7 @@ export default function GoalDetailPage() {
     );
   }
   
+  // Fallback if goal is not available for any other reason (e.g. no goalId in params)
   if (!goal) {
      return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
@@ -80,9 +104,10 @@ export default function GoalDetailPage() {
     );
   }
   
-  if (typeof document !== 'undefined') {
-     document.title = `${goal.title || goal.originalGoal} - Achievo`;
-  }
+  // Client-side title update (optional, as metadata should handle it)
+  // if (typeof document !== 'undefined') {
+  //    document.title = `${goal.title || goal.originalGoal} - Achievo`;
+  // }
 
 
   return (
