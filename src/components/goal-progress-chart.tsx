@@ -41,7 +41,7 @@ function IndividualGoalPieChart({ goal }: IndividualGoalPieChartProps) {
   const goalTitle = (goal.title || goal.originalGoal).substring(0, 35) + ((goal.title || goal.originalGoal).length > 35 ? '...' : '');
 
   return (
-    <Link href={`/goal/${goal.id}`} passHref className="flex flex-col items-center group cursor-pointer">
+    <Link href={`/goal/${goal.id}`} className="flex flex-col items-center group cursor-pointer">
       <ChartContainer
         config={chartConfig}
         className="mx-auto aspect-[2/1] h-24 w-40 sm:h-28 sm:w-48 group-hover:opacity-80 transition-opacity"
@@ -67,8 +67,7 @@ function IndividualGoalPieChart({ goal }: IndividualGoalPieChartProps) {
               endAngle={0}
               outerRadius={typeof window !== 'undefined' && window.innerWidth < 640 ? 70 : 80} 
               innerRadius={typeof window !== 'undefined' && window.innerWidth < 640 ? 45 : 55} 
-              strokeWidth={0} // Changed from 2 to 0
-              // stroke="hsl(var(--background))" // Stroke color is now irrelevant
+              strokeWidth={0}
               style={{ filter: 'url(#shadow)' }}
             >
               {data.map((entry, index) => (
@@ -100,7 +99,7 @@ export default function GoalProgressChart({ goals }: GoalProgressChartProps) {
     <div className="w-full"> 
       <div className="pt-2 pb-4">
         {goals.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-2 gap-y-4 sm:gap-x-4 sm:gap-y-6 items-start justify-center">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-2 gap-y-4 sm:gap-x-4 sm:gap-y-6 items-start justify-center justify-items-center">
             {goals.map(goal => (
               <IndividualGoalPieChart key={goal.id} goal={goal} />
             ))}
