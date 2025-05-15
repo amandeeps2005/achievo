@@ -235,7 +235,7 @@ export default function GoalSetupForm() {
             <Button 
               variant="outline" 
               onClick={() => { setGeneratedPlan(null); form.reset(); setApiError(null); }} 
-              className="w-full sm:w-auto border-primary text-primary hover:bg-primary/20 py-3 text-base rounded-lg shadow-sm hover:shadow-md transition-all duration-300" 
+              className="w-full sm:w-auto border-primary text-primary hover:bg-primary/30 hover:text-primary-foreground py-3 text-base rounded-lg shadow-sm hover:shadow-md transition-all duration-300" 
               disabled={isSavingGoal}
             >
               Edit Goal & Regenerate
