@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Target, Brain, Map, CalendarDays, BarChartBig, Wand2, ArrowRight, Zap } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import AppFooter from '@/components/app-footer';
 
 
 const features = [
@@ -50,7 +51,10 @@ const features = [
 export default function LandingPage() {
   const { user, loading: authLoading } = useAuth();
 
-  if (authLoading) { 
+  // No redirect here, landing page is always accessible
+  // Conditional rendering of buttons will handle logged-in state
+
+  if (authLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-background">
         <LoadingSpinner size={64} />
@@ -65,7 +69,7 @@ export default function LandingPage() {
       <section className="py-20 md:py-32 bg-gradient-to-br from-[var(--hero-gradient-from)] via-[var(--hero-gradient-via)] to-[var(--hero-gradient-to)]">
         <div className="container mx-auto px-6 text-center">
           <Target className="w-24 h-24 text-primary mx-auto mb-8 animate-bounce" />
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-foreground via-foreground/80 to-foreground">
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 text-foreground">
             Achieve Your Dreams with <span className="text-accent">Achievo</span>
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-3xl mx-auto">
@@ -98,8 +102,8 @@ export default function LandingPage() {
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature) => (
-              <Card 
-                key={feature.title} 
+              <Card
+                key={feature.title}
                 className="bg-card shadow-xl hover:shadow-[0_0_25px_hsl(var(--primary)/0.2),0_0_10px_hsl(var(--accent)/0.1)] border border-primary/30 hover:border-primary/40 transition-all duration-300 transform hover:-translate-y-1.5 flex flex-col rounded-xl overflow-hidden"
               >
                 <CardHeader className="items-center text-center bg-gradient-to-br from-primary/20 to-primary/5 p-6">
@@ -145,7 +149,7 @@ export default function LandingPage() {
       </section>
 
       {/* Call to Action Section */}
-      {!user && ( 
+      {!user && (
         <section className="py-20 md:py-28 bg-gradient-to-r from-[hsl(var(--primary-gradient-start))] to-[hsl(var(--primary-gradient-end))] text-primary-foreground">
           <div className="container mx-auto px-6 text-center">
             <Zap className="w-16 h-16 mx-auto mb-6" />
@@ -161,6 +165,7 @@ export default function LandingPage() {
           </div>
         </section>
       )}
+      {/* AppFooter is rendered globally by layout.tsx, no need to include it here explicitly */}
     </div>
   );
 }

@@ -28,7 +28,7 @@ body {
     --secondary-foreground: 145 30% 90%; /* Light Seafoam Green text */
 
     --muted: 210 15% 92%; /* Lighter gray for muted elements in light mode */
-    --muted-foreground: 210 10% 45%; /* Medium gray for muted text */
+    --muted-foreground: 210 10% 35%; /* Medium gray for muted text - Made darker */
 
     --accent: 28 100% 50%; /* Orange */
     --accent-foreground: 28 100% 10%; /* Very dark Orange for contrast */
@@ -153,3 +153,4 @@ body {
   scrollbar-width: thin;
   scrollbar-color: hsl(var(--primary) / 0.7) hsl(var(--muted) / 0.5);
 }
+
