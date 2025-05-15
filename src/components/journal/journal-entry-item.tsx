@@ -54,14 +54,16 @@ export default function JournalEntryItem({ entry }: JournalEntryItemProps) {
     <Card className="shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col">
       <CardHeader className="pb-3">
         <div className="flex justify-between items-start">
-          <Link href={`/my-journal/${entry.id}`} passHref legacyBehavior>
-            <a className="flex-grow cursor-pointer hover:underline" aria-label={`View journal entry: ${entry.title}`}>
-              <CardTitle
-                className="text-lg text-primary"
-              >
-                {entry.title}
-              </CardTitle>
-            </a>
+          <Link 
+            href={`/my-journal/${entry.id}`} 
+            className="flex-grow cursor-pointer hover:underline" 
+            aria-label={`View journal entry: ${entry.title}`}
+          >
+            <CardTitle
+              className="text-lg text-primary"
+            >
+              {entry.title}
+            </CardTitle>
           </Link>
 
           <DropdownMenu>
@@ -79,7 +81,6 @@ export default function JournalEntryItem({ entry }: JournalEntryItemProps) {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                {/* Update this Link to point to the view page; editing is handled there */}
                 <Link href={`/my-journal/${entry.id}`} className="flex items-center w-full cursor-pointer">
                   <Edit3 className="w-4 h-4 mr-2" />
                   Edit
@@ -114,14 +115,16 @@ export default function JournalEntryItem({ entry }: JournalEntryItemProps) {
           )}
         </div>
       </CardHeader>
-      <Link href={`/my-journal/${entry.id}`} passHref legacyBehavior>
-        <a className="flex-grow cursor-pointer hover:bg-muted/20 transition-colors duration-150" aria-label={`View content of journal entry: ${entry.title}`}>
-          <CardContent className="py-2">
-            <p className="text-sm text-foreground whitespace-pre-wrap line-clamp-3">
-              {entry.content}
-            </p>
-          </CardContent>
-        </a>
+      <Link 
+        href={`/my-journal/${entry.id}`} 
+        className="flex-grow cursor-pointer hover:bg-muted/20 transition-colors duration-150" 
+        aria-label={`View content of journal entry: ${entry.title}`}
+      >
+        <CardContent className="py-2">
+          <p className="text-sm text-foreground whitespace-pre-wrap line-clamp-3">
+            {entry.content}
+          </p>
+        </CardContent>
       </Link>
       <CardFooter className="flex justify-end space-x-2 pt-3">
       </CardFooter>
@@ -145,3 +148,4 @@ export default function JournalEntryItem({ entry }: JournalEntryItemProps) {
     </Card>
   );
 }
+
