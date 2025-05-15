@@ -3,7 +3,7 @@
 
 import type { Goal, StepUi } from '@/types';
 import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback, useRef } from 'react';
-import { useAuth } from '@/context/auth-context'; 
+import { useAuth } from '@/context/auth-context';
 import { toast } from "@/hooks/use-toast";
 
 interface GoalContextType {
@@ -11,6 +11,7 @@ interface GoalContextType {
   addGoal: (goal: Goal) => void;
   deleteGoal: (goalId: string) => void;
   updateStepCompletion: (goalId: string, stepId: string, completed: boolean) => void;
+  setStepReminder: (goalId: string, stepId: string, reminderDateTime: string | null) => void;
   getGoalById: (goalId: string) => Goal | undefined;
   isLoading: boolean;
   setIsLoading: (loading: boolean) => void; // Exposed for potential external control if ever needed
@@ -81,11 +82,11 @@ export const GoalProvider = ({ children }: { children: ReactNode }) => {
 
       // Filter out any existing goals of the current user from what was read from storage
       const otherUserGoalsFromStorage = allGoalsInStorage.filter(g => g.userId !== user.uid);
-      
+
       // Combine the goals of other users (from storage) with the current user's goals (from context state)
       // The 'goals' state variable here contains ONLY the current user's goals.
       const goalsToSave = [...otherUserGoalsFromStorage, ...goals];
-      
+
       localStorage.setItem('achievoGoals', JSON.stringify(goalsToSave));
     }
   }, [goals, user]); // Re-run when current user's goals change or user identity changes (after initial load)
@@ -148,12 +149,37 @@ export const GoalProvider = ({ children }: { children: ReactNode }) => {
     );
   }, [calculateProgress]);
 
+  const setStepReminder = useCallback((goalId: string, stepId: string, reminderDateTime: string | null) => {
+    setGoals(prevGoals =>
+      prevGoals.map(goal => {
+        if (goal.id === goalId) {
+          const updatedSteps = goal.steps.map(step =>
+            step.id === stepId ? { ...step, reminderDateTime: reminderDateTime ?? undefined } : step
+          );
+          return { ...goal, steps: updatedSteps };
+        }
+        return goal;
+      })
+    );
+    if (reminderDateTime) {
+      toast({
+        title: "Reminder Set",
+        description: `Reminder for step updated.`,
+      });
+    } else {
+      toast({
+        title: "Reminder Cleared",
+        description: `Reminder for step removed.`,
+      });
+    }
+  }, []);
+
   const getGoalById = useCallback((goalId: string): Goal | undefined => {
     return goals.find(goal => goal.id === goalId);
   }, [goals]);
 
   return (
-    <GoalContext.Provider value={{ goals, addGoal, deleteGoal, updateStepCompletion, getGoalById, isLoading, setIsLoading }}>
+    <GoalContext.Provider value={{ goals, addGoal, deleteGoal, updateStepCompletion, setStepReminder, getGoalById, isLoading, setIsLoading }}>
       {children}
     </GoalContext.Provider>
   );

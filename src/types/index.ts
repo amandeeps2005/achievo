@@ -7,6 +7,7 @@ export interface StepUi extends GoalDecompositionOutput['steps'][0] {
   endDate?: string; // ISO date string
   repeatInterval?: 'daily' | 'weekly';
   completed: boolean;
+  reminderDateTime?: string; // ISO date-time string for reminder
 }
 
 export interface Goal {
