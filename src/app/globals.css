@@ -21,6 +21,10 @@ body {
 
     --primary: 180 100% 35%; /* Calm Teal */
     --primary-foreground: 180 100% 95%; /* Very light teal for contrast on primary */
+    /* For gradients */
+    --primary-gradient-start: hsl(180 100% 35%);
+    --primary-gradient-end: hsl(180 100% 25%);
+
 
     --secondary: 145 55% 42%; /* Seafoam Green */
     --secondary-foreground: 145 30% 90%; /* Light Seafoam Green text */
@@ -30,6 +34,10 @@ body {
 
     --accent: 28 100% 55%; /* Orange */
     --accent-foreground: 28 100% 10%; /* Very dark Orange for contrast */
+    /* For gradients */
+    --accent-gradient-start: hsl(28 100% 55%);
+    --accent-gradient-end: hsl(28 100% 45%);
+
 
     --destructive: 0 70% 50%; 
     --destructive-foreground: 0 0% 95%;
@@ -44,7 +52,7 @@ body {
     --chart-4: 220 50% 65%; /* Complementary Blue/Purple */
     --chart-5: 50 70% 60%;  /* Yellow-Orange */
 
-    --radius: 0.5rem;
+    --radius: 0.75rem; /* Increased for a more modern feel, affects rounded-xl etc. */
 
     /* Sidebar Variables */
     --sidebar-background: hsl(0 0% 7%); /* Same as card */
@@ -66,4 +74,25 @@ body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+}
+
+/* Custom scrollbar for a more modern look */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: hsl(var(--muted) / 0.5);
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary) / 0.7);
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary));
+}
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--primary) / 0.7) hsl(var(--muted) / 0.5);
 }

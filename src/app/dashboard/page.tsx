@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/card';
 import { useHabits } from '@/context/habit-context';
 import { format } from 'date-fns';
-import GoalProgressChart from '@/components/goal-progress-chart'; // Import GoalProgressChart
+import GoalProgressChart from '@/components/goal-progress-chart'; 
 
 
 export default function DashboardPage() {
@@ -66,7 +66,7 @@ export default function DashboardPage() {
 
   const isDataLoading = (goalsLoading || habitsLoading) && typeof window !== 'undefined' && (!localStorage.getItem('achievoGoals') || !localStorage.getItem('achievoHabits'));
 
-  if (isDataLoading && !user) { // Check !user to avoid brief flash for logged in users
+  if (isDataLoading && !user) { 
     return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
         <LoadingSpinner size={48} />
@@ -85,15 +85,15 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-8 py-4">
-      <div className="p-4 sm:p-6 rounded-xl bg-card shadow-lg border border-border">
-        <div className="flex items-center gap-3 mb-1">
+      <div className="p-6 rounded-xl bg-gradient-to-br from-primary/10 via-card to-card shadow-xl border border-primary/20">
+        <div className="flex items-center gap-4 mb-1">
             {user.photoURL ? (
-                <img src={user.photoURL} alt="User" className="w-12 h-12 rounded-full object-cover border-2 border-primary" />
+                <img src={user.photoURL} alt="User" className="w-16 h-16 rounded-full object-cover border-2 border-primary shadow-md" />
             ) : (
-                <UserCircle className="w-12 h-12 text-primary" />
+                <UserCircle className="w-16 h-16 text-primary" />
             )}
             <div>
-                <h1 className="text-3xl md:text-4xl font-bold text-primary">
+                <h1 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-teal-400">
                     {greeting}, {user.displayName?.split(' ')[0] || 'Achiever'}!
                 </h1>
                 <p className="text-md text-muted-foreground">
@@ -105,7 +105,7 @@ export default function DashboardPage() {
 
       {/* Integrated Goal Progress Chart */}
       <Card className="shadow-xl border-primary/20 rounded-xl overflow-hidden">
-        <CardHeader className="p-6 bg-primary/5">
+        <CardHeader className="p-6 bg-gradient-to-br from-primary/20 to-primary/5">
             <CardTitle className="text-3xl font-bold text-primary flex items-center">
                 <BarChartBig className="mr-3 h-7 w-7" />
                 My Goal Progress
@@ -114,7 +114,7 @@ export default function DashboardPage() {
                 A visual summary of your progress across all your goals.
             </ShadcnCardDescription>
         </CardHeader>
-        <CardContent className="p-6">
+        <CardContent className="p-6 bg-card/80">
           {goalsLoading && !localStorage.getItem('achievoGoals') ? (
               <div className="flex flex-col items-center justify-center min-h-[250px]">
                 <LoadingSpinner size={48} />
@@ -127,96 +127,38 @@ export default function DashboardPage() {
       </Card>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4 sm:p-0">
-        <Card className="flex flex-col shadow-xl hover:shadow-2xl transition-all duration-300 rounded-xl transform hover:-translate-y-1 border border-border hover:border-primary/30">
-          <CardHeader className="bg-card">
-            <div className="flex items-center gap-3 mb-2">
-              <LayoutGrid className="w-8 h-8 text-primary" />
-              <CardTitle className="text-2xl">My Goals</CardTitle>
-            </div>
-            <ShadcnCardDescription>View, manage, and track all your active and completed goals.</ShadcnCardDescription>
-          </CardHeader>
-          <CardContent className="flex-grow">
-             <p className="text-sm text-muted-foreground">
-                You currently have <span className="font-semibold text-primary">{goals.length}</span> active goal(s).
-             </p>
-          </CardContent>
-          <CardFooter>
-            <Button asChild size="lg" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg">
-              <Link href="/my-goals">
-                Go to My Goals <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-          </CardFooter>
-        </Card>
-        
-         <Card className="flex flex-col shadow-xl hover:shadow-2xl transition-all duration-300 rounded-xl transform hover:-translate-y-1 border border-border hover:border-primary/30">
-            <CardHeader className="bg-card">
+        {[
+          { title: "My Goals", href: "/my-goals", icon: LayoutGrid, description: "View, manage, and track all your active and completed goals.", stats: `You currently have ${goals.length} active goal(s).`, buttonText: "Go to My Goals" },
+          { title: "Smart Goal Tips", href: "/smart-suggestions", icon: Brain, description: "Get AI-powered ideas to boost your progress on existing or new goals.", stats: "Receive tailored advice to help you strategize.", buttonText: "Get Tips" },
+          { title: "My Journal", href: "/my-journal", icon: NotebookPen, description: "Record your thoughts, ideas, and reflections.", stats: "Organize entries and link them to goals if needed.", buttonText: "Open Journal" },
+          { title: "Habit Tracking", href: "/my-habits", icon: CheckSquare, description: "Build and maintain your daily habits for consistent growth.", stats: `Tracking ${activeHabitsCount} active habit(s). ${habitsCompletedToday} completed today!`, buttonText: "Track Habits" }
+        ].map(item => (
+          <Card key={item.title} className="flex flex-col rounded-xl shadow-xl hover:shadow-[0_0_25px_hsl(var(--primary)/0.2),0_0_10px_hsl(var(--accent)/0.1)] border border-primary/20 hover:border-primary/40 transition-all duration-300 transform hover:-translate-y-1.5 overflow-hidden">
+            <CardHeader className="bg-gradient-to-br from-primary/15 to-transparent">
               <div className="flex items-center gap-3 mb-2">
-                <Brain className="w-8 h-8 text-primary" />
-                <CardTitle className="text-2xl text-primary">Smart Goal Tips</CardTitle>
+                <item.icon className="w-8 h-8 text-primary" />
+                <CardTitle className="text-2xl text-primary">{item.title}</CardTitle>
               </div>
-              <ShadcnCardDescription>Get AI-powered ideas to boost your progress on existing or new goals.</ShadcnCardDescription>
+              <ShadcnCardDescription className="text-muted-foreground h-10 line-clamp-2">{item.description}</ShadcnCardDescription>
             </CardHeader>
             <CardContent className="flex-grow">
-              <p className="text-sm text-muted-foreground">Receive tailored advice to help you strategize and achieve more effectively.</p>
+              <p className="text-sm text-muted-foreground h-12 line-clamp-2">
+                {item.stats}
+              </p>
             </CardContent>
-            <CardFooter>
-              <Button asChild size="lg" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg">
-                <Link href="/smart-suggestions">
-                  Get Tips <ArrowRight className="ml-2 h-5 w-5" />
+            <CardFooter className="border-t border-primary/10">
+              <Button asChild size="lg" className="w-full bg-gradient-to-r from-primary to-[hsl(var(--primary-gradient-end))] hover:from-primary/90 hover:to-[hsl(var(--primary-gradient-end)/0.9)] text-primary-foreground rounded-lg hover:shadow-md transition-all">
+                <Link href={item.href}>
+                  {item.buttonText} <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
             </CardFooter>
           </Card>
-
-
-        <Card className="flex flex-col shadow-xl hover:shadow-2xl transition-all duration-300 rounded-xl transform hover:-translate-y-1 border border-border hover:border-primary/30">
-          <CardHeader className="bg-card">
-            <div className="flex items-center gap-3 mb-2">
-              <NotebookPen className="w-8 h-8 text-primary" />
-              <CardTitle className="text-2xl">My Journal</CardTitle>
-            </div>
-            <ShadcnCardDescription>Record your thoughts, ideas, and reflections.</ShadcnCardDescription>
-          </CardHeader>
-          <CardContent className="flex-grow">
-            <p className="text-sm text-muted-foreground">Organize entries and link them to goals if needed.</p>
-          </CardContent>
-          <CardFooter>
-             <Button asChild size="lg" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg">
-              <Link href="/my-journal">
-                Open Journal <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-          </CardFooter>
-        </Card>
-
-        <Card className="flex flex-col shadow-xl hover:shadow-2xl transition-all duration-300 rounded-xl transform hover:-translate-y-1 border border-border hover:border-primary/30">
-          <CardHeader className="bg-card">
-            <div className="flex items-center gap-3 mb-2">
-              <CheckSquare className="w-8 h-8 text-primary" />
-              <CardTitle className="text-2xl">Habit Tracking</CardTitle>
-            </div>
-            <ShadcnCardDescription>Build and maintain your daily habits for consistent growth.</ShadcnCardDescription>
-          </CardHeader>
-          <CardContent className="flex-grow">
-             <p className="text-sm text-muted-foreground">
-                Tracking <span className="font-semibold text-primary">{activeHabitsCount}</span> active habit(s).
-                <br/>
-                <span className="font-semibold text-accent">{habitsCompletedToday}</span> completed today!
-             </p>
-          </CardContent>
-          <CardFooter>
-             <Button asChild size="lg" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg">
-              <Link href="/my-habits">
-                Track Habits <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-          </CardFooter>
-        </Card>
+        ))}
       </div>
 
       {goals.length === 0 && !goalsLoading && (
-        <Card className="mt-8 text-center py-12 bg-card shadow-md rounded-xl border border-border">
+        <Card className="mt-8 text-center py-12 bg-gradient-to-br from-card to-card/80 shadow-md rounded-xl border border-border">
           <CardHeader>
             <CardTitle className="text-2xl font-semibold text-primary">Ready to Start Achieving?</CardTitle>
           </CardHeader>

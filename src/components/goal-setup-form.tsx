@@ -43,7 +43,7 @@ export default function GoalSetupForm() {
 
   useEffect(() => {
     if (!authLoading && !user) {
-      redirect('/'); // Redirect to landing page if not authenticated
+      redirect('/'); 
     }
   }, [user, authLoading]);
 
@@ -71,11 +71,11 @@ export default function GoalSetupForm() {
     }
     setIsSavingGoal(true);
     
-    const goalDescription = form.getValues().goalDescription;
+    const goalDescriptionValue = form.getValues().goalDescription;
     const newGoal: Goal = {
       id: crypto.randomUUID(),
-      originalGoal: goalDescription,
-      title: goalDescription.substring(0, 70) + (goalDescription.length > 70 ? '...' : ''),
+      originalGoal: goalDescriptionValue,
+      title: goalDescriptionValue.substring(0, 70) + (goalDescriptionValue.length > 70 ? '...' : ''),
       category: generatedPlan.category,
       timeline: generatedPlan.timeline,
       overallDeadline: generatedPlan.overallDeadline, 
@@ -109,8 +109,8 @@ export default function GoalSetupForm() {
 
 
   return (
-    <Card className="w-full max-w-2xl mx-auto shadow-xl border-primary/20">
-      <CardHeader className="bg-primary/5 p-6 rounded-t-lg">
+    <Card className="w-full max-w-2xl mx-auto shadow-xl border-primary/20 rounded-xl">
+      <CardHeader className="bg-gradient-to-br from-primary/15 to-transparent p-6 rounded-t-xl">
         <div className="flex items-center gap-3">
           <Sparkles className="w-8 h-8 text-primary" />
           <div>
@@ -134,7 +134,7 @@ export default function GoalSetupForm() {
                       placeholder="e.g., 'Launch a new SaaS product by end of year' or 'Complete a full-stack web development bootcamp'"
                       {...field}
                       rows={5}
-                      className="text-base border-muted-foreground/50 focus:border-primary focus:ring-primary/50 transition-all duration-300"
+                      className="text-base border-muted-foreground/50 focus:border-primary focus:ring-primary/50 transition-all duration-300 rounded-lg"
                       disabled={isGeneratingPlan || !!generatedPlan || isSavingGoal}
                     />
                   </FormControl>
@@ -144,7 +144,7 @@ export default function GoalSetupForm() {
             />
 
             {apiError && (
-              <Alert variant="destructive" className="bg-destructive/10 border-destructive/30 text-destructive">
+              <Alert variant="destructive" className="bg-destructive/10 border-destructive/30 text-destructive rounded-lg">
                 <Info className="h-5 w-5" />
                 <AlertTitle>Oops! Something went wrong.</AlertTitle>
                 <AlertDescription>{apiError}</AlertDescription>
@@ -154,7 +154,7 @@ export default function GoalSetupForm() {
             {!generatedPlan && (
               <Button 
                 type="submit" 
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-3 text-base font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-[1.02] transition-all duration-300" 
+                className="w-full bg-gradient-to-r from-primary to-[hsl(var(--primary-gradient-end))] hover:from-primary/90 hover:to-[hsl(var(--primary-gradient-end)/0.9)] text-primary-foreground py-3 text-base font-semibold rounded-lg shadow-md hover:shadow-primary/30 transform hover:scale-[1.02] transition-all duration-300" 
                 disabled={isGeneratingPlan || isSavingGoal}
               >
                 {isGeneratingPlan ? <LoadingSpinner className="mr-2" /> : <Lightbulb className="mr-2 h-5 w-5" />}
@@ -231,7 +231,7 @@ export default function GoalSetupForm() {
         )}
       </CardContent>
       {generatedPlan && !isGeneratingPlan && (
-        <CardFooter className="flex flex-col sm:flex-row gap-3 p-6 bg-primary/5 rounded-b-lg border-t border-primary/10">
+        <CardFooter className="flex flex-col sm:flex-row gap-3 p-6 bg-gradient-to-t from-card to-black/20 rounded-b-xl border-t border-primary/10">
             <Button 
               variant="outline" 
               onClick={() => { setGeneratedPlan(null); form.reset(); setApiError(null); }} 
@@ -242,7 +242,7 @@ export default function GoalSetupForm() {
             </Button>
             <Button 
               onClick={handleSaveGoal} 
-              className="w-full sm:w-auto bg-accent hover:bg-accent/90 text-accent-foreground py-3 text-base font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-[1.02] transition-all duration-300" 
+              className="w-full sm:w-auto bg-gradient-to-r from-accent to-[hsl(var(--accent-gradient-end))] hover:from-accent/90 hover:to-[hsl(var(--accent-gradient-end)/0.9)] text-accent-foreground py-3 text-base font-semibold rounded-lg shadow-md hover:shadow-accent/30 transform hover:scale-[1.02] transition-all duration-300" 
               disabled={isSavingGoal}
             >
              {isSavingGoal ? <LoadingSpinner className="mr-2" /> :  <CheckCircle className="mr-2 h-5 w-5" />}
@@ -253,4 +253,3 @@ export default function GoalSetupForm() {
     </Card>
   );
 }
-

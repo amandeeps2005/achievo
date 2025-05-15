@@ -2,14 +2,12 @@
 "use client";
 
 import { useAuth } from '@/context/auth-context';
-import { useRouter } from 'next/navigation';
-// Removed useEffect as redirect is no longer needed from here
 import LoadingSpinner from '@/components/loading-spinner';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Target, Brain, Map, CalendarDays, BarChartBig, Wand2, ArrowRight, Zap } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-// import AppFooter from '@/components/app-footer'; // Import the new AppFooter - Removed
+
 
 const features = [
   {
@@ -51,11 +49,8 @@ const features = [
 
 export default function LandingPage() {
   const { user, loading: authLoading } = useAuth();
-  const router = useRouter();
 
-  // Removed useEffect that redirected to dashboard
-
-  if (authLoading) { // Show loading spinner if auth state is still loading
+  if (authLoading) { 
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-background">
         <LoadingSpinner size={64} />
@@ -67,23 +62,23 @@ export default function LandingPage() {
   return (
     <div className="bg-background text-foreground">
       {/* Hero Section */}
-      <section className="py-20 md:py-32 bg-gradient-to-br from-primary/10 via-background to-background">
+      <section className="py-20 md:py-32 bg-gradient-to-br from-black via-primary/10 to-black">
         <div className="container mx-auto px-6 text-center">
           <Target className="w-24 h-24 text-primary mx-auto mb-8 animate-bounce" />
-          <h1 className="text-5xl md:text-7xl font-bold mb-6">
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-foreground via-foreground/80 to-foreground">
             Achieve Your Dreams with <span className="text-accent">Achievo</span>
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-3xl mx-auto">
             The smart, AI-powered platform to break down, track, and conquer your goals. Turn ambition into reality.
           </p>
           {user ? (
-            <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground text-lg px-10 py-6 rounded-lg shadow-lg transform hover:scale-105 transition-transform">
+            <Button asChild size="lg" className="bg-gradient-to-r from-primary to-[hsl(var(--primary-gradient-end))] hover:from-primary/90 hover:to-[hsl(var(--primary-gradient-end)/0.9)] text-primary-foreground text-lg px-10 py-6 rounded-lg shadow-lg hover:shadow-primary/30 transform hover:scale-105 transition-all">
               <Link href="/dashboard">
                 Go to Dashboard <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
           ) : (
-            <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground text-lg px-10 py-6 rounded-lg shadow-lg transform hover:scale-105 transition-transform">
+            <Button asChild size="lg" className="bg-gradient-to-r from-accent to-[hsl(var(--accent-gradient-end))] hover:from-accent/90 hover:to-[hsl(var(--accent-gradient-end)/0.9)] text-accent-foreground text-lg px-10 py-6 rounded-lg shadow-lg hover:shadow-accent/30 transform hover:scale-105 transition-all">
               <Link href="/register">
                 Get Started Free <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
@@ -93,7 +88,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 md:py-28 bg-card">
+      <section id="features" className="py-20 md:py-28 bg-card/50">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-primary mb-4">Unlock Your Potential with Achievo</h2>
@@ -103,18 +98,21 @@ export default function LandingPage() {
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature) => (
-              <Card key={feature.title} className="bg-background shadow-lg hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1 flex flex-col">
-                <CardHeader className="items-center text-center">
-                  <div className="p-4 bg-primary/10 rounded-full mb-4 inline-block">
+              <Card 
+                key={feature.title} 
+                className="bg-card shadow-xl hover:shadow-[0_0_25px_hsl(var(--primary)/0.2),0_0_10px_hsl(var(--accent)/0.1)] border border-primary/20 hover:border-primary/40 transition-all duration-300 transform hover:-translate-y-1.5 flex flex-col rounded-xl overflow-hidden"
+              >
+                <CardHeader className="items-center text-center bg-gradient-to-br from-primary/10 to-transparent p-6">
+                  <div className="p-4 bg-primary/20 rounded-full mb-4 inline-block border-2 border-primary/30 shadow-inner">
                     <feature.icon className="w-10 h-10 text-primary" />
                   </div>
                   <CardTitle className="text-2xl font-semibold text-primary">{feature.title}</CardTitle>
                 </CardHeader>
-                <CardContent className="text-center text-muted-foreground flex-grow">
+                <CardContent className="text-center text-muted-foreground flex-grow p-6">
                   <p>{feature.description}</p>
                 </CardContent>
-                <CardFooter>
-                  <Button asChild size="sm" variant="outline" className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground">
+                <CardFooter className="p-6 bg-card/50 border-t border-primary/10">
+                  <Button asChild variant="outline" className="w-full border-primary text-primary hover:bg-gradient-to-r hover:from-primary/80 hover:to-primary/60 hover:text-primary-foreground transition-all duration-300 rounded-lg">
                     <Link href={feature.href}>
                       Learn More <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
@@ -131,35 +129,31 @@ export default function LandingPage() {
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-4xl md:text-5xl font-bold text-primary mb-16">Simple Steps to Success</h2>
           <div className="grid md:grid-cols-3 gap-10 max-w-5xl mx-auto">
-            <div className="flex flex-col items-center p-6 bg-card rounded-xl shadow-lg">
-              <div className="bg-accent text-accent-foreground rounded-full w-16 h-16 flex items-center justify-center text-3xl font-bold mb-6">1</div>
-              <h3 className="text-2xl font-semibold text-primary mb-3">Define Your Goal</h3>
-              <p className="text-muted-foreground">Tell Achievo what you want to achieve in your own words.</p>
-            </div>
-            <div className="flex flex-col items-center p-6 bg-card rounded-xl shadow-lg">
-              <div className="bg-accent text-accent-foreground rounded-full w-16 h-16 flex items-center justify-center text-3xl font-bold mb-6">2</div>
-              <h3 className="text-2xl font-semibold text-primary mb-3">Get Your Plan</h3>
-              <p className="text-muted-foreground">Our AI breaks it down into actionable steps, timeline, and resources.</p>
-            </div>
-            <div className="flex flex-col items-center p-6 bg-card rounded-xl shadow-lg">
-               <div className="bg-accent text-accent-foreground rounded-full w-16 h-16 flex items-center justify-center text-3xl font-bold mb-6">3</div>
-              <h3 className="text-2xl font-semibold text-primary mb-3">Track & Achieve</h3>
-              <p className="text-muted-foreground">Follow your roadmap, mark progress, and celebrate success!</p>
-            </div>
+            {[
+              { num: 1, title: "Define Your Goal", desc: "Tell Achievo what you want to achieve in your own words." },
+              { num: 2, title: "Get Your Plan", desc: "Our AI breaks it down into actionable steps, timeline, and resources." },
+              { num: 3, title: "Track & Achieve", desc: "Follow your roadmap, mark progress, and celebrate success!" }
+            ].map(step => (
+              <div key={step.num} className="flex flex-col items-center p-6 bg-gradient-to-br from-card to-card/80 rounded-xl shadow-xl border border-border hover:border-primary/30 transition-all transform hover:scale-105">
+                <div className="bg-gradient-to-r from-accent to-[hsl(var(--accent-gradient-end))] text-accent-foreground rounded-full w-16 h-16 flex items-center justify-center text-3xl font-bold mb-6 shadow-lg">{step.num}</div>
+                <h3 className="text-2xl font-semibold text-primary mb-3">{step.title}</h3>
+                <p className="text-muted-foreground">{step.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Call to Action Section */}
-      {!user && ( // Only show this CTA if user is not logged in
-        <section className="py-20 md:py-28 bg-primary text-primary-foreground">
+      {!user && ( 
+        <section className="py-20 md:py-28 bg-gradient-to-r from-primary to-teal-600 text-primary-foreground">
           <div className="container mx-auto px-6 text-center">
             <Zap className="w-16 h-16 mx-auto mb-6" />
             <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Start Achieving?</h2>
             <p className="text-xl md:text-2xl mb-10 max-w-2xl mx-auto opacity-90">
               Join thousands of users who are transforming their ambitions into accomplishments with Achievo.
             </p>
-            <Button asChild size="lg" className="bg-accent hover:bg-accent/80 text-accent-foreground text-lg px-10 py-6 rounded-lg shadow-lg transform hover:scale-105 transition-transform">
+            <Button asChild size="lg" className="bg-gradient-to-r from-accent to-[hsl(var(--accent-gradient-end))] hover:from-accent/90 hover:to-[hsl(var(--accent-gradient-end)/0.9)] text-accent-foreground text-lg px-10 py-6 rounded-lg shadow-xl hover:shadow-accent/40 transform hover:scale-105 transition-transform">
               <Link href="/register">
                 Sign Up Now - It's Free!
               </Link>
@@ -167,10 +161,6 @@ export default function LandingPage() {
           </div>
         </section>
       )}
-
-      {/* Footer - Replaced with AppFooter in RootLayout
-      <AppFooter /> 
-      */}
     </div>
   );
 }
