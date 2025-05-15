@@ -48,10 +48,12 @@ export function SidebarNavigation() {
 
 export function SidebarAccountMenu() {
   const pathname = usePathname();
-  const router = useRouter(); // Kept for future use if other actions need router
-  const { user } = useAuth(); // Kept to ensure menu only renders if user exists
+  const { user } = useAuth(); 
 
   if (!user) return null;
+
+  // Define isActive logic locally for this component
+  const isActive = (href: string) => pathname === href || (href !== "/" && pathname.startsWith(href));
 
   return (
     <SidebarMenu>
