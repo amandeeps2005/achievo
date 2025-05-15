@@ -98,8 +98,8 @@ const LoginPage: React.FC = () => {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="password">Password</Label>
-              <Link href="/reset-password" passHref legacyBehavior>
-                <a className="text-sm text-primary hover:underline">Forgot password?</a>
+              <Link href="/reset-password" className="text-sm text-primary hover:underline">
+                Forgot password?
               </Link>
             </div>
             <div className="relative">
@@ -158,8 +158,8 @@ const LoginPage: React.FC = () => {
       <CardFooter className="justify-center">
         <p className="text-sm text-muted-foreground">
           Don't have an account?{' '}
-          <Link href="/register" passHref legacyBehavior>
-            <a className="font-semibold text-primary hover:underline">Sign Up</a>
+          <Link href="/register" className="font-semibold text-primary hover:underline">
+            Sign Up
           </Link>
         </p>
       </CardFooter>

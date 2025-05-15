@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState } from "react";
@@ -110,8 +111,8 @@ const PasswordResetPage: React.FC = () => {
       <CardFooter className="justify-center">
         <p className="text-sm text-muted-foreground">
           Remember your password?{' '}
-          <Link href="/login" passHref legacyBehavior>
-             <a className="font-semibold text-primary hover:underline">Sign In</a>
+          <Link href="/login" className="font-semibold text-primary hover:underline">
+             Sign In
           </Link>
         </p>
       </CardFooter>
