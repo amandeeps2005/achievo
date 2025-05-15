@@ -1,20 +1,22 @@
 
 "use client";
 
-import { useEffect } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import GoalList from '@/components/goal-list';
 import { useGoals } from '@/context/goal-context';
 import LoadingSpinner from '@/components/loading-spinner';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth-context';
 import Link from 'next/link';
-import { PlusCircle, LayoutGrid, ArrowLeft } from 'lucide-react';
+import { PlusCircle, LayoutGrid, ArrowLeft, Search, X } from 'lucide-react';
 import { redirect } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 
 export default function MyGoalsPage() {
   const { goals, isLoading: goalsLoading } = useGoals();
   const { user, loading: authLoading } = useAuth();
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     if (typeof document !== 'undefined') {
@@ -24,6 +26,19 @@ export default function MyGoalsPage() {
       redirect('/');
     }
   }, [user, authLoading]);
+
+  const filteredGoals = useMemo(() => {
+    if (!searchTerm.trim()) {
+      return goals;
+    }
+    const lowercasedSearchTerm = searchTerm.toLowerCase();
+    return goals.filter(goal =>
+      (goal.title?.toLowerCase().includes(lowercasedSearchTerm)) ||
+      (goal.originalGoal.toLowerCase().includes(lowercasedSearchTerm)) ||
+      (goal.category.toLowerCase().includes(lowercasedSearchTerm)) ||
+      (goal.steps.some(step => step.description.toLowerCase().includes(lowercasedSearchTerm)))
+    );
+  }, [goals, searchTerm]);
 
   if (authLoading || (!user && !authLoading) ) {
      return (
@@ -55,26 +70,56 @@ export default function MyGoalsPage() {
         </div>
 
       <Card className="shadow-xl border-border rounded-xl overflow-hidden">
-        <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-6 bg-muted/20">
-            <div>
-                <CardTitle className="text-3xl font-bold text-primary flex items-center">
-                    <LayoutGrid className="mr-3 h-7 w-7" />
-                    My Goals
-                </CardTitle>
-                <CardDescription className="text-primary/80">
-                    View, manage, and track all your active and completed goals.
-                </CardDescription>
+        <CardHeader className="p-6 bg-muted/20 space-y-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <CardTitle className="text-3xl font-bold text-primary flex items-center">
+                        <LayoutGrid className="mr-3 h-7 w-7" />
+                        My Goals
+                    </CardTitle>
+                    <CardDescription className="text-primary/80">
+                        View, manage, and track all your active and completed goals.
+                    </CardDescription>
+                </div>
+                <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg shadow-md transform hover:scale-105 transition-transform w-full sm:w-auto">
+                    <Link href="/new-goal">
+                        <PlusCircle className="mr-2 h-5 w-5" />
+                        Add New Goal
+                    </Link>
+                </Button>
             </div>
-            <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg shadow-md transform hover:scale-105 transition-transform w-full sm:w-auto">
-                <Link href="/new-goal">
-                    <PlusCircle className="mr-2 h-5 w-5" />
-                    Add New Goal
-                </Link>
-            </Button>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search goals by title, category, description..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 w-full"
+              />
+              {searchTerm && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7"
+                  onClick={() => setSearchTerm('')}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
         </CardHeader>
         <CardContent className="p-6">
-          {goals.length > 0 ? (
-            <GoalList goals={goals} />
+          {filteredGoals.length > 0 ? (
+            <GoalList goals={filteredGoals} />
+          ) : goals.length > 0 && searchTerm ? (
+             <div className="text-center py-12">
+                 <Search className="w-16 h-16 mx-auto mb-6 text-primary opacity-30" />
+                <h2 className="text-2xl font-semibold text-foreground mb-2">No Goals Found</h2>
+                <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                  No goals match your search term "{searchTerm}". Try a different search or clear the filter.
+                </p>
+            </div>
           ) : (
             <div className="text-center py-12">
                  <LayoutGrid className="w-16 h-16 mx-auto mb-6 text-primary opacity-30" />
@@ -91,10 +136,10 @@ export default function MyGoalsPage() {
             </div>
           )}
         </CardContent>
-        {goals.length > 0 && (
+        {filteredGoals.length > 0 && (
             <CardFooter className="p-6 bg-muted/20 border-t border-border justify-center">
                 <p className="text-sm text-muted-foreground">
-                    Showing {goals.length} goal{goals.length === 1 ? '' : 's'}. Keep up the great work!
+                    Showing {filteredGoals.length} goal{filteredGoals.length === 1 ? '' : 's'}. Keep up the great work!
                 </p>
             </CardFooter>
         )}
