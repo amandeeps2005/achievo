@@ -13,32 +13,32 @@ import { useAuth } from '@/context/auth-context';
 
 export function SidebarNavigation() {
   const pathname = usePathname();
-  const isActive = (href: string) => pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
+  const isActive = (href: string) => pathname === href || (href !== "/dashboard" && href !== "/" && pathname.startsWith(href));
 
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <SidebarMenuButton asChild isActive={isActive('/dashboard')} tooltip="Dashboard">
+        <SidebarMenuButton asChild isActive={isActive('/dashboard')} tooltip="Dashboard" size="default">
           <Link href="/dashboard"><LayoutDashboard /> <span className="group-data-[collapsible=icon]:hidden">Dashboard</span></Link>
         </SidebarMenuButton>
       </SidebarMenuItem>
       <SidebarMenuItem>
-        <SidebarMenuButton asChild isActive={isActive('/my-goals')} tooltip="My Goals">
+        <SidebarMenuButton asChild isActive={isActive('/my-goals')} tooltip="My Goals" size="default">
           <Link href="/my-goals"><Target /> <span className="group-data-[collapsible=icon]:hidden">My Goals</span></Link>
         </SidebarMenuButton>
       </SidebarMenuItem>
       <SidebarMenuItem>
-        <SidebarMenuButton asChild isActive={isActive('/my-habits')} tooltip="My Habits">
+        <SidebarMenuButton asChild isActive={isActive('/my-habits')} tooltip="My Habits" size="default">
           <Link href="/my-habits"><CheckSquare /> <span className="group-data-[collapsible=icon]:hidden">My Habits</span></Link>
         </SidebarMenuButton>
       </SidebarMenuItem>
       <SidebarMenuItem>
-        <SidebarMenuButton asChild isActive={isActive('/my-journal')} tooltip="My Journal">
+        <SidebarMenuButton asChild isActive={isActive('/my-journal')} tooltip="My Journal" size="default">
           <Link href="/my-journal"><NotebookPen /> <span className="group-data-[collapsible=icon]:hidden">My Journal</span></Link>
         </SidebarMenuButton>
       </SidebarMenuItem>
       <SidebarMenuItem>
-        <SidebarMenuButton asChild isActive={isActive('/smart-suggestions')} tooltip="Smart Suggestions">
+        <SidebarMenuButton asChild isActive={isActive('/smart-suggestions')} tooltip="Smart Suggestions" size="default">
           <Link href="/smart-suggestions"><Brain /> <span className="group-data-[collapsible=icon]:hidden">Suggestions</span></Link>
         </SidebarMenuButton>
       </SidebarMenuItem>
@@ -62,17 +62,17 @@ export function SidebarAccountMenu() {
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <SidebarMenuButton asChild isActive={isActive('/profile')} tooltip="Profile">
+        <SidebarMenuButton asChild isActive={isActive('/profile')} tooltip="Profile" size="default">
           <Link href="/profile"><User /> <span className="group-data-[collapsible=icon]:hidden">Profile</span></Link>
         </SidebarMenuButton>
       </SidebarMenuItem>
       <SidebarMenuItem>
-        <SidebarMenuButton asChild isActive={isActive('/feedback')} tooltip="Feedback">
+        <SidebarMenuButton asChild isActive={isActive('/feedback')} tooltip="Feedback" size="default">
           <Link href="/feedback"><MessageSquareHeart /> <span className="group-data-[collapsible=icon]:hidden">Feedback</span></Link>
         </SidebarMenuButton>
       </SidebarMenuItem>
       <SidebarMenuItem>
-        <SidebarMenuButton onClick={handleLogout} tooltip="Logout">
+        <SidebarMenuButton onClick={handleLogout} tooltip="Logout" size="default">
           <LogOut /> <span className="group-data-[collapsible=icon]:hidden">Logout</span>
         </SidebarMenuButton>
       </SidebarMenuItem>
