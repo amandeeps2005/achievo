@@ -48,35 +48,19 @@ export function SidebarNavigation() {
 
 export function SidebarAccountMenu() {
   const pathname = usePathname();
-  const router = useRouter();
-  const { logout, user } = useAuth();
-  const isActive = (href: string) => pathname === href;
+  const router = useRouter(); // Kept for future use if other actions need router
+  const { user } = useAuth(); // Kept to ensure menu only renders if user exists
 
-  const handleLogout = async () => {
-    await logout();
-    router.push('/login'); // Redirect to login after logout
-  };
-
-  if (!user) return null; // Don't show account menu if not logged in
+  if (!user) return null;
 
   return (
     <SidebarMenu>
-      <SidebarMenuItem>
-        <SidebarMenuButton asChild isActive={isActive('/profile')} tooltip="Profile" size="default">
-          <Link href="/profile"><User /> <span className="group-data-[collapsible=icon]:hidden">Profile</span></Link>
-        </SidebarMenuButton>
-      </SidebarMenuItem>
       <SidebarMenuItem>
         <SidebarMenuButton asChild isActive={isActive('/feedback')} tooltip="Feedback" size="default">
           <Link href="/feedback"><MessageSquareHeart /> <span className="group-data-[collapsible=icon]:hidden">Feedback</span></Link>
         </SidebarMenuButton>
       </SidebarMenuItem>
-      <SidebarMenuItem>
-        <SidebarMenuButton onClick={handleLogout} tooltip="Logout" size="default">
-          <LogOut /> <span className="group-data-[collapsible=icon]:hidden">Logout</span>
-        </SidebarMenuButton>
-      </SidebarMenuItem>
+      {/* "Profile" and "Log out" items removed from here */}
     </SidebarMenu>
   );
 }
-
