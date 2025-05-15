@@ -3,9 +3,9 @@
 
 import type { Goal } from '@/types';
 import { Pie, PieChart, ResponsiveContainer, Cell, Tooltip } from 'recharts';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartConfig, ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
 import { BarChartBig } from 'lucide-react';
+import Link from 'next/link'; // Added Link import
 
 interface GoalProgressChartProps {
   goals: Goal[];
@@ -41,10 +41,10 @@ function IndividualGoalPieChart({ goal }: IndividualGoalPieChartProps) {
   const goalTitle = (goal.title || goal.originalGoal).substring(0, 35) + ((goal.title || goal.originalGoal).length > 35 ? '...' : '');
 
   return (
-    <div className="flex flex-col items-center">
+    <Link href={`/goal/${goal.id}`} passHref className="flex flex-col items-center group cursor-pointer">
       <ChartContainer
         config={chartConfig}
-        className="mx-auto aspect-[2/1] h-24 w-40 sm:h-28 sm:w-48" // Adjusted aspect ratio for half donut
+        className="mx-auto aspect-[2/1] h-24 w-40 sm:h-28 sm:w-48 group-hover:opacity-80 transition-opacity" // Added group-hover effect
       >
         <ResponsiveContainer width="100%" height="100%">
           <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }} accessibilityLayer>
@@ -65,8 +65,8 @@ function IndividualGoalPieChart({ goal }: IndividualGoalPieChartProps) {
               cy="100%" // Position the center at the bottom for top half donut
               startAngle={180}
               endAngle={0}
-              outerRadius={Math.min(window.innerWidth < 640 ? 70 : 80, 80)} 
-              innerRadius={Math.min(window.innerWidth < 640 ? 45 : 55, 55)} 
+              outerRadius={typeof window !== 'undefined' && window.innerWidth < 640 ? 70 : 80} 
+              innerRadius={typeof window !== 'undefined' && window.innerWidth < 640 ? 45 : 55} 
               strokeWidth={2}
               stroke="hsl(var(--background))"
               style={{ filter: 'url(#shadow)' }}
@@ -87,10 +87,10 @@ function IndividualGoalPieChart({ goal }: IndividualGoalPieChartProps) {
           </PieChart>
         </ResponsiveContainer>
       </ChartContainer>
-      <p className="text-center text-xs sm:text-sm font-medium text-muted-foreground mt-1 h-8 sm:h-10 overflow-hidden" title={goal.title || goal.originalGoal}>
+      <p className="text-center text-xs sm:text-sm font-medium text-muted-foreground group-hover:text-primary transition-colors mt-1 h-8 sm:h-10 overflow-hidden" title={goal.title || goal.originalGoal}>
         {goalTitle}
       </p>
-    </div>
+    </Link>
   );
 }
 
