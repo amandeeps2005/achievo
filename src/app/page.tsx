@@ -135,7 +135,7 @@ export default function LandingPage() {
               { num: 3, title: "Track & Achieve", desc: "Follow your roadmap, mark progress, and celebrate success!" }
             ].map(step => (
               <div key={step.num} className="flex flex-col items-center p-6 bg-gradient-to-br from-card to-card/80 rounded-xl shadow-xl border border-border hover:border-primary/30 transition-all transform hover:scale-105">
-                <div className="bg-gradient-to-r from-[hsl(var(--accent-gradient-start))] to-[hsl(var(--accent-gradient-end))] text-accent-foreground rounded-full w-16 h-16 flex items-center justify-center text-3xl font-bold mb-6 shadow-lg">{step.num}</div>
+                <div className="bg-gradient-to-r from-[hsl(var(--accent-gradient-start))] to-[hsl(var(--accent-gradient-end))] text-white rounded-full w-16 h-16 flex items-center justify-center text-3xl font-bold mb-6 shadow-lg">{step.num}</div>
                 <h3 className="text-2xl font-semibold text-primary mb-3">{step.title}</h3>
                 <p className="text-muted-foreground">{step.desc}</p>
               </div>
