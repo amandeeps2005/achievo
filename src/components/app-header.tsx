@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { LogIn, UserPlus, LogOut, User, Target } from 'lucide-react'; // Removed Moon, Sun
+import { LogIn, UserPlus, LogOut, User, Target, Moon, Sun } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/auth-context';
 import LoadingSpinner from './loading-spinner';
@@ -18,14 +18,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SidebarTrigger } from '@/components/ui/sidebar';
-// Removed useTheme
+import { useTheme } from 'next-themes';
 
 export default function AppHeader() {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout, loading: authLoading } = useAuth();
   const [mounted, setMounted] = useState(false);
-  // Removed theme state and setTheme
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     setMounted(true);
@@ -52,7 +52,9 @@ export default function AppHeader() {
     return <User className="h-5 w-5 text-muted-foreground" />;
   };
 
-  // Removed toggleTheme function
+  const toggleTheme = () => {
+    setTheme(theme === 'light' ? 'dark' : 'light');
+  };
 
   return (
     <header className="bg-card border-b border-border shadow-sm sticky top-0 z-50">
@@ -128,7 +130,11 @@ export default function AppHeader() {
               )}
             </>
           ) : null }
-           {/* Removed theme toggle button */}
+           {mounted && (
+            <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme" className="h-9 w-9 sm:h-10 sm:w-10">
+              {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+            </Button>
+           )}
         </nav>
       </div>
     </header>

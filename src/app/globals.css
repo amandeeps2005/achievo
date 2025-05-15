@@ -9,7 +9,60 @@ body {
 
 @layer base {
   :root {
-    /* Dark Theme Only - Black Background */
+    /* Light Theme Variables (New) */
+    --background: 208 60% 97%; /* Very light, soft blue tint */
+    --foreground: 220 13% 13%; /* Dark gray for text */
+
+    --card: 0 0% 100%; /* White */
+    --card-foreground: 220 13% 13%;
+
+    --popover: 0 0% 100%; /* White */
+    --popover-foreground: 220 13% 13%;
+
+    --primary: 180 100% 25%; /* Calm Teal */
+    --primary-foreground: 180 100% 95%; /* Very light teal for contrast on primary */
+    --primary-gradient-start: hsl(180 100% 25%);
+    --primary-gradient-end: hsl(180 100% 15%);
+
+    --secondary: 145 55% 35%; /* Seafoam Green */
+    --secondary-foreground: 145 30% 90%; /* Light Seafoam Green text */
+
+    --muted: 210 15% 92%; /* Lighter gray for muted elements in light mode */
+    --muted-foreground: 210 10% 45%; /* Medium gray for muted text */
+
+    --accent: 28 100% 50%; /* Orange */
+    --accent-foreground: 28 100% 10%; /* Very dark Orange for contrast */
+    --accent-gradient-start: hsl(28 100% 50%);
+    --accent-gradient-end: hsl(28 100% 40%);
+
+    --destructive: 0 84% 60%; /* Brighter red for light mode */
+    --destructive-foreground: 0 0% 100%; /* White */
+
+    --border: 210 10% 85%; /* Light gray border */
+    --input: 210 10% 90%; /* Slightly darker gray for inputs */
+    --ring: 180 100% 30%; /* Primary color (Teal) for rings */
+
+    --chart-1: 180 100% 30%;
+    --chart-2: 28 100% 50%;
+    --chart-3: 145 50% 50%;
+    --chart-4: 220 50% 60%;
+    --chart-5: 50 70% 55%;
+
+    --radius: 0.75rem;
+
+    /* Sidebar Light Theme Variables */
+    --sidebar-background: hsl(0 0% 97%); /* Off-white */
+    --sidebar-foreground: hsl(220 13% 13%);
+    --sidebar-primary: hsl(var(--primary));
+    --sidebar-primary-foreground: hsl(var(--primary-foreground));
+    --sidebar-accent: hsl(var(--accent));
+    --sidebar-accent-foreground: hsl(var(--accent-foreground));
+    --sidebar-border: hsl(210 10% 88%);
+    --sidebar-ring: hsl(var(--primary));
+  }
+
+  .dark {
+    /* Dark Theme Variables (Moved here) */
     --background: 0 0% 0%; /* Black */
     --foreground: 210 20% 90%; /* Light cool gray (off-white) */
 
@@ -50,8 +103,6 @@ body {
     --chart-4: 220 50% 60%;
     --chart-5: 50 70% 55%;
 
-    --radius: 0.75rem;
-
     /* Sidebar Dark Theme Variables */
     --sidebar-background: hsl(0 0% 7%);
     --sidebar-foreground: hsl(210 20% 90%);
@@ -62,8 +113,6 @@ body {
     --sidebar-border: hsl(0 0% 15%);
     --sidebar-ring: hsl(var(--primary));
   }
-
-  /* Removed .dark selector as dark theme is the base */
 }
 
 @layer base {
