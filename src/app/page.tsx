@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Target, Brain, Map, CalendarDays, BarChartBig, Wand2, ArrowRight, Zap } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import AppFooter from '@/components/app-footer';
 
 
 const features = [
@@ -73,13 +72,13 @@ export default function LandingPage() {
             The smart, AI-powered platform to break down, track, and conquer your goals. Turn ambition into reality.
           </p>
           {user ? (
-            <Button asChild size="lg" className="bg-gradient-to-r from-[hsl(var(--primary-gradient-start))] to-[hsl(var(--primary-gradient-end))] hover:from-[hsl(var(--primary-gradient-start)/0.9)] hover:to-[hsl(var(--primary-gradient-end)/0.9)] text-primary-foreground text-lg px-10 py-6 rounded-lg shadow-lg hover:shadow-primary/30 transform hover:scale-105 transition-all">
+            <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground text-lg px-10 py-6 rounded-lg shadow-lg hover:shadow-primary/30 transform hover:scale-105 transition-all">
               <Link href="/dashboard">
                 Go to Dashboard <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
           ) : (
-            <Button asChild size="lg" className="bg-gradient-to-r from-[hsl(var(--accent-gradient-start))] to-[hsl(var(--accent-gradient-end))] hover:from-[hsl(var(--accent-gradient-start)/0.9)] hover:to-[hsl(var(--accent-gradient-end)/0.9)] text-accent-foreground text-lg px-10 py-6 rounded-lg shadow-lg hover:shadow-accent/30 transform hover:scale-105 transition-all">
+            <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground text-lg px-10 py-6 rounded-lg shadow-lg hover:shadow-accent/30 transform hover:scale-105 transition-all">
               <Link href="/register">
                 Get Started Free <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
@@ -154,7 +153,7 @@ export default function LandingPage() {
             <p className="text-xl md:text-2xl mb-10 max-w-2xl mx-auto opacity-90">
               Join thousands of users who are transforming their ambitions into accomplishments with Achievo.
             </p>
-            <Button asChild size="lg" className="bg-gradient-to-r from-[hsl(var(--accent-gradient-start))] to-[hsl(var(--accent-gradient-end))] hover:from-[hsl(var(--accent-gradient-start)/0.9)] hover:to-[hsl(var(--accent-gradient-end)/0.9)] text-accent-foreground text-lg px-10 py-6 rounded-lg shadow-xl hover:shadow-accent/40 transform hover:scale-105 transition-transform">
+            <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground text-lg px-10 py-6 rounded-lg shadow-xl hover:shadow-accent/40 transform hover:scale-105 transition-transform">
               <Link href="/register">
                 Sign Up Now - It's Free!
               </Link>
@@ -165,3 +164,4 @@ export default function LandingPage() {
     </div>
   );
 }
+
