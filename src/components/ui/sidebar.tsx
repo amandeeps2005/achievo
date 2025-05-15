@@ -405,7 +405,7 @@ const SidebarContent = React.forwardRef<
       ref={ref}
       data-sidebar="content"
       className={cn(
-        "flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden custom-scrollbar",
+        "flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden custom-scrollbar p-2",
         className
       )}
       {...props}
@@ -513,7 +513,7 @@ const SidebarMenuItem = React.forwardRef<
 SidebarMenuItem.displayName = "SidebarMenuItem"
 
 const sidebarMenuButtonVariants = cva(
-  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-none ring-sidebar-ring transition-all duration-200 ease-in-out hover:bg-gradient-to-r hover:from-[hsl(var(--accent-gradient-start))] hover:to-[hsl(var(--accent-gradient-end))] hover:text-sidebar-accent-foreground hover:translate-x-1.5 hover:shadow-[0_0_12px_hsl(var(--accent)/0.35)] focus-visible:ring-2 active:bg-gradient-to-r active:from-[hsl(var(--accent-gradient-start))] active:to-[hsl(var(--accent-gradient-end))] active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-gradient-to-r data-[active=true]:from-[hsl(var(--accent-gradient-start))] data-[active=true]:to-[hsl(var(--accent-gradient-end))] data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-gradient-to-r data-[state=open]:hover:from-[hsl(var(--accent-gradient-start))] data-[state=open]:hover:to-[hsl(var(--accent-gradient-end))] data-[state=open]:hover:text-sidebar-accent-foreground data-[state=open]:hover:translate-x-1.5 data-[state=open]:hover:shadow-[0_0_12px_hsl(var(--accent)/0.35)] group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
+  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-all duration-200 ease-in-out focus-visible:ring-2 active:bg-gradient-to-r active:from-[hsl(var(--accent-gradient-start))] active:to-[hsl(var(--accent-gradient-end))] active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-gradient-to-r data-[active=true]:from-[hsl(var(--accent-gradient-start))] data-[active=true]:to-[hsl(var(--accent-gradient-end))] data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-gradient-to-r data-[state=open]:hover:from-[hsl(var(--accent-gradient-start))] data-[state=open]:hover:to-[hsl(var(--accent-gradient-end))] data-[state=open]:hover:text-sidebar-accent-foreground data-[state=open]:hover:translate-x-1.5 data-[state=open]:hover:shadow-[0_0_12px_hsl(var(--accent)/0.35)] group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-gradient-to-r hover:from-[hsl(var(--accent-gradient-start))] hover:to-[hsl(var(--accent-gradient-end))] hover:text-sidebar-accent-foreground hover:translate-x-1.5 hover:shadow-[0_0_12px_hsl(var(--accent)/0.35)]",
   {
     variants: {
       variant: {
@@ -762,5 +762,7 @@ export {
   SidebarTrigger,
   useSidebar,
 }
+
+    
 
     
