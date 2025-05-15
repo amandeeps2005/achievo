@@ -4,7 +4,6 @@
 import { useEffect, useState } from 'react';
 import { useGoals } from '@/context/goal-context';
 import LoadingSpinner from '@/components/loading-spinner';
-import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth-context';
 import Link from 'next/link';
 import { PlusCircle, BarChartBig, Lightbulb, Brain, LayoutGrid, ArrowRight, NotebookPen, CheckSquare, UserCircle } from 'lucide-react';
@@ -83,6 +82,13 @@ export default function DashboardPage() {
       return log?.completed;
   }).length;
 
+  const dashboardFeatures = [
+    { title: "My Goals", href: "/my-goals", icon: LayoutGrid, description: "View, manage, and track all your active and completed goals.", stats: `You currently have ${goals.length} active goal(s).` },
+    { title: "Smart Goal Tips", href: "/smart-suggestions", icon: Brain, description: "Get AI-powered ideas to boost your progress on existing or new goals.", stats: "Receive tailored advice to help you strategize." },
+    { title: "My Journal", href: "/my-journal", icon: NotebookPen, description: "Record your thoughts, ideas, and reflections.", stats: "Organize entries and link them to goals if needed." },
+    { title: "Habit Tracking", href: "/my-habits", icon: CheckSquare, description: "Build and maintain your daily habits for consistent growth.", stats: `Tracking ${activeHabitsCount} active habit(s). ${habitsCompletedToday} completed today!` }
+  ];
+
   return (
     <div className="space-y-8 py-4">
       <div className="p-6 rounded-xl bg-gradient-to-br from-primary/10 via-card to-card shadow-xl border border-primary/20">
@@ -115,7 +121,7 @@ export default function DashboardPage() {
             </ShadcnCardDescription>
         </CardHeader>
         <CardContent className="p-6 bg-card/80">
-          {goalsLoading && !localStorage.getItem('achievoGoals') ? (
+          {goalsLoading && typeof window !== 'undefined' && !localStorage.getItem('achievoGoals') ? (
               <div className="flex flex-col items-center justify-center min-h-[250px]">
                 <LoadingSpinner size={48} />
                 <p className="mt-4 text-muted-foreground">Loading progress data...</p>
@@ -127,33 +133,26 @@ export default function DashboardPage() {
       </Card>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4 sm:p-0">
-        {[
-          { title: "My Goals", href: "/my-goals", icon: LayoutGrid, description: "View, manage, and track all your active and completed goals.", stats: `You currently have ${goals.length} active goal(s).`, buttonText: "Go to My Goals" },
-          { title: "Smart Goal Tips", href: "/smart-suggestions", icon: Brain, description: "Get AI-powered ideas to boost your progress on existing or new goals.", stats: "Receive tailored advice to help you strategize.", buttonText: "Get Tips" },
-          { title: "My Journal", href: "/my-journal", icon: NotebookPen, description: "Record your thoughts, ideas, and reflections.", stats: "Organize entries and link them to goals if needed.", buttonText: "Open Journal" },
-          { title: "Habit Tracking", href: "/my-habits", icon: CheckSquare, description: "Build and maintain your daily habits for consistent growth.", stats: `Tracking ${activeHabitsCount} active habit(s). ${habitsCompletedToday} completed today!`, buttonText: "Track Habits" }
-        ].map(item => (
-          <Card key={item.title} className="flex flex-col rounded-xl shadow-xl hover:shadow-[0_0_25px_hsl(var(--primary)/0.2),0_0_10px_hsl(var(--accent)/0.1)] border border-primary/20 hover:border-primary/40 transition-all duration-300 transform hover:-translate-y-1.5 overflow-hidden">
-            <CardHeader className="bg-gradient-to-br from-primary/15 to-transparent">
-              <div className="flex items-center gap-3 mb-2">
-                <item.icon className="w-8 h-8 text-primary" />
-                <CardTitle className="text-2xl text-primary">{item.title}</CardTitle>
-              </div>
-              <ShadcnCardDescription className="text-muted-foreground h-10 line-clamp-2">{item.description}</ShadcnCardDescription>
-            </CardHeader>
-            <CardContent className="flex-grow">
-              <p className="text-sm text-muted-foreground h-12 line-clamp-2">
-                {item.stats}
-              </p>
-            </CardContent>
-            <CardFooter className="border-t border-primary/10">
-              <Button asChild size="lg" className="w-full bg-gradient-to-r from-primary to-[hsl(var(--primary-gradient-end))] hover:from-primary/90 hover:to-[hsl(var(--primary-gradient-end)/0.9)] text-primary-foreground rounded-lg hover:shadow-md transition-all">
-                <Link href={item.href}>
-                  {item.buttonText} <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-            </CardFooter>
-          </Card>
+        {dashboardFeatures.map(item => (
+          <Link key={item.title} href={item.href} passHref legacyBehavior>
+            <a className="block rounded-xl shadow-xl hover:shadow-[0_0_25px_hsl(var(--primary)/0.2),0_0_10px_hsl(var(--accent)/0.1)] border border-primary/20 hover:border-primary/40 transition-all duration-300 transform hover:-translate-y-1.5 overflow-hidden">
+              <Card className="flex flex-col h-full border-none shadow-none bg-transparent"> {/* Remove Card's own border/shadow if Link provides it */}
+                <CardHeader className="bg-gradient-to-br from-primary/15 to-transparent">
+                  <div className="flex items-center gap-3 mb-2">
+                    <item.icon className="w-8 h-8 text-primary" />
+                    <CardTitle className="text-2xl text-primary">{item.title}</CardTitle>
+                  </div>
+                  <ShadcnCardDescription className="text-muted-foreground h-10 line-clamp-2">{item.description}</ShadcnCardDescription>
+                </CardHeader>
+                <CardContent className="flex-grow">
+                  <p className="text-sm text-muted-foreground h-12 line-clamp-2">
+                    {item.stats}
+                  </p>
+                </CardContent>
+                {/* CardFooter with Button is removed */}
+              </Card>
+            </a>
+          </Link>
         ))}
       </div>
 
@@ -173,3 +172,4 @@ export default function DashboardPage() {
     </div>
   );
 }
+
