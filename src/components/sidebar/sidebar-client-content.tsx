@@ -37,12 +37,13 @@ export function SidebarNavigation() {
           <Link href="/my-journal"><NotebookPen /> <span className="group-data-[collapsible=icon]:hidden">My Journal</span></Link>
         </SidebarMenuButton>
       </SidebarMenuItem>
+      {/* Removed Progress Overview link as it's now part of the dashboard
       <SidebarMenuItem>
-        {/* Link to dashboard as Progress Overview is now part of it */}
         <SidebarMenuButton asChild isActive={pathname === '/dashboard' && pathname.includes('progress')} tooltip="Progress Overview">
           <Link href="/dashboard"><BarChartBig /> <span className="group-data-[collapsible=icon]:hidden">Progress</span></Link>
         </SidebarMenuButton>
       </SidebarMenuItem>
+      */}
       <SidebarMenuItem>
         <SidebarMenuButton asChild isActive={isActive('/smart-suggestions')} tooltip="Smart Suggestions">
           <Link href="/smart-suggestions"><Brain /> <span className="group-data-[collapsible=icon]:hidden">Suggestions</span></Link>
@@ -80,3 +81,4 @@ export function SidebarAccountMenu() {
     </SidebarMenu>
   );
 }
+
