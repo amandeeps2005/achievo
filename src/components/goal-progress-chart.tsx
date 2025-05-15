@@ -44,13 +44,13 @@ function IndividualGoalPieChart({ goal }: IndividualGoalPieChartProps) {
     <div className="flex flex-col items-center">
       <ChartContainer
         config={chartConfig}
-        className="mx-auto aspect-square h-40 w-40 sm:h-48 sm:w-48"
+        className="mx-auto aspect-[2/1] h-24 w-40 sm:h-28 sm:w-48" // Adjusted aspect ratio for half donut
       >
         <ResponsiveContainer width="100%" height="100%">
           <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }} accessibilityLayer>
             <defs>
               <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-                <feDropShadow dx="0" dy="2" stdDeviation="2" floodColor="hsl(var(--foreground))" floodOpacity="0.1"/>
+                <feDropShadow dx="0" dy="1" stdDeviation="1.5" floodColor="hsl(var(--foreground))" floodOpacity="0.1"/>
               </filter>
             </defs>
             <Tooltip
@@ -62,7 +62,9 @@ function IndividualGoalPieChart({ goal }: IndividualGoalPieChartProps) {
               dataKey="value"
               nameKey="name"
               cx="50%"
-              cy="50%"
+              cy="100%" // Position the center at the bottom for top half donut
+              startAngle={180}
+              endAngle={0}
               outerRadius={Math.min(window.innerWidth < 640 ? 70 : 80, 80)} 
               innerRadius={Math.min(window.innerWidth < 640 ? 45 : 55, 55)} 
               strokeWidth={2}
@@ -75,17 +77,17 @@ function IndividualGoalPieChart({ goal }: IndividualGoalPieChartProps) {
             </Pie>
             <text
               x="50%"
-              y="50%"
+              y="85%" // Adjust text position for half donut
               textAnchor="middle"
               dominantBaseline="middle"
-              className="fill-foreground text-2xl sm:text-3xl font-bold"
+              className="fill-foreground text-xl sm:text-2xl font-bold"
             >
               {`${goal.progress}%`}
             </text>
           </PieChart>
         </ResponsiveContainer>
       </ChartContainer>
-      <p className="text-center text-xs sm:text-sm font-medium text-muted-foreground mt-2 h-8 sm:h-10 overflow-hidden" title={goal.title || goal.originalGoal}>
+      <p className="text-center text-xs sm:text-sm font-medium text-muted-foreground mt-1 h-8 sm:h-10 overflow-hidden" title={goal.title || goal.originalGoal}>
         {goalTitle}
       </p>
     </div>
@@ -94,12 +96,8 @@ function IndividualGoalPieChart({ goal }: IndividualGoalPieChartProps) {
 
 
 export default function GoalProgressChart({ goals }: GoalProgressChartProps) {
-  // Display all goals, not just a slice
   return (
-    // Card wrapper is removed from here as the page will provide its own Card structure.
-    // Adding border-none to avoid double borders if parent Card still exists.
     <div className="w-full"> 
-      {/* CardHeader is removed as the parent page will have its own title and description for the overview */}
       <div className="pt-2 pb-4">
         {goals.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-2 gap-y-4 sm:gap-x-4 sm:gap-y-6 items-start justify-center">
@@ -134,3 +132,4 @@ export default function GoalProgressChart({ goals }: GoalProgressChartProps) {
     </div>
   );
 }
+
