@@ -134,24 +134,26 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4 sm:p-0">
         {dashboardFeatures.map(item => (
-          <Link key={item.title} href={item.href} passHref legacyBehavior>
-            <a className="block rounded-xl shadow-xl hover:shadow-[0_0_25px_hsl(var(--primary)/0.2),0_0_10px_hsl(var(--accent)/0.1)] border border-primary/20 hover:border-primary/40 transition-all duration-300 transform hover:-translate-y-1.5 overflow-hidden">
-              <Card className="flex flex-col h-full border-none shadow-none bg-transparent"> {/* Remove Card's own border/shadow if Link provides it */}
-                <CardHeader className="bg-gradient-to-br from-primary/15 to-transparent">
-                  <div className="flex items-center gap-3 mb-2">
-                    <item.icon className="w-8 h-8 text-primary" />
-                    <CardTitle className="text-2xl text-primary">{item.title}</CardTitle>
-                  </div>
-                  <ShadcnCardDescription className="text-muted-foreground h-10 line-clamp-2">{item.description}</ShadcnCardDescription>
-                </CardHeader>
-                <CardContent className="flex-grow">
-                  <p className="text-sm text-muted-foreground h-12 line-clamp-2">
-                    {item.stats}
-                  </p>
-                </CardContent>
-                {/* CardFooter with Button is removed */}
-              </Card>
-            </a>
+          <Link
+            key={item.title}
+            href={item.href}
+            className="block rounded-xl shadow-xl hover:shadow-[0_0_25px_hsl(var(--primary)/0.2),0_0_10px_hsl(var(--accent)/0.1)] border border-primary/20 hover:border-primary/40 transition-all duration-300 transform hover:-translate-y-1.5 overflow-hidden"
+          >
+            <Card className="flex flex-col h-full border-none shadow-none bg-transparent"> {/* Remove Card's own border/shadow if Link provides it */}
+              <CardHeader className="bg-gradient-to-br from-primary/15 to-transparent">
+                <div className="flex items-center gap-3 mb-2">
+                  <item.icon className="w-8 h-8 text-primary" />
+                  <CardTitle className="text-2xl text-primary">{item.title}</CardTitle>
+                </div>
+                <ShadcnCardDescription className="text-muted-foreground h-10 line-clamp-2">{item.description}</ShadcnCardDescription>
+              </CardHeader>
+              <CardContent className="flex-grow">
+                <p className="text-sm text-muted-foreground h-12 line-clamp-2">
+                  {item.stats}
+                </p>
+              </CardContent>
+              {/* CardFooter with Button is removed */}
+            </Card>
           </Link>
         ))}
       </div>
