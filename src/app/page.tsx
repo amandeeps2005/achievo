@@ -27,14 +27,14 @@ const features = [
   {
     icon: CalendarDays,
     title: "Daily Planner + Habit Sync",
-    description: "Integrate your roadmap into a daily planner. Get reminders and track streaks to build habits.",
+    description: "Build powerful habits with daily tracking and visualize your consistency. Set reminders for crucial goal steps to stay on track.",
     dataAiHint: "calendar schedule",
     href: "/features/daily-planner-sync"
   },
   {
     icon: BarChartBig,
     title: "Progress Dashboard",
-    description: "Monitor your success with an intuitive dashboard. View progress charts and get motivation boosters.",
+    description: "Monitor your success with an intuitive dashboard. View insightful charts of your progress across all goals.",
     dataAiHint: "charts analytics",
     href: "/features/progress-dashboard"
   },
@@ -164,3 +164,4 @@ export default function LandingPage() {
     </div>
   );
 }
+
