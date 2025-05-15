@@ -38,13 +38,13 @@ export function SidebarNavigation() {
         </SidebarMenuButton>
       </SidebarMenuItem>
       <SidebarMenuItem>
-        <SidebarMenuButton asChild isActive={isActive('/smart-suggestions')} tooltip="Smart Suggestions">
-          <Link href="/smart-suggestions"><Brain /> <span className="group-data-[collapsible=icon]:hidden">Suggestions</span></Link>
+        <SidebarMenuButton asChild isActive={isActive('/feedback')} tooltip="Feedback">
+          <Link href="/feedback"><MessageSquareHeart /> <span className="group-data-[collapsible=icon]:hidden">Feedback</span></Link>
         </SidebarMenuButton>
       </SidebarMenuItem>
       <SidebarMenuItem>
-        <SidebarMenuButton asChild isActive={isActive('/feedback')} tooltip="Feedback">
-          <Link href="/feedback"><MessageSquareHeart /> <span className="group-data-[collapsible=icon]:hidden">Feedback</span></Link>
+        <SidebarMenuButton asChild isActive={isActive('/smart-suggestions')} tooltip="Smart Suggestions">
+          <Link href="/smart-suggestions"><Brain /> <span className="group-data-[collapsible=icon]:hidden">Suggestions</span></Link>
         </SidebarMenuButton>
       </SidebarMenuItem>
     </SidebarMenu>
