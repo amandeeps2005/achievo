@@ -79,41 +79,44 @@ interface CustomDayComponentProps extends DayProps {
   heatmapData: Record<string, { completedCount: number; totalTrackedHabits: number }>;
 }
 
-const CustomDayComponent: React.FC<CustomDayComponentProps> = ({ date, displayMonth, heatmapData }) => {
+// Standalone component for custom day rendering
+const CustomDayComponent: React.FC<CustomDayComponentProps> = ({ date, displayMonth, heatmapData, ...props }) => {
     const dayStr = format(date, 'yyyy-MM-dd');
     const dayData = heatmapData[dayStr];
     
-    let cellClassName = "hover:bg-accent/50 focus-visible:ring-1 focus-visible:ring-ring"; // Base hover/focus for clickable area
+    let cellClassName = ""; 
     let tooltipText = format(date, "PPP"); 
 
     if (date.getMonth() === displayMonth.getMonth()) { 
         if (dayData && dayData.totalTrackedHabits > 0) {
             const completionRatio = dayData.completedCount / dayData.totalTrackedHabits;
             if (completionRatio === 1) {
-                cellClassName = cn(cellClassName, "bg-primary text-primary-foreground hover:bg-primary/90");
+                cellClassName = "bg-primary text-primary-foreground hover:bg-primary/90";
                 tooltipText = `${dayData.completedCount}/${dayData.totalTrackedHabits} habits completed`;
             } else if (completionRatio > 0) {
-                cellClassName = cn(cellClassName, "bg-primary/60 text-primary-foreground hover:bg-primary/50");
+                cellClassName = "bg-primary/60 text-primary-foreground hover:bg-primary/50";
                 tooltipText = `${dayData.completedCount}/${dayData.totalTrackedHabits} habits completed`;
             } else { 
-                cellClassName = cn(cellClassName, "bg-muted/50 hover:bg-muted text-muted-foreground");
+                cellClassName = "bg-muted/50 hover:bg-muted text-muted-foreground";
                 tooltipText = `0/${dayData.totalTrackedHabits} habits completed`;
             }
         } else if (dayData && dayData.totalTrackedHabits === 0) {
              tooltipText = "No habits tracked on this day";
         }
-    } else {
-        cellClassName = cn(cellClassName, "text-muted-foreground opacity-50"); 
     }
+    // Days outside current month will use default styling from props.className
 
     return (
         <TooltipProvider delayDuration={100}>
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <DayPickerPrimitive.Day date={date} displayMonth={displayMonth} className={cn(
-                        "h-9 w-9 p-0 font-normal rounded-md transition-colors relative", 
-                        cellClassName
-                    )} />
+                    <DayPickerPrimitive.Day
+                        {...props} // Spreads props like 'className' from DayPicker, 'onClick', 'onKeyDown', etc.
+                        date={date}
+                        displayMonth={displayMonth}
+                        // Merge base props.className with our heatmap styles and explicit rounding/transitions
+                        className={cn(props.className, "rounded-md transition-colors relative", cellClassName)} 
+                    />
                 </TooltipTrigger>
                 <TooltipContent side="top">
                     <p>{tooltipText}</p>
@@ -158,7 +161,7 @@ export default function MyHabitsPage() {
   
   const heatmapDataForMonth = useMemo(() => {
     const data: Record<string, { completedCount: number; totalTrackedHabits: number }> = {};
-    if (!user) return data; // Only calculate if user is present
+    if (!user) return data; // Ensure user is available
 
     const monthStart = startOfMonth(heatmapDisplayMonth);
     const monthEnd = endOfMonth(heatmapDisplayMonth);
@@ -167,15 +170,19 @@ export default function MyHabitsPage() {
     if (activeUserHabits.length === 0) return data;
 
     const userLogsForMonth = habitLogs.filter(log => {
+        if (log.userId !== user.uid) return false; // Ensure log belongs to current user
         try {
              const d = parseISO(log.date);
-             return log.userId === user.uid && d >= monthStart && d <= monthEnd;
-        } catch (e) { return false; }
+             return d >= monthStart && d <= monthEnd;
+        } catch (e) { 
+            console.warn("Could not parse log date:", log.date, e);
+            return false; 
+        }
     });
 
     for (let dayIndex = 0; dayIndex < getDaysInMonth(heatmapDisplayMonth); dayIndex++) {
-        const currentDate = setDateOnMonth(heatmapDisplayMonth, dayIndex + 1);
-        const currentDateStr = format(currentDate, 'yyyy-MM-dd');
+        const currentDateIter = setDateOnMonth(heatmapDisplayMonth, dayIndex + 1);
+        const currentDateStr = format(currentDateIter, 'yyyy-MM-dd');
 
         let completedOnDay = 0;
         let trackedOnDay = 0;
@@ -183,7 +190,14 @@ export default function MyHabitsPage() {
         activeUserHabits.forEach(habit => {
             try {
               const habitCreatedAt = parseISO(habit.createdAt);
-              if (habitCreatedAt <= currentDate) { 
+              // Normalize dates to avoid timezone issues in comparison, comparing only date parts
+              const habitCreationDayStart = startOfMonth(habitCreatedAt); // Not ideal, better to compare directly
+                                                                        // but ensures we only compare date part roughly
+              
+              const currentDayStart = startOfMonth(currentDateIter); // Not ideal as above
+
+              // A habit is trackable on currentDateIter if it was created on or before currentDateIter
+              if (habitCreatedAt.setHours(0,0,0,0) <= currentDateIter.setHours(0,0,0,0)) { 
                   trackedOnDay++;
                   const log = userLogsForMonth.find(l => l.habitId === habit.id && l.date === currentDateStr);
                   if (log?.completed) {
@@ -191,7 +205,7 @@ export default function MyHabitsPage() {
                   }
               }
             } catch (e) {
-              console.warn("Could not parse habit createdAt date:", habit.createdAt);
+              console.warn("Could not parse habit createdAt date:", habit.createdAt, e);
             }
         });
 
@@ -260,11 +274,11 @@ export default function MyHabitsPage() {
           </CardHeader>
           <CardContent className="p-3 flex flex-col items-center">
               <Calendar
-                  mode="single"
+                  mode="single" 
                   month={heatmapDisplayMonth}
                   onMonthChange={setHeatmapDisplayMonth}
                   components={{
-                      Day: (props) => <MemoizedCustomDay {...props} heatmapData={heatmapDataForMonth} />,
+                      Day: (dayProps) => <MemoizedCustomDay {...dayProps} heatmapData={heatmapDataForMonth} />,
                   }}
                   className="rounded-md border" 
                   selected={undefined} 
