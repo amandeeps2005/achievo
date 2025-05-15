@@ -5,7 +5,7 @@ import type { Goal } from '@/types';
 import { Pie, PieChart, ResponsiveContainer, Cell, Tooltip } from 'recharts';
 import { ChartConfig, ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
 import { BarChartBig } from 'lucide-react';
-import Link from 'next/link'; // Added Link import
+import Link from 'next/link'; 
 
 interface GoalProgressChartProps {
   goals: Goal[];
@@ -44,7 +44,7 @@ function IndividualGoalPieChart({ goal }: IndividualGoalPieChartProps) {
     <Link href={`/goal/${goal.id}`} passHref className="flex flex-col items-center group cursor-pointer">
       <ChartContainer
         config={chartConfig}
-        className="mx-auto aspect-[2/1] h-24 w-40 sm:h-28 sm:w-48 group-hover:opacity-80 transition-opacity" // Added group-hover effect
+        className="mx-auto aspect-[2/1] h-24 w-40 sm:h-28 sm:w-48 group-hover:opacity-80 transition-opacity"
       >
         <ResponsiveContainer width="100%" height="100%">
           <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }} accessibilityLayer>
@@ -67,8 +67,8 @@ function IndividualGoalPieChart({ goal }: IndividualGoalPieChartProps) {
               endAngle={0}
               outerRadius={typeof window !== 'undefined' && window.innerWidth < 640 ? 70 : 80} 
               innerRadius={typeof window !== 'undefined' && window.innerWidth < 640 ? 45 : 55} 
-              strokeWidth={2}
-              stroke="hsl(var(--background))"
+              strokeWidth={0} // Changed from 2 to 0
+              // stroke="hsl(var(--background))" // Stroke color is now irrelevant
               style={{ filter: 'url(#shadow)' }}
             >
               {data.map((entry, index) => (
