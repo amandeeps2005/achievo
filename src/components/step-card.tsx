@@ -31,16 +31,17 @@ export default function StepCard({ step, goalId, stepNumber }: StepCardProps) {
     if (!dateString) return '';
     try {
       const date = new Date(dateString);
+      // Adjust for timezone to display the date as it was intended, not shifted to UTC then to local
       const userTimezoneOffset = date.getTimezoneOffset() * 60000;
       return new Date(date.getTime() + userTimezoneOffset).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
     } catch (e) {
       console.warn("Invalid date string for formatting:", dateString, e);
-      return dateString;
+      return dateString; // return original if parsing fails
     }
   };
 
   return (
-    <Card className={`transition-all duration-300 rounded-xl border ${step.completed ? 'bg-green-800/40 border-green-600' : 'bg-card shadow-lg hover:shadow-xl border-border hover:border-primary/20'}`}>
+    <Card className={`transition-all duration-300 rounded-xl border ${step.completed ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-600' : 'bg-card shadow-lg hover:shadow-xl border-border hover:border-primary/20'}`}>
       <CardHeader className="flex flex-row items-start space-x-4 p-4">
         <Checkbox
           id={`step-${step.id}`}
@@ -51,7 +52,7 @@ export default function StepCard({ step, goalId, stepNumber }: StepCardProps) {
         />
         <div className="flex-1">
           <Label htmlFor={`step-${step.id}`} className="cursor-pointer">
-            <CardTitle className={`text-lg font-medium ${step.completed ? 'line-through text-green-400' : 'text-foreground'}`}>
+            <CardTitle className={`text-lg font-medium ${step.completed ? 'line-through text-green-600 dark:text-green-400' : 'text-foreground'}`}>
                {step.description}
             </CardTitle>
           </Label>
