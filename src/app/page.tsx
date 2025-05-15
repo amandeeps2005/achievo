@@ -51,9 +51,6 @@ const features = [
 export default function LandingPage() {
   const { user, loading: authLoading } = useAuth();
 
-  // No redirect here, landing page is always accessible
-  // Conditional rendering of buttons will handle logged-in state
-
   if (authLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-background">
@@ -150,9 +147,9 @@ export default function LandingPage() {
 
       {/* Call to Action Section */}
       {!user && (
-        <section className="py-20 md:py-28 bg-gradient-to-r from-[hsl(var(--primary-gradient-start))] to-[hsl(var(--primary-gradient-end))] text-primary-foreground">
+        <section className="py-20 md:py-28 bg-gradient-to-r from-[hsl(var(--primary-gradient-start))] to-[hsl(var(--primary-gradient-end))] text-white">
           <div className="container mx-auto px-6 text-center">
-            <Zap className="w-16 h-16 mx-auto mb-6" />
+            <Zap className="w-16 h-16 mx-auto mb-6" /> {/* Will inherit text-white */}
             <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Start Achieving?</h2>
             <p className="text-xl md:text-2xl mb-10 max-w-2xl mx-auto opacity-90">
               Join thousands of users who are transforming their ambitions into accomplishments with Achievo.
@@ -165,7 +162,6 @@ export default function LandingPage() {
           </div>
         </section>
       )}
-      {/* AppFooter is rendered globally by layout.tsx, no need to include it here explicitly */}
     </div>
   );
 }
