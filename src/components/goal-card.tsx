@@ -30,12 +30,14 @@ export default function GoalCard({ goal }: GoalCardProps) {
   return (
     <Card className="flex flex-col h-full shadow-xl hover:shadow-2xl transition-shadow duration-300 rounded-xl border border-border hover:border-primary/30">
       <CardHeader className="bg-muted/20">
-        <Link href={`/goal/${goal.id}`} passHref legacyBehavior>
-          <a className="cursor-pointer hover:underline" aria-label={`View goal: ${goal.title || goal.originalGoal}`}>
-            <CardTitle className="text-xl font-semibold text-primary truncate">
-              {goal.title || goal.originalGoal}
-            </CardTitle>
-          </a>
+        <Link 
+          href={`/goal/${goal.id}`} 
+          className="cursor-pointer hover:underline" 
+          aria-label={`View goal: ${goal.title || goal.originalGoal}`}
+        >
+          <CardTitle className="text-xl font-semibold text-primary truncate">
+            {goal.title || goal.originalGoal}
+          </CardTitle>
         </Link>
         <CardDescription className="flex items-center text-sm text-muted-foreground">
           <Tag className="w-4 h-4 mr-2" />
