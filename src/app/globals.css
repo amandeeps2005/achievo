@@ -9,7 +9,7 @@ body {
 
 @layer base {
   :root {
-    /* Dark Theme - Black Background */
+    /* Dark Theme Only - Black Background */
     --background: 0 0% 0%; /* Black */
     --foreground: 210 20% 90%; /* Light cool gray (off-white) */
 
@@ -19,51 +19,51 @@ body {
     --popover: 0 0% 7%; /* Very dark gray, for popovers */
     --popover-foreground: 210 20% 90%;
 
-    --primary: 180 100% 35%; /* Calm Teal */
+    --primary: 180 100% 25%; /* Calm Teal - adjusted for dark bg */
     --primary-foreground: 180 100% 95%; /* Very light teal for contrast on primary */
-    /* For gradients */
-    --primary-gradient-start: hsl(180 100% 35%);
-    --primary-gradient-end: hsl(180 100% 25%);
+    --primary-gradient-start: hsl(180 100% 25%);
+    --primary-gradient-end: hsl(180 100% 15%);
 
 
-    --secondary: 145 55% 42%; /* Seafoam Green */
+    --secondary: 145 55% 35%; /* Seafoam Green - adjusted for dark bg */
     --secondary-foreground: 145 30% 90%; /* Light Seafoam Green text */
 
     --muted: 0 0% 10%; /* Darker gray for muted elements */
     --muted-foreground: 210 15% 65%; /* Medium cool gray */
 
-    --accent: 28 100% 55%; /* Orange */
+    --accent: 28 100% 50%; /* Orange - adjusted for dark bg */
     --accent-foreground: 28 100% 10%; /* Very dark Orange for contrast */
-    /* For gradients */
-    --accent-gradient-start: hsl(28 100% 55%);
-    --accent-gradient-end: hsl(28 100% 45%);
+    --accent-gradient-start: hsl(28 100% 50%);
+    --accent-gradient-end: hsl(28 100% 40%);
 
 
-    --destructive: 0 70% 50%; 
+    --destructive: 0 70% 45%;  /* Adjusted for dark bg */
     --destructive-foreground: 0 0% 95%;
 
     --border: 0 0% 12%; /* Dark gray border */
     --input: 0 0% 5%; /* Very dark gray for inputs */
-    --ring: 180 100% 35%; /* Primary color (Teal) for rings */
+    --ring: 180 100% 30%; /* Primary color (Teal) for rings - slightly brighter */
 
-    --chart-1: 180 100% 35%; /* Primary (Teal) */
-    --chart-2: 28 100% 55%;  /* Accent (Orange) */
-    --chart-3: 145 50% 55%; /* Seafoam Green variation */
-    --chart-4: 220 50% 65%; /* Complementary Blue/Purple */
-    --chart-5: 50 70% 60%;  /* Yellow-Orange */
+    --chart-1: 180 100% 30%;
+    --chart-2: 28 100% 50%;
+    --chart-3: 145 50% 50%;
+    --chart-4: 220 50% 60%;
+    --chart-5: 50 70% 55%;
 
-    --radius: 0.75rem; /* Increased for a more modern feel, affects rounded-xl etc. */
+    --radius: 0.75rem;
 
-    /* Sidebar Variables */
-    --sidebar-background: hsl(0 0% 7%); /* Same as card */
-    --sidebar-foreground: hsl(210 20% 90%); /* Same as main foreground */
-    --sidebar-primary: hsl(180 100% 35%); /* Same as main primary */
-    --sidebar-primary-foreground: hsl(180 100% 95%); /* Same as main primary foreground */
-    --sidebar-accent: hsl(var(--accent)); /* Use main accent for sidebar active items */
-    --sidebar-accent-foreground: hsl(var(--accent-foreground)); /* Use main accent foreground */
-    --sidebar-border: hsl(0 0% 15%); /* Slightly lighter than main border */
-    --sidebar-ring: hsl(var(--primary)); /* Use main primary for rings */
+    /* Sidebar Dark Theme Variables */
+    --sidebar-background: hsl(0 0% 7%);
+    --sidebar-foreground: hsl(210 20% 90%);
+    --sidebar-primary: hsl(var(--primary));
+    --sidebar-primary-foreground: hsl(var(--primary-foreground));
+    --sidebar-accent: hsl(var(--accent));
+    --sidebar-accent-foreground: hsl(var(--accent-foreground));
+    --sidebar-border: hsl(0 0% 15%);
+    --sidebar-ring: hsl(var(--primary));
   }
+
+  /* Removed .dark selector as dark theme is the base */
 }
 
 @layer base {

@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { LogIn, UserPlus, LogOut, User, Target } from 'lucide-react';
+import { LogIn, UserPlus, LogOut, User, Target } from 'lucide-react'; // Removed Moon, Sun
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/auth-context';
 import LoadingSpinner from './loading-spinner';
@@ -18,12 +18,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SidebarTrigger } from '@/components/ui/sidebar';
+// Removed useTheme
 
 export default function AppHeader() {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout, loading: authLoading } = useAuth();
   const [mounted, setMounted] = useState(false);
+  // Removed theme state and setTheme
 
   useEffect(() => {
     setMounted(true);
@@ -50,17 +52,19 @@ export default function AppHeader() {
     return <User className="h-5 w-5 text-muted-foreground" />;
   };
 
+  // Removed toggleTheme function
+
   return (
     <header className="bg-card border-b border-border shadow-sm sticky top-0 z-50">
-      <div className="container mx-auto px-2 py-3 flex justify-between items-center"> {/* Changed px-4 to px-2 */}
+      <div className="container mx-auto px-2 py-3 flex justify-between items-center">
         <div className="flex items-center gap-2">
-          {!authLoading && user && <SidebarTrigger />}
+          {mounted && !authLoading && user && <SidebarTrigger />}
           <Link href="/" className="flex items-center gap-2 text-xl font-bold text-primary hover:opacity-80 transition-opacity">
             <Target className="w-7 h-7" />
             Achievo
           </Link>
         </div>
-        <nav className="flex items-center gap-2 sm:gap-3">
+        <nav className="flex items-center gap-1 sm:gap-2">
           {authLoading && mounted ? (
             <div className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground">
               <LoadingSpinner size={16} /> Authenticating...
@@ -124,6 +128,7 @@ export default function AppHeader() {
               )}
             </>
           ) : null }
+           {/* Removed theme toggle button */}
         </nav>
       </div>
     </header>

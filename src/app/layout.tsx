@@ -7,6 +7,7 @@ import { AuthProvider } from '@/context/auth-context';
 import { JournalProvider } from '@/context/journal-context';
 import { HabitProvider } from '@/context/habit-context';
 import AuthenticatedLayoutWrapper from '@/components/layout/authenticated-layout-wrapper';
+// ThemeProvider import removed
 
 
 const geistSans = Geist({
@@ -32,6 +33,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans flex flex-col min-h-screen`}>
+        {/* ThemeProvider is removed */}
           <AuthProvider>
             <GoalProvider>
               <JournalProvider>
@@ -43,6 +45,7 @@ export default function RootLayout({
               </JournalProvider>
             </GoalProvider>
           </AuthProvider>
+        {/* ThemeProvider is removed */}
       </body>
     </html>
   );
