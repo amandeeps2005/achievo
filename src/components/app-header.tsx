@@ -52,7 +52,7 @@ export default function AppHeader() {
 
   return (
     <header className="bg-card border-b border-border shadow-sm sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+      <div className="container mx-auto px-2 py-3 flex justify-between items-center"> {/* Changed px-4 to px-2 */}
         <div className="flex items-center gap-2">
           {!authLoading && user && <SidebarTrigger />}
           <Link href="/" className="flex items-center gap-2 text-xl font-bold text-primary hover:opacity-80 transition-opacity">
