@@ -8,7 +8,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from '@/components/ui/sidebar';
-import { Target, LayoutDashboard, CheckSquare, NotebookPen, Brain, User, LogOut, MessageSquareHeart } from 'lucide-react'; // Added MessageSquareHeart
+import { Target, LayoutDashboard, CheckSquare, NotebookPen, Brain, User, LogOut, MessageSquareHeart } from 'lucide-react';
 import { useAuth } from '@/context/auth-context';
 
 export function SidebarNavigation() {
@@ -35,11 +35,6 @@ export function SidebarNavigation() {
       <SidebarMenuItem>
         <SidebarMenuButton asChild isActive={isActive('/my-journal')} tooltip="My Journal">
           <Link href="/my-journal"><NotebookPen /> <span className="group-data-[collapsible=icon]:hidden">My Journal</span></Link>
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-      <SidebarMenuItem>
-        <SidebarMenuButton asChild isActive={isActive('/feedback')} tooltip="Feedback">
-          <Link href="/feedback"><MessageSquareHeart /> <span className="group-data-[collapsible=icon]:hidden">Feedback</span></Link>
         </SidebarMenuButton>
       </SidebarMenuItem>
       <SidebarMenuItem>
@@ -72,6 +67,11 @@ export function SidebarAccountMenu() {
         </SidebarMenuButton>
       </SidebarMenuItem>
       <SidebarMenuItem>
+        <SidebarMenuButton asChild isActive={isActive('/feedback')} tooltip="Feedback">
+          <Link href="/feedback"><MessageSquareHeart /> <span className="group-data-[collapsible=icon]:hidden">Feedback</span></Link>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+      <SidebarMenuItem>
         <SidebarMenuButton onClick={handleLogout} tooltip="Logout">
           <LogOut /> <span className="group-data-[collapsible=icon]:hidden">Logout</span>
         </SidebarMenuButton>
@@ -79,3 +79,4 @@ export function SidebarAccountMenu() {
     </SidebarMenu>
   );
 }
+
