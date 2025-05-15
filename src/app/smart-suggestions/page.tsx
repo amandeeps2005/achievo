@@ -11,13 +11,13 @@ import { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Label } from '@/components/ui/label'; // Not directly used but good to keep for Shadcn consistency
 import { Form, FormControl, FormField, FormItem, FormMessage, FormLabel } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel as RadixSelectLabel } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription as ShadcnCardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription as ShadcnCardDescription, CardFooter } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import LoadingSpinner from '@/components/loading-spinner';
-import { ArrowLeft, Brain, Lightbulb } from 'lucide-react';
+import { ArrowLeft, Brain, Lightbulb, Save } from 'lucide-react';
 
 import { useAuth } from '@/context/auth-context';
 import { useGoals } from '@/context/goal-context';
@@ -25,6 +25,7 @@ import type { Goal } from '@/types';
 import type { SmartSuggestionsOutput } from '@/ai/flows/smart-suggestions-flow';
 import { getSmartSuggestions, type GenerateSmartSuggestionsResult } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
+import { useJournal } from '@/context/journal-context'; // Import useJournal
 
 const GOAL_CATEGORIES = ["Fitness", "Learning", "Career", "Finance", "Hobby", "Other"];
 
@@ -38,6 +39,7 @@ type CustomGoalFormData = z.infer<typeof customGoalSchema>;
 export default function SmartSuggestionsPage() {
   const { user, loading: authLoading } = useAuth();
   const { goals, isLoading: goalsLoading } = useGoals();
+  const { addJournalEntry } = useJournal(); // Get addJournalEntry function
   const router = useRouter();
   const { toast } = useToast();
 
@@ -45,6 +47,7 @@ export default function SmartSuggestionsPage() {
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   const [suggestionsError, setSuggestionsError] = useState<string | null>(null);
   const [loadedFromGoalId, setLoadedFromGoalId] = useState<string | undefined>(undefined);
+  const [isSavingToJournal, setIsSavingToJournal] = useState(false); // State for saving to journal
 
 
   const form = useForm<CustomGoalFormData>({
@@ -99,6 +102,8 @@ export default function SmartSuggestionsPage() {
     if (goalId === "none") {
         form.reset({ customTitle: "", customCategory: "", customTimeframe: "" });
         setLoadedFromGoalId(undefined);
+        setSmartSuggestions(null); // Clear previous suggestions if any
+        setSuggestionsError(null);
     } else {
         const existingGoal = goals.find(g => g.id === goalId);
         if (existingGoal) {
@@ -108,16 +113,86 @@ export default function SmartSuggestionsPage() {
              customTimeframe: existingGoal.overallDeadline || existingGoal.timeline,
            });
            setLoadedFromGoalId(goalId);
+           setSmartSuggestions(null); // Clear previous suggestions
+           setSuggestionsError(null);
         }
     }
   };
 
-  const renderSuggestionsList = (title: string, items?: string[]) => {
-    // Filter out empty or whitespace-only strings from the items array
-    const validItems = items?.filter(item => typeof item === 'string' && item.trim() !== "");
+  const formatSuggestionsForJournal = (
+    suggestions: SmartSuggestionsOutput,
+    goalData: CustomGoalFormData
+  ): string => {
+    let content = `## Smart Suggestions for: ${goalData.customTitle}\n\n`;
+    content += `**Goal Category:** ${goalData.customCategory}\n`;
+    content += `**Timeframe:** ${goalData.customTimeframe}\n\n`;
+    content += "---\n\n";
+  
+    const formatList = (title: string, items?: string[]): string => {
+      const validItems = items?.filter(item => typeof item === 'string' && item.trim() !== "");
+      if (!validItems || validItems.length === 0) return "";
+      let listContent = `**${title}:**\n`;
+      validItems.forEach(item => {
+        listContent += `- ${item}\n`;
+      });
+      return listContent + "\n";
+    };
+  
+    content += formatList("Key Topics to Cover", suggestions.topicsToCover);
+    if (suggestions.dailyOrWeeklyTimeSuggestion && suggestions.dailyOrWeeklyTimeSuggestion.trim() !== "") {
+      content += `**Suggested Time Commitment:**\n${suggestions.dailyOrWeeklyTimeSuggestion}\n\n`;
+    }
+    content += formatList("Sample Projects/Activities", suggestions.sampleProjectsOrActivities);
+    content += formatList("Diet & Nutrition Tips", suggestions.dietAndNutritionTips);
+    content += formatList("Workout Routine Ideas", suggestions.workoutRoutineIdeas);
+    content += formatList("General Tips & Advice", suggestions.generalTips);
+  
+    return content.trim();
+  };
 
+  const handleSaveSuggestionsToJournal = async () => {
+    if (!smartSuggestions || !user) {
+        toast({
+            title: "Cannot Save",
+            description: "No suggestions to save or user not logged in.",
+            variant: "destructive",
+        });
+        return;
+    }
+    setIsSavingToJournal(true);
+    try {
+        const goalData = form.getValues();
+        const journalTitle = `Smart Suggestions for: ${goalData.customTitle.substring(0,50)}${goalData.customTitle.length > 50 ? '...' : ''}`;
+        const journalContent = formatSuggestionsForJournal(smartSuggestions, goalData);
+        
+        addJournalEntry({
+            title: journalTitle,
+            content: journalContent,
+            goalId: loadedFromGoalId, // Will be undefined if custom goal, which is correct
+        });
+
+        toast({
+            title: "Saved to Journal",
+            description: `Suggestions for "${goalData.customTitle.substring(0,30)}..." have been saved to your journal.`,
+        });
+
+    } catch (error) {
+        console.error("Error saving suggestions to journal:", error);
+        toast({
+            title: "Save Failed",
+            description: "Could not save suggestions to journal. Please try again.",
+            variant: "destructive",
+        });
+    } finally {
+        setIsSavingToJournal(false);
+    }
+  };
+
+
+  const renderSuggestionsList = (title: string, items?: string[]) => {
+    const validItems = items?.filter(item => typeof item === 'string' && item.trim() !== "");
     if (!validItems || validItems.length === 0) {
-      return null; // If no valid items, render nothing (not even the title)
+      return null; 
     }
 
     return (
@@ -134,13 +209,10 @@ export default function SmartSuggestionsPage() {
     if (!suggestions) return true;
     return Object.values(suggestions).every(value => {
       if (value === undefined || value === null) return true;
-      if (typeof value === 'string') return value.trim() === ""; // Check if string fields are empty
+      if (typeof value === 'string') return value.trim() === ""; 
       if (Array.isArray(value)) {
-        // Check if array fields are empty or contain only empty/whitespace strings
         return value.filter(item => typeof item === 'string' && item.trim() !== "").length === 0;
       }
-      // For any other type, if it's present, consider it not empty.
-      // Based on SmartSuggestionsOutputSchema, values are string or array of strings or undefined.
       return false; 
     });
   };
@@ -154,6 +226,8 @@ export default function SmartSuggestionsPage() {
       </div>
     );
   }
+
+  const noSuggestionsAvailable = allSuggestionsEmpty(smartSuggestions);
 
   return (
     <div className="space-y-8 py-8">
@@ -301,10 +375,23 @@ export default function SmartSuggestionsPage() {
                 {renderSuggestionsList("Diet & Nutrition Tips", smartSuggestions.dietAndNutritionTips)}
                 {renderSuggestionsList("Workout Routine Ideas", smartSuggestions.workoutRoutineIdeas)}
                 {renderSuggestionsList("General Tips & Advice", smartSuggestions.generalTips)}
-                 {allSuggestionsEmpty(smartSuggestions) && (
+                 {noSuggestionsAvailable && (
                     <p className="text-muted-foreground">No specific suggestions were generated for this goal type. Try rephrasing or providing more detail.</p>
                 )}
               </CardContent>
+              {!noSuggestionsAvailable && (
+                <CardFooter className="p-4 border-t border-border">
+                    <Button 
+                        onClick={handleSaveSuggestionsToJournal} 
+                        disabled={isSavingToJournal}
+                        className="w-full sm:w-auto"
+                        variant="outline"
+                    >
+                        {isSavingToJournal ? <LoadingSpinner className="mr-2" /> : <Save className="mr-2 h-4 w-4" />}
+                        {isSavingToJournal ? 'Saving to Journal...' : 'Save as Journal Entry'}
+                    </Button>
+                </CardFooter>
+              )}
             </Card>
           )}
            {!isLoadingSuggestions && !smartSuggestions && !suggestionsError && (
