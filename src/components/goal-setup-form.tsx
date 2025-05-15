@@ -15,7 +15,7 @@ import { generateGoalPlan, type GenerateGoalPlanResult } from '@/app/actions';
 import type { GoalDecompositionOutput } from '@/ai/flows/goal-decomposition';
 import { useGoals } from '@/context/goal-context';
 import type { Goal, StepUi } from '@/types';
-import { Info, ListChecks, CalendarDays, Wrench, CheckCircle, Lightbulb, Sparkles } from 'lucide-react';
+import { Info, ListChecks, CalendarDays, Wrench, CheckCircle, Lightbulb, Sparkles, CalendarClock } from 'lucide-react';
 import LoadingSpinner from '@/components/loading-spinner';
 import { useAuth } from '@/context/auth-context';
 import { redirect } from 'next/navigation';
@@ -45,7 +45,7 @@ export default function GoalSetupForm() {
     if (!authLoading && !user) {
       redirect('/'); 
     }
-  }, [user, authLoading]);
+  }, [user, authLoading, router]);
 
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
@@ -154,7 +154,7 @@ export default function GoalSetupForm() {
             {!generatedPlan && (
               <Button 
                 type="submit" 
-                className="w-full bg-gradient-to-r from-primary to-[hsl(var(--primary-gradient-end))] hover:from-primary/90 hover:to-[hsl(var(--primary-gradient-end)/0.9)] text-primary-foreground py-3 text-base font-semibold rounded-lg shadow-md hover:shadow-primary/30 transform hover:scale-[1.02] transition-all duration-300" 
+                className="w-full bg-gradient-to-r from-primary to-[hsl(180,100%,15%)] hover:from-primary/90 hover:to-[hsl(180,100%,15%)/0.9)] text-primary-foreground py-3 text-base font-semibold rounded-lg shadow-md hover:shadow-primary/30 transform hover:scale-[1.02] transition-all duration-300" 
                 disabled={isGeneratingPlan || isSavingGoal}
               >
                 {isGeneratingPlan ? <LoadingSpinner className="mr-2" /> : <Lightbulb className="mr-2 h-5 w-5" />}
@@ -191,7 +191,7 @@ export default function GoalSetupForm() {
               </div>
                {generatedPlan.overallDeadline && (
                 <div className="flex items-start">
-                  <CalendarDays className="inline mr-2 h-4 w-4 text-accent mt-1 flex-shrink-0" />
+                  <CalendarClock className="inline mr-2 h-4 w-4 text-accent mt-1 flex-shrink-0" />
                   <p><strong className="text-foreground">Overall Deadline:</strong> <span className="text-muted-foreground">{generatedPlan.overallDeadline}</span></p>
                 </div>
               )}
@@ -242,7 +242,7 @@ export default function GoalSetupForm() {
             </Button>
             <Button 
               onClick={handleSaveGoal} 
-              className="w-full sm:w-auto bg-gradient-to-r from-accent to-[hsl(var(--accent-gradient-end))] hover:from-accent/90 hover:to-[hsl(var(--accent-gradient-end)/0.9)] text-accent-foreground py-3 text-base font-semibold rounded-lg shadow-md hover:shadow-accent/30 transform hover:scale-[1.02] transition-all duration-300" 
+              className="w-full sm:w-auto bg-accent hover:bg-accent/90 text-accent-foreground py-3 text-base font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-[1.02] transition-all duration-300" 
               disabled={isSavingGoal}
             >
              {isSavingGoal ? <LoadingSpinner className="mr-2" /> :  <CheckCircle className="mr-2 h-5 w-5" />}
